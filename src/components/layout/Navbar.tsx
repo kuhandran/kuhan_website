@@ -1,7 +1,11 @@
+// ============================================
+// FILE: src/components/layout/Navbar.tsx
+// ============================================
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from '../elements/Button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Download } from 'lucide-react';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,6 +16,15 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isMobileMenuOpen]);
   
   const navLinks = [
     { name: 'About', href: '#about' },
@@ -27,66 +40,149 @@ export const Navbar = () => {
     element?.scrollIntoView({ behavior: 'smooth' });
   };
   
+  const handleDownloadResume = () => {
+    // Replace with your actual resume URL
+    window.open('/resume/resume.pdf', '_blank');
+  };
+  
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-4' : 'bg-transparent py-6'
-    }`}>
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <a href="#" className="text-2xl font-bold text-slate-900">
-            KS<span className="text-blue-500">.</span>
-          </a>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white/95 backdrop-blur-lg shadow-lg py-3' 
+          : 'bg-white/80 backdrop-blur-md py-4'
+      }`}>
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <button 
+              onClick={() => handleNavClick('#')}
+              className="text-2xl md:text-3xl font-bold text-slate-900 hover:text-blue-600 transition-colors z-50"
+            >
+              <span className="inline-block hover:scale-110 transition-transform">
+                KS<span className="text-blue-500">.</span>
+              </span>
+            </button>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              {navLinks.map((link) => (
+                <button
+                  key={link.name}
+                  onClick={() => handleNavClick(link.href)}
+                  className="relative text-slate-600 hover:text-blue-600 font-medium transition-colors group"
+                >
+                  {link.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full" />
+                </button>
+              ))}
+            </div>
+            
+            {/* CTA Button - Desktop */}
+            <div className="hidden md:block">
+              <Button 
+                variant="primary" 
+                size="sm"
+                onClick={handleDownloadResume}
+                className="group"
+              >
+                <Download size={16} className="mr-2 group-hover:animate-bounce" />
+                Download Resume
+              </Button>
+            </div>
+            
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden text-slate-900 z-50 p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? (
+                <X size={28} className="text-slate-900" />
+              ) : (
+                <Menu size={28} />
+              )}
+            </button>
+          </div>
+        </div>
+      </nav>
+      
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ${
+          isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      
+      {/* Mobile Menu */}
+      <div 
+        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-40 md:hidden transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-full pt-24 pb-8 px-6">
+          {/* Mobile Navigation Links */}
+          <div className="flex flex-col gap-2 mb-8">
+            {navLinks.map((link, index) => (
               <button
                 key={link.name}
                 onClick={() => handleNavClick(link.href)}
-                className="text-slate-600 hover:text-blue-600 font-medium transition-colors"
+                className="text-left text-slate-700 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all transform hover:translate-x-2"
+                style={{ 
+                  animation: isMobileMenuOpen ? `slideInRight 0.3s ease-out ${index * 0.1}s both` : 'none'
+                }}
               >
                 {link.name}
               </button>
             ))}
           </div>
           
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Button variant="primary" size="sm">
+          {/* Mobile CTA Button */}
+          <div className="mt-auto">
+            <Button 
+              variant="primary" 
+              size="md" 
+              className="w-full group"
+              onClick={handleDownloadResume}
+            >
+              <Download size={18} className="mr-2 group-hover:animate-bounce" />
               Download Resume
             </Button>
-          </div>
-          
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-slate-900"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-        
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4">
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <button
-                  key={link.name}
-                  onClick={() => handleNavClick(link.href)}
-                  className="text-slate-600 hover:text-blue-600 font-medium text-left"
-                >
-                  {link.name}
-                </button>
-              ))}
-              <Button variant="primary" size="sm" className="w-full">
-                Download Resume
-              </Button>
+            
+            {/* Contact Info */}
+            <div className="mt-6 pt-6 border-t border-slate-200">
+              <p className="text-sm text-slate-500 mb-2">Get in touch</p>
+              <a 
+                href="mailto:skuhandran@yahoo.com"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium block mb-2"
+              >
+                skuhandran@yahoo.com
+              </a>
+              <a 
+                href="tel:+60149337280"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium block"
+              >
+                +60 14 933 7280
+              </a>
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </nav>
+      
+      {/* Add keyframe animation for mobile menu items */}
+      <style jsx>{`
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+    </>
   );
 };
