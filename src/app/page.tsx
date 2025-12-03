@@ -8,6 +8,7 @@ import { Projects } from '../components/sections/Projects';
 import { Achievements } from '../components/sections/Achievements';
 import { Education } from '../components/sections/Education';
 import { Contact } from '../components/sections/Contact';
+import { Chatbot } from '../components/sections/Chatbot';
 
 export default function Home() {
   return (
@@ -21,6 +22,7 @@ export default function Home() {
       <Achievements />
       <Education />
       <Contact />
+      <Chatbot />
       <Footer />
     </main>
   );

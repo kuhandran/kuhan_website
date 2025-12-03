@@ -11,7 +11,7 @@ export const experienceData = [
       'Applied agile methodologies to optimize workflows and adapt to project demands'
     ],
     techStack: ['React Native', 'Agile', 'Project Management', 'Cross-functional Teams'],
-    logo: '/api/placeholder/48/48'
+    logo: 'image/fwd-logo.png'
   },
   {
     title: 'Senior Software Engineer',
@@ -25,7 +25,7 @@ export const experienceData = [
       'Designed and implemented RESTful APIs, improving application functionalities'
     ],
     techStack: ['React.js', 'Redux', 'RESTful APIs', 'React Hooks', 'Git'],
-    logo: '/api/placeholder/48/48'
+    logo: 'image/maybank-logo.png'
   },
   {
     title: 'Software Engineer',
@@ -39,7 +39,7 @@ export const experienceData = [
       'Collaborated remotely using Agile methodologies with global teams'
     ],
     techStack: ['React', 'Redux', 'Axios', 'SPA Architecture', 'Agile'],
-    logo: '/api/placeholder/48/48'
+    logo: 'image/maybank-logo.png'
   },
   {
     title: 'UI/UX Developer',
@@ -53,7 +53,7 @@ export const experienceData = [
       'Enhanced project modularity through component-based architecture'
     ],
     techStack: ['React', 'Redux', 'UI/UX Design', 'Component Architecture'],
-    logo: '/api/placeholder/48/48'
+    logo: 'image/maybank-logo.png'
   },
   {
     title: 'Junior Developer',
@@ -67,6 +67,6 @@ export const experienceData = [
       'Supported API integration for insurance renewal and purchases'
     ],
     techStack: ['Java', 'API Integration', 'Security', 'SDLC'],
-    logo: '/api/placeholder/48/48'
+    logo: 'image/maybank-logo.png'
   }
 ];
