@@ -173,13 +173,28 @@ export function Chatbot() {
       sender: 'bot',
       timestamp: new Date()
     };
-    setMessages(prev => [...prev, botMessage]);
+            resetToEmail();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  // Helper to reset all session, token, email, otp and go to email entry
+  const resetToEmail = (msg?: string) => {
+    setJwt(null);
+    setSessionId(null);
+    setEmail('');
+    setOtp('');
+    setStep('email');
+    setStatusMsg(msg || 'Session reset due to inactivity. Please enter your email to start again.');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('chatbot_jwt');
+      localStorage.removeItem('chatbot_session_id');
+      localStorage.removeItem('chatbot_email');
     }
   };
 
