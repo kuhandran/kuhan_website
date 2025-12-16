@@ -1,8 +1,6 @@
-// ============================================
-// FILE: src/components/common/Chatbot.tsx
-// ============================================
 
 'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
@@ -28,6 +26,7 @@ export function Chatbot() {
     }
   ]);
   const [inputValue, setInputValue] = useState<string>('');
+  const [inactivitySeconds, setInactivitySeconds] = useState<number>(300);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [otp, setOtp] = useState<string>('');
@@ -50,6 +49,51 @@ export function Chatbot() {
     setSessionId(null);
     setEmail('');
     setStep('email');
+  // Helper to reset to email entry
+  function resetToEmail(msg?: string) {
+    setJwt(null);
+    setSessionId(null);
+    setEmail('');
+    setOtp('');
+    setStep('email');
+    setStatusMsg(msg || null);
+    setMessages([
+      {
+        id: '1',
+        text: "Hi! I'm Kuhandran's AI assistant. Ask me anything about his experience, skills, or projects!",
+        sender: 'bot',
+        timestamp: new Date()
+      }
+    ]);
+    setInactivitySeconds(300);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('chatbot_jwt');
+      localStorage.removeItem('chatbot_session_id');
+      localStorage.removeItem('chatbot_email');
+    }
+  }
+
+  // Helper to reset to OTP entry
+  function resetToOtp(msg?: string) {
+    setJwt(null);
+    setSessionId(null);
+    setOtp('');
+    setStep('otp');
+    setStatusMsg(msg || null);
+    setInactivitySeconds(300);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('chatbot_jwt');
+      localStorage.removeItem('chatbot_session_id');
+    }
+  }
+
+  // Patch handleSendMessage to reset inactivity timer
+  const originalHandleSendMessage = handleSendMessage;
+  const handleSendMessageWithTimer = async (...args: any[]) => {
+    setInactivitySeconds(300);
+    // @ts-ignore
+    return originalHandleSendMessage.apply(this, args);
+  };
     if (typeof window !== 'undefined') {
       localStorage.removeItem('chatbot_jwt');
       localStorage.removeItem('chatbot_session_id');
@@ -127,7 +171,7 @@ export function Chatbot() {
       sender: 'user',
       timestamp: new Date()
     };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev: Message[]) => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
 
@@ -304,7 +348,7 @@ export function Chatbot() {
           {step === 'chat' && <>
           {/* Messages Container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-            {messages.map((message) => (
+            {messages.map((message: Message) => (
               <div
                 key={message.id}
                 className={`flex gap-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -352,48 +396,52 @@ export function Chatbot() {
             )}
             <div ref={messagesEndRef} />
           </div>
-          {/* Input Area */}
-          <div className="p-4 bg-white border-t border-slate-200 rounded-b-2xl">
-            <div className="flex gap-2">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
-                disabled={isTyping}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputValue.trim() || isTyping}
-                className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95"
-                aria-label="Send message"
-              >
-                {isTyping ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Send className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-2 mt-3">
-              {['Experience', 'Skills', 'Projects', 'Contact'].map((action) => (
-                <button
-                  key={action}
-                  onClick={() => {
-                    setInputValue(action);
-                    setTimeout(() => handleSendMessage(), 100);
-                  }}
-                  className="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full transition-colors"
-                >
-                  {action}
-                </button>
-              ))}
-            </div>
-          </div>
+           {/* Input Area */}
+           <div className="p-4 bg-white border-t border-slate-200 rounded-b-2xl">
+             {/* Inactivity Timer Display */}
+             <div className="mb-2 text-center text-xs text-slate-500 font-semibold">
+               {`Session will expire in ${Math.floor(inactivitySeconds / 60)}:${(inactivitySeconds % 60).toString().padStart(2, '0')}`}
+             </div>
+             <div className="flex gap-2">
+               <input
+                 ref={inputRef}
+                 type="text"
+                 value={inputValue}
+                 onChange={(e) => setInputValue(e.target.value)}
+                 onKeyPress={handleKeyPress}
+                 placeholder="Type your message..."
+                 className="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+                 disabled={isTyping}
+               />
+               <button
+                 onClick={handleSendMessage}
+                 disabled={!inputValue.trim() || isTyping}
+                 className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95"
+                 aria-label="Send message"
+               >
+                 {isTyping ? (
+                   <Loader2 className="w-5 h-5 animate-spin" />
+                 ) : (
+                   <Send className="w-5 h-5" />
+                 )}
+               </button>
+             </div>
+             {/* Quick Actions */}
+             <div className="flex flex-wrap gap-2 mt-3">
+               {['Experience', 'Skills', 'Projects', 'Contact'].map((action) => (
+                 <button
+                   key={action}
+                   onClick={() => {
+                     setInputValue(action);
+                     setTimeout(() => handleSendMessage(), 100);
+                   }}
+                   className="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full transition-colors"
+                 >
+                   {action}
+                 </button>
+               ))}
+             </div>
+           </div>
           </>}
         </div>
       )}
@@ -450,5 +498,4 @@ export function Chatbot() {
     }
     setLoading(false);
   }
-
 }
