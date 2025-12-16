@@ -2,12 +2,17 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import ReCAPTCHA from 'react-google-recaptcha';
-import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
+import EmailCaptcha from './EmailCaptcha';
+import OtpEntry from './OtpEntry';
+import ChatProcess from './ChatProcess';
+import type { ChatbotStep } from './ChatbotState';
+import { resetToEmail, resetToOtp } from './chatbotHelpers';
+import { MessageCircle, X, Bot } from 'lucide-react';
 
 
 export function Chatbot() {
-  // Message type
+
+  // Message type for chat messages
   interface Message {
     id: string;
     text: string;
@@ -15,8 +20,8 @@ export function Chatbot() {
     timestamp: Date;
   }
 
-  // State and refs
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  // State and refs for chatbot session, input, and timers
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -25,16 +30,16 @@ export function Chatbot() {
       timestamp: new Date()
     }
   ]);
-  const [inputValue, setInputValue] = useState<string>('');
-  const [inactivitySeconds, setInactivitySeconds] = useState<number>(300);
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>('');
-  const [otp, setOtp] = useState<string>('');
+  const [inputValue, setInputValue] = useState('');
+  const [inactivitySeconds, setInactivitySeconds] = useState(300);
+  const [isTyping, setIsTyping] = useState(false);
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
   const [jwt, setJwt] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [step, setStep] = useState<'email' | 'otp' | 'chat'>('email');
+  const [step, setStep] = useState<ChatbotStep>('email');
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -43,65 +48,42 @@ export function Chatbot() {
   const inactivityTimeoutRef = useRef<number | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
 
-  // Try to restore jwt/sessionId/email from localStorage on mount
+  // Countdown effect for inactivity timer (visible timer)
+  // Resets inactivitySeconds if not in chat, or decrements every second
+  useEffect(() => {
+    if (step !== 'chat') {
+      setInactivitySeconds(300);
+      return;
+    }
+    if (inactivitySeconds <= 0) {
+      resetToOtp(
+        setJwt,
+        setSessionId,
+        setOtp,
+        setStep,
+        setStatusMsg,
+        setInactivitySeconds
+      );
+      return;
+    }
+    const interval = setInterval(() => {
+      setInactivitySeconds((s: number) => s - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [step, inactivitySeconds]);
+  // (State, refs, and interface declarations are only at the top of the file now)
+
+  // On mount, reset all session state to initial values
   useEffect(() => {
     setJwt(null);
     setSessionId(null);
     setEmail('');
     setStep('email');
-  // Helper to reset to email entry
-  function resetToEmail(msg?: string) {
-    setJwt(null);
-    setSessionId(null);
-    setEmail('');
-    setOtp('');
-    setStep('email');
-    setStatusMsg(msg || null);
-    setMessages([
-      {
-        id: '1',
-        text: "Hi! I'm Kuhandran's AI assistant. Ask me anything about his experience, skills, or projects!",
-        sender: 'bot',
-        timestamp: new Date()
-      }
-    ]);
-    setInactivitySeconds(300);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('chatbot_jwt');
-      localStorage.removeItem('chatbot_session_id');
-      localStorage.removeItem('chatbot_email');
-    }
-  }
 
-  // Helper to reset to OTP entry
-  function resetToOtp(msg?: string) {
-    setJwt(null);
-    setSessionId(null);
-    setOtp('');
-    setStep('otp');
-    setStatusMsg(msg || null);
-    setInactivitySeconds(300);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('chatbot_jwt');
-      localStorage.removeItem('chatbot_session_id');
-    }
-  }
-
-  // Patch handleSendMessage to reset inactivity timer
-  const originalHandleSendMessage = handleSendMessage;
-  const handleSendMessageWithTimer = async (...args: any[]) => {
-    setInactivitySeconds(300);
-    // @ts-ignore
-    return originalHandleSendMessage.apply(this, args);
-  };
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('chatbot_jwt');
-      localStorage.removeItem('chatbot_session_id');
-      localStorage.removeItem('chatbot_email');
-    }
+  // (handleSendMessageWithTimer logic removed as it's not used)
   }, []);
 
-  // Save jwt/sessionId/email to localStorage
+  // Persist jwt/sessionId/email to localStorage when changed
   useEffect(() => {
     if (jwt && sessionId && email) {
       localStorage.setItem('chatbot_jwt', jwt);
@@ -110,14 +92,21 @@ export function Chatbot() {
     }
   }, [jwt, sessionId, email]);
 
-  // Idle timeout: reset if no typing or interaction for 30s
+  // Idle timeout: reset if no typing or interaction for 5min
   useEffect(() => {
     if (step !== 'chat') return;
     const resetIdle = () => {
       if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
       idleTimeoutRef.current = window.setTimeout(() => {
-        resetToOtp();
-      }, 30000); // 30s
+        resetToOtp(
+          setJwt,
+          setSessionId,
+          setOtp,
+          setStep,
+          setStatusMsg,
+          setInactivitySeconds
+        );
+      }, 300000); // 5min
     };
     const handleUserActivity = () => {
       lastActivityRef.current = Date.now();
@@ -138,27 +127,22 @@ export function Chatbot() {
     if (step !== 'chat') return;
     if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
     inactivityTimeoutRef.current = window.setTimeout(() => {
-      resetToOtp();
+      resetToOtp(
+        setJwt,
+        setSessionId,
+        setOtp,
+        setStep,
+        setStatusMsg,
+        setInactivitySeconds
+      );
     }, 5 * 60 * 1000); // 5min
     return () => {
       if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
     };
   }, [messages, step]);
 
-  // Helper to reset session to OTP step
-  const resetToOtp = () => {
-    setJwt(null);
-    setSessionId(null);
-    setStep('otp');
-    setStatusMsg('Session reset due to inactivity. Please re-enter the OTP sent to your email.');
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('chatbot_jwt');
-      localStorage.removeItem('chatbot_session_id');
-      localStorage.removeItem('chatbot_email');
-    }
-  };
 
-  // Send message handler
+  // Send message handler: sends user message, calls backend, handles bot response and session expiry
   const handleSendMessage = async () => {
     // Reset inactivity timer on send
     if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
@@ -192,11 +176,15 @@ export function Chatbot() {
         const data = await response.json();
         if (data.detail === 'Token expired') {
           // Clear session and reset to OTP screen
-          setJwt(null);
-          setSessionId(null);
-          localStorage.removeItem('chatbot_jwt');
-          localStorage.removeItem('chatbot_session_id');
-          setStep('otp');
+          resetToOtp(
+            setJwt,
+            setSessionId,
+            setOtp,
+            setStep,
+            setStatusMsg,
+            setInactivitySeconds,
+            'Your session has expired. Please re-enter the OTP sent to your email.'
+          );
           botResponse = 'Your session has expired. Please re-enter the OTP sent to your email.';
         } else if (data.answer) {
           botResponse = data.answer;
@@ -217,9 +205,20 @@ export function Chatbot() {
       sender: 'bot',
       timestamp: new Date()
     };
-            resetToEmail();
+            resetToEmail(
+              setJwt,
+              setSessionId,
+              setEmail,
+              setOtp,
+              setStep,
+              setStatusMsg,
+              setMessages,
+              setInactivitySeconds,
+              undefined
+            );
   };
 
+  // Handle Enter key to send message
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -228,19 +227,6 @@ export function Chatbot() {
   };
 
   // Helper to reset all session, token, email, otp and go to email entry
-  const resetToEmail = (msg?: string) => {
-    setJwt(null);
-    setSessionId(null);
-    setEmail('');
-    setOtp('');
-    setStep('email');
-    setStatusMsg(msg || 'Session reset due to inactivity. Please enter your email to start again.');
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('chatbot_jwt');
-      localStorage.removeItem('chatbot_session_id');
-      localStorage.removeItem('chatbot_email');
-    }
-  };
 
   return (
     <>
@@ -286,62 +272,44 @@ export function Chatbot() {
             </button>
           </div>
 
-          {/* Email/OTP Step */}
-          {step !== 'chat' && (
-            <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50">
-              {step === 'email' && (
-                <>
-                  <label className="block mb-2 text-sm font-medium text-slate-700">Enter your email to start chat</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3 text-black"
-                    placeholder="you@email.com"
-                    disabled={loading}
-                  />
-                  <div className="mb-3 flex justify-center">
-                    <ReCAPTCHA
-                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
-                      onChange={(token: string | null) => setCaptchaToken(token)}
-                    />
-                  </div>
-                  <button
-                    onClick={handleRequestOtp}
-                    disabled={!email || !captchaToken || loading}
-                    className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    {loading ? 'Sending OTP...' : 'Request OTP'}
-                  </button>
-                </>
-              )}
-              {step === 'otp' && (
-                <>
-                  <label className="block mb-2 text-sm font-medium text-slate-700">Enter the OTP sent to your email</label>
-                  <input
-                    type="text"
-                    value={otp}
-                    onChange={e => setOtp(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3 text-black"
-                    placeholder="6-digit OTP"
-                    disabled={loading}
-                  />
-                  <button
-                    onClick={handleVerifyOtp}
-                    disabled={!otp || loading}
-                    className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    {loading ? 'Verifying...' : 'Verify OTP'}
-                  </button>
-                  <button
-                    onClick={() => setStep('email')}
-                    className="mt-2 text-xs text-blue-600 hover:underline"
-                    disabled={loading}
-                  >Change email</button>
-                </>
-              )}
-              {statusMsg && <div className="mt-4 text-sm text-center text-slate-600">{statusMsg}</div>}
-            </div>
+          {/* Step-based component rendering */}
+          {step === 'email' && (
+            <EmailCaptcha
+              email={email}
+              setEmail={setEmail}
+              captchaToken={captchaToken}
+              setCaptchaToken={setCaptchaToken}
+              loading={loading}
+              onRequestOtp={handleRequestOtp}
+            />
+          )}
+          {step === 'otp' && (
+            <OtpEntry
+              otp={otp}
+              setOtp={setOtp}
+              loading={loading}
+              statusMsg={statusMsg}
+              onVerifyOtp={handleVerifyOtp}
+              onChangeEmail={() => setStep('email')}
+            />
+          )}
+          {step === 'chat' && (
+            <ChatProcess
+              messages={messages}
+              inactivitySeconds={inactivitySeconds}
+              isTyping={isTyping}
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              inputRef={inputRef as React.RefObject<HTMLInputElement>}
+              messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
+              handleSendMessage={handleSendMessage}
+              handleKeyPress={handleKeyPress}
+              quickActions={['Experience', 'Skills', 'Projects', 'Contact']}
+              setQuickAction={(action) => {
+                setInputValue(action);
+                setTimeout(() => handleSendMessage(), 100);
+              }}
+            />
           )}
 
           {/* Chat Step */}
@@ -372,11 +340,7 @@ export function Chatbot() {
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-                {message.sender === 'user' && (
-                  <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-slate-600" />
-                  </div>
-                )}
+                {/* User avatar handled in ChatProcess subcomponent */}
               </div>
             ))}
             {/* Typing Indicator */}
@@ -419,11 +383,7 @@ export function Chatbot() {
                  className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95"
                  aria-label="Send message"
                >
-                 {isTyping ? (
-                   <Loader2 className="w-5 h-5 animate-spin" />
-                 ) : (
-                   <Send className="w-5 h-5" />
-                 )}
+                 {/* Loader2 and Send icons handled in ChatProcess subcomponent */}
                </button>
              </div>
              {/* Quick Actions */}
@@ -447,7 +407,7 @@ export function Chatbot() {
       )}
     </>
   );
-  // OTP request handler
+  // OTP request handler: requests OTP from backend
   async function handleRequestOtp() {
     setStatusMsg(null);
     if (!captchaToken) {
@@ -474,7 +434,7 @@ export function Chatbot() {
     setLoading(false);
   }
 
-  // OTP verify handler
+  // OTP verify handler: verifies OTP and transitions to chat step
   async function handleVerifyOtp() {
     setStatusMsg(null);
     setLoading(true);
