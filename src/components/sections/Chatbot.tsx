@@ -205,17 +205,8 @@ export function Chatbot() {
       sender: 'bot',
       timestamp: new Date()
     };
-            resetToEmail(
-              setJwt,
-              setSessionId,
-              setEmail,
-              setOtp,
-              setStep,
-              setStatusMsg,
-              setMessages,
-              setInactivitySeconds,
-              undefined
-            );
+    setMessages((prev: Message[]) => [...prev, botMessage]);
+    // Only reset to email or OTP if session expired or inactivity, not after every message
   };
 
   // Handle Enter key to send message
