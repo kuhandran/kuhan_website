@@ -22,14 +22,7 @@ export function Chatbot() {
 
   // State and refs for chatbot session, input, and timers
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hi! I'm Kuhandran's AI assistant. Ask me anything about his experience, skills, or projects!",
-      sender: 'bot',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [inactivitySeconds, setInactivitySeconds] = useState(300);
   const [isTyping, setIsTyping] = useState(false);
@@ -114,10 +107,17 @@ export function Chatbot() {
     };
     document.addEventListener('keydown', handleUserActivity);
     document.addEventListener('mousedown', handleUserActivity);
+    const chatWindow = document.querySelector('.fixed.bottom-24.right-6');
+    if (chatWindow) {
+      chatWindow.addEventListener('scroll', handleUserActivity);
+    }
     resetIdle();
     return () => {
       document.removeEventListener('keydown', handleUserActivity);
       document.removeEventListener('mousedown', handleUserActivity);
+      if (chatWindow) {
+        chatWindow.removeEventListener('scroll', handleUserActivity);
+      }
       if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
     };
   }, [step]);
