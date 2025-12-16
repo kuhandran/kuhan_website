@@ -7,15 +7,18 @@ import { useState, useRef, useEffect } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
 
 export function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
+  // Message type
+  interface Message {
+    id: string;
+    text: string;
+    sender: 'user' | 'bot';
+    timestamp: Date;
+  }
+
+  // State and refs
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -24,30 +27,33 @@ export function Chatbot() {
       timestamp: new Date()
     }
   ]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
+  const [inputValue, setInputValue] = useState<string>('');
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>('');
+  const [otp, setOtp] = useState<string>('');
   const [jwt, setJwt] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [step, setStep] = useState<'email' | 'otp' | 'chat'>('email');
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  // Timers: use number | null for browser
+  const idleTimeoutRef = useRef<number | null>(null);
+  const inactivityTimeoutRef = useRef<number | null>(null);
+  const lastActivityRef = useRef<number>(Date.now());
+
   // Try to restore jwt/sessionId/email from localStorage on mount
   useEffect(() => {
+    setJwt(null);
+    setSessionId(null);
+    setEmail('');
+    setStep('email');
     if (typeof window !== 'undefined') {
-      const savedJwt = localStorage.getItem('chatbot_jwt');
-      const savedSessionId = localStorage.getItem('chatbot_session_id');
-      const savedEmail = localStorage.getItem('chatbot_email');
-      if (savedJwt && savedSessionId && savedEmail) {
-        setJwt(savedJwt);
-        setSessionId(savedSessionId);
-        setEmail(savedEmail);
-        setStep('chat');
-      }
+      localStorage.removeItem('chatbot_jwt');
+      localStorage.removeItem('chatbot_session_id');
+      localStorage.removeItem('chatbot_email');
     }
   }, []);
 
@@ -59,108 +65,59 @@ export function Chatbot() {
       localStorage.setItem('chatbot_email', email);
     }
   }, [jwt, sessionId, email]);
-  // Request OTP
-  const handleRequestOtp = async () => {
-    setStatusMsg(null);
-    if (!captchaToken) {
-      setStatusMsg('Please complete the captcha.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch('https://resume-chatbot-services-v2-0.onrender.com/auth/request-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, recaptchaToken: captchaToken })
-      });
-      const data = await res.json();
-      if (data.otp_generated) {
-        setStep('otp');
-        setStatusMsg('OTP sent to your email. Please check your inbox.');
-      } else {
-        setStatusMsg('Failed to send OTP. Try again.');
-      }
-    } catch (e) {
-      setStatusMsg('Error sending OTP. Try again.');
-    }
-    setLoading(false);
-  };
 
-  // Verify OTP
-  const handleVerifyOtp = async () => {
-    setStatusMsg(null);
-    setLoading(true);
-    try {
-      const res = await fetch('https://resume-chatbot-services-v2-0.onrender.com/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp })
-      });
-      const data = await res.json();
-      // Accepts either { jwt, session_id } or { token, session_id }
-      if ((data.jwt || data.token) && data.session_id) {
-        setJwt(data.jwt || data.token);
-        setSessionId(data.session_id);
-        setStep('chat');
-        setStatusMsg('Email verified! You can now chat.');
-      } else {
-        setStatusMsg(data.detail || 'Invalid OTP. Try again.');
-      }
-    } catch (e) {
-      setStatusMsg('Error verifying OTP. Try again.');
-    }
-    setLoading(false);
-  };
-
-  // Auto scroll to bottom when new messages arrive
+  // Idle timeout: reset if no typing or interaction for 30s
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (step !== 'chat') return;
+    const resetIdle = () => {
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+      idleTimeoutRef.current = window.setTimeout(() => {
+        resetToOtp();
+      }, 30000); // 30s
+    };
+    const handleUserActivity = () => {
+      lastActivityRef.current = Date.now();
+      resetIdle();
+    };
+    document.addEventListener('keydown', handleUserActivity);
+    document.addEventListener('mousedown', handleUserActivity);
+    resetIdle();
+    return () => {
+      document.removeEventListener('keydown', handleUserActivity);
+      document.removeEventListener('mousedown', handleUserActivity);
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+    };
+  }, [step]);
 
-  // Focus input when chat opens
+  // Inactivity timeout: reset if no chat message sent for 5min
   useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus();
-    }
-  }, [isOpen]);
+    if (step !== 'chat') return;
+    if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
+    inactivityTimeoutRef.current = window.setTimeout(() => {
+      resetToOtp();
+    }, 5 * 60 * 1000); // 5min
+    return () => {
+      if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
+    };
+  }, [messages, step]);
 
-  // Simulated bot response - Replace this with your API call
-  const getBotResponse = async (userMessage: string): Promise<string> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Sample responses based on keywords
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('experience') || lowerMessage.includes('work')) {
-      return "Kuhandran has 8+ years of experience in technical leadership, currently serving as Technical Project Manager at FWD Insurance. Previously, he spent 6 years at Maybank progressing from Junior Developer to Senior Software Engineer. Would you like to know more about any specific role?";
+  // Helper to reset session to OTP step
+  const resetToOtp = () => {
+    setJwt(null);
+    setSessionId(null);
+    setStep('otp');
+    setStatusMsg('Session reset due to inactivity. Please re-enter the OTP sent to your email.');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('chatbot_jwt');
+      localStorage.removeItem('chatbot_session_id');
+      localStorage.removeItem('chatbot_email');
     }
-    
-    if (lowerMessage.includes('skill') || lowerMessage.includes('technology')) {
-      return "Kuhandran specializes in React.js, React Native, Spring Boot, and Power BI. He's also AWS certified and has expertise in data visualization and microservices architecture. Which technology would you like to know more about?";
-    }
-    
-    if (lowerMessage.includes('project')) {
-      return "Some notable projects include the FWD Insurance React Native App with 15% efficiency improvement, Maybank Digital Banking Platform with 15% faster load speeds, and various API integrations. Would you like details on any specific project?";
-    }
-    
-    if (lowerMessage.includes('education') || lowerMessage.includes('mba')) {
-      return "Kuhandran holds an MBA in Business Analytics from Cardiff Metropolitan University (2022-2024) and a BSc in Computer Software Engineering from University of Wollongong. This combination of technical and business expertise makes him unique!";
-    }
-    
-    if (lowerMessage.includes('contact') || lowerMessage.includes('reach') || lowerMessage.includes('email')) {
-      return "You can reach Kuhandran at skuhandran@yahoo.com or call +60 14 933 7280. He's based in Kuala Lumpur, Malaysia and is open to relocation opportunities!";
-    }
-    
-    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-      return "Hello! 👋 I'm here to help you learn more about Kuhandran. You can ask me about his experience, skills, projects, education, or how to contact him. What would you like to know?";
-    }
-    
-    // Default response
-    return "That's a great question! While I'm still learning, you can explore the portfolio sections above for detailed information, or feel free to contact Kuhandran directly at skuhandran@yahoo.com. Is there something specific you'd like to know about his experience, skills, or projects?";
   };
 
+  // Send message handler
   const handleSendMessage = async () => {
+    // Reset inactivity timer on send
+    if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
     if (!inputValue.trim()) return;
 
     // Add user message
@@ -427,4 +384,56 @@ export function Chatbot() {
       )}
     </>
   );
+  // OTP request handler
+  async function handleRequestOtp() {
+    setStatusMsg(null);
+    if (!captchaToken) {
+      setStatusMsg('Please complete the captcha.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('https://resume-chatbot-services-v2-0.onrender.com/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, recaptchaToken: captchaToken })
+      });
+      const data = await res.json();
+      if (data.otp_generated) {
+        setStep('otp');
+        setStatusMsg('OTP sent to your email. Please check your inbox.');
+      } else {
+        setStatusMsg('Failed to send OTP. Try again.');
+      }
+    } catch (e) {
+      setStatusMsg('Error sending OTP. Try again.');
+    }
+    setLoading(false);
+  }
+
+  // OTP verify handler
+  async function handleVerifyOtp() {
+    setStatusMsg(null);
+    setLoading(true);
+    try {
+      const res = await fetch('https://resume-chatbot-services-v2-0.onrender.com/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp })
+      });
+      const data = await res.json();
+      if ((data.jwt || data.token) && data.session_id) {
+        setJwt(data.jwt || data.token);
+        setSessionId(data.session_id);
+        setStep('chat');
+        setStatusMsg('Email verified! You can now chat.');
+      } else {
+        setStatusMsg(data.detail || 'Invalid OTP. Try again.');
+      }
+    } catch (e) {
+      setStatusMsg('Error verifying OTP. Try again.');
+    }
+    setLoading(false);
+  }
+
 }
