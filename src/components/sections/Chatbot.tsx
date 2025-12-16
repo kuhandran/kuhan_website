@@ -4,6 +4,7 @@
 
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
 
 interface Message {
@@ -13,7 +14,7 @@ interface Message {
   timestamp: Date;
 }
 
-export const Chatbot = () => {
+export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -25,8 +26,91 @@ export const Chatbot = () => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [jwt, setJwt] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [step, setStep] = useState<'email' | 'otp' | 'chat'>('email');
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Try to restore jwt/sessionId/email from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedJwt = localStorage.getItem('chatbot_jwt');
+      const savedSessionId = localStorage.getItem('chatbot_session_id');
+      const savedEmail = localStorage.getItem('chatbot_email');
+      if (savedJwt && savedSessionId && savedEmail) {
+        setJwt(savedJwt);
+        setSessionId(savedSessionId);
+        setEmail(savedEmail);
+        setStep('chat');
+      }
+    }
+  }, []);
+
+  // Save jwt/sessionId/email to localStorage
+  useEffect(() => {
+    if (jwt && sessionId && email) {
+      localStorage.setItem('chatbot_jwt', jwt);
+      localStorage.setItem('chatbot_session_id', sessionId);
+      localStorage.setItem('chatbot_email', email);
+    }
+  }, [jwt, sessionId, email]);
+  // Request OTP
+  const handleRequestOtp = async () => {
+    setStatusMsg(null);
+    if (!captchaToken) {
+      setStatusMsg('Please complete the captcha.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('https://resume-chatbot-services-v2-0.onrender.com/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, captcha: captchaToken })
+      });
+      const data = await res.json();
+      if (data.otp_generated) {
+        setStep('otp');
+        setStatusMsg('OTP sent to your email. Please check your inbox.');
+      } else {
+        setStatusMsg('Failed to send OTP. Try again.');
+      }
+    } catch (e) {
+      setStatusMsg('Error sending OTP. Try again.');
+    }
+    setLoading(false);
+  };
+
+  // Verify OTP
+  const handleVerifyOtp = async () => {
+    setStatusMsg(null);
+    setLoading(true);
+    try {
+      const res = await fetch('https://resume-chatbot-services-v2-0.onrender.com/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp })
+      });
+      const data = await res.json();
+      // Accepts either { jwt, session_id } or { token, session_id }
+      if ((data.jwt || data.token) && data.session_id) {
+        setJwt(data.jwt || data.token);
+        setSessionId(data.session_id);
+        setStep('chat');
+        setStatusMsg('Email verified! You can now chat.');
+      } else {
+        setStatusMsg(data.detail || 'Invalid OTP. Try again.');
+      }
+    } catch (e) {
+      setStatusMsg('Error verifying OTP. Try again.');
+    }
+    setLoading(false);
+  };
 
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
@@ -86,33 +170,37 @@ export const Chatbot = () => {
       sender: 'user',
       timestamp: new Date()
     };
-    
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
 
-    // TODO: Replace this with your actual API call
-    // Example API call structure:
-    /*
+    // Call new /chat API with jwt and sessionId
+    let botResponse = '';
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: inputValue })
-      });
-      const data = await response.json();
-      const botResponse = data.response;
+      if (!jwt || !sessionId) {
+        botResponse = 'Session expired or not verified. Please refresh and verify your email again.';
+      } else {
+        const response = await fetch('https://resume-chatbot-services-v2-0.onrender.com/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`
+          },
+          body: JSON.stringify({ token: sessionId, question: userMessage.text })
+        });
+        const data = await response.json();
+        if (data.answer) {
+          botResponse = data.answer;
+        } else if (data.error) {
+          botResponse = data.error;
+        } else {
+          botResponse = 'Sorry, I did not understand the response.';
+        }
+      }
     } catch (error) {
-      console.error('API Error:', error);
-      const botResponse = "Sorry, I'm having trouble connecting. Please try again later.";
+      botResponse = "Sorry, I'm having trouble connecting. Please try again later.";
     }
-    */
-
-    // Get bot response
-    const botResponse = await getBotResponse(inputValue);
-    
     setIsTyping(false);
-    
     // Add bot message
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
@@ -120,7 +208,6 @@ export const Chatbot = () => {
       sender: 'bot',
       timestamp: new Date()
     };
-    
     setMessages(prev => [...prev, botMessage]);
   };
 
@@ -148,7 +235,6 @@ export const Chatbot = () => {
         ) : (
           <MessageCircle className="w-6 h-6 text-white animate-pulse" />
         )}
-        
         {/* Notification Badge */}
         {!isOpen && (
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
@@ -176,6 +262,66 @@ export const Chatbot = () => {
             </button>
           </div>
 
+          {/* Email/OTP Step */}
+          {step !== 'chat' && (
+            <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50">
+              {step === 'email' && (
+                <>
+                  <label className="block mb-2 text-sm font-medium text-slate-700">Enter your email to start chat</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3"
+                    placeholder="you@email.com"
+                    disabled={loading}
+                  />
+                  <div className="mb-3 flex justify-center">
+                    <ReCAPTCHA
+                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+                      onChange={(token: string | null) => setCaptchaToken(token)}
+                    />
+                  </div>
+                  <button
+                    onClick={handleRequestOtp}
+                    disabled={!email || !captchaToken || loading}
+                    className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    {loading ? 'Sending OTP...' : 'Request OTP'}
+                  </button>
+                </>
+              )}
+              {step === 'otp' && (
+                <>
+                  <label className="block mb-2 text-sm font-medium text-slate-700">Enter the OTP sent to your email</label>
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3"
+                    placeholder="6-digit OTP"
+                    disabled={loading}
+                  />
+                  <button
+                    onClick={handleVerifyOtp}
+                    disabled={!otp || loading}
+                    className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    {loading ? 'Verifying...' : 'Verify OTP'}
+                  </button>
+                  <button
+                    onClick={() => setStep('email')}
+                    className="mt-2 text-xs text-blue-600 hover:underline"
+                    disabled={loading}
+                  >Change email</button>
+                </>
+              )}
+              {statusMsg && <div className="mt-4 text-sm text-center text-slate-600">{statusMsg}</div>}
+            </div>
+          )}
+
+          {/* Chat Step */}
+          {step === 'chat' && <>
           {/* Messages Container */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
             {messages.map((message) => (
@@ -188,7 +334,6 @@ export const Chatbot = () => {
                     <Bot className="w-5 h-5 text-white" />
                   </div>
                 )}
-                
                 <div
                   className={`max-w-[75%] p-3 rounded-2xl ${
                     message.sender === 'user'
@@ -203,7 +348,6 @@ export const Chatbot = () => {
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-
                 {message.sender === 'user' && (
                   <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
                     <User className="w-5 h-5 text-slate-600" />
@@ -211,7 +355,6 @@ export const Chatbot = () => {
                 )}
               </div>
             ))}
-            
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex gap-2 justify-start">
@@ -227,10 +370,8 @@ export const Chatbot = () => {
                 </div>
               </div>
             )}
-            
             <div ref={messagesEndRef} />
           </div>
-
           {/* Input Area */}
           <div className="p-4 bg-white border-t border-slate-200 rounded-b-2xl">
             <div className="flex gap-2">
@@ -257,7 +398,6 @@ export const Chatbot = () => {
                 )}
               </button>
             </div>
-            
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-2 mt-3">
               {['Experience', 'Skills', 'Projects', 'Contact'].map((action) => (
@@ -274,8 +414,9 @@ export const Chatbot = () => {
               ))}
             </div>
           </div>
+          </>}
         </div>
       )}
     </>
   );
-};
+}
