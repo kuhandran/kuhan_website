@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
 
 interface Message {
@@ -54,7 +55,13 @@ const ChatProcess: React.FC<ChatProcessProps> = ({
                 : 'bg-white text-slate-800 shadow-sm rounded-bl-none'
             }`}
           >
-            <p className="text-sm leading-relaxed">{message.text}</p>
+            {message.sender === 'bot' ? (
+              <div className="text-sm leading-relaxed">
+                <ReactMarkdown>{message.text}</ReactMarkdown>
+              </div>
+            ) : (
+              <p className="text-sm leading-relaxed">{message.text}</p>
+            )}
             <span className={`text-xs mt-1 block ${
               message.sender === 'user' ? 'text-white/70' : 'text-slate-400'
             }`}>
