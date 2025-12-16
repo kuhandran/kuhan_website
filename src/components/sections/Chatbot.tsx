@@ -71,7 +71,7 @@ export function Chatbot() {
       const res = await fetch('https://resume-chatbot-services-v2-0.onrender.com/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, captcha: captchaToken })
+        body: JSON.stringify({ email, recaptchaToken: captchaToken })
       });
       const data = await res.json();
       if (data.otp_generated) {
