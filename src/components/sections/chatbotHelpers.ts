@@ -10,6 +10,7 @@ export function resetToEmail(
   setStatusMsg: Dispatch<SetStateAction<string | null>>,
   setMessages: Dispatch<SetStateAction<any[]>>,
   setInactivitySeconds: Dispatch<SetStateAction<number>>,
+  setCaptchaToken?: Dispatch<SetStateAction<string | null>>,
   msg?: string
 ) {
   setJwt(null);
@@ -27,6 +28,7 @@ export function resetToEmail(
     }
   ]);
   setInactivitySeconds(300);
+  if (setCaptchaToken) setCaptchaToken(null);
   if (typeof window !== 'undefined') {
     localStorage.removeItem('chatbot_jwt');
     localStorage.removeItem('chatbot_session_id');

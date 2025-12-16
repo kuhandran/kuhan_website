@@ -72,8 +72,7 @@ export function Chatbot() {
     setSessionId(null);
     setEmail('');
     setStep('email');
-
-  // (handleSendMessageWithTimer logic removed as it's not used)
+    setCaptchaToken(null);
   }, []);
 
   // Persist jwt/sessionId/email to localStorage when changed
@@ -272,6 +271,7 @@ export function Chatbot() {
               setCaptchaToken={setCaptchaToken}
               loading={loading}
               onRequestOtp={handleRequestOtp}
+              key={step}
             />
           )}
           {step === 'otp' && (
