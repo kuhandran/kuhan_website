@@ -60,7 +60,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Security and trust meta tags for Zscaler and SEO */}
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://resume-chatbot-services-v2-0.onrender.com; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <meta name="googlebot" content="index, follow, noimageindex:off, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
