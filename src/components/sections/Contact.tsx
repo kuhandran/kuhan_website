@@ -91,8 +91,8 @@ export const Contact = () => {
         formDataToSend.append('file', attachedFile);
       }
       
-      // Send to FastAPI backend
-      const response = await fetch('https://resume-chatbot-services-v2-0.onrender.com/contact', {
+      // Send to API Gateway backend
+      const response = await fetch('https://api-gateway-715i.onrender.com/contact/', {
         method: 'POST',
         body: formDataToSend,
       });
