@@ -318,7 +318,7 @@ export function Chatbot() {
       const res = await fetch('https://api-gateway-715i.onrender.com/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, recaptchaToken: captchaToken })
+        body: JSON.stringify({ email, recaptcha: captchaToken })
       });
       const data = await res.json();
       if (data.otp_generated) {
