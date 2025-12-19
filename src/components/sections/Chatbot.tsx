@@ -164,7 +164,7 @@ export function Chatbot() {
       if (!jwt || !sessionId) {
         botResponse = 'Session expired or not verified. Please refresh and verify your email again.';
       } else {
-        const response = await fetch('https://api-gateway-715i.onrender.com/chat/send', {
+        const response = await fetch('https://api-gateway-services-7tgk.onrender.com/chat/send', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -315,7 +315,7 @@ export function Chatbot() {
     }
     setLoading(true);
     try {
-      const res = await fetch('https://api-gateway-715i.onrender.com/auth/request-otp', {
+      const res = await fetch('https://api-gateway-services-7tgk.onrender.com/auth/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, recaptcha: captchaToken })
@@ -338,7 +338,7 @@ export function Chatbot() {
     setStatusMsg(null);
     setLoading(true);
     try {
-      const res = await fetch('https://api-gateway-715i.onrender.com/auth/verify-otp', {
+      const res = await fetch('https://api-gateway-services-7tgk.onrender.com/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp })
