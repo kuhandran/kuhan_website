@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         name: 'Portfolio Contact Form',
         address: process.env.EMAIL_USER as string,
       },
-      to: 'kuhandransamudrapandiyan@gmail.com',
+      to: 'skuhandran@yahoo.com',
       subject: `🎯 New Portfolio Contact: ${subject}`,
       html: getAdminNotificationEmail(emailData),
       attachments,
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       to: email,
       subject: '✨ Thank You for Contacting Kuhandran SamudraPandiyan',
       html: getSenderAutoReplyEmail(emailData),
-      replyTo: 'kuhandransamudrapandiyan@gmail.com',
+      replyTo: 'skuhandran@yahoo.com',
     };
     
     await transporter.sendMail(senderEmail);

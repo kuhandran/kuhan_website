@@ -305,7 +305,7 @@ export const Contact = () => {
               
               <div className="space-y-4">
                 <a 
-                  href="mailto:kuhandransamudrapandiyan@gmail.com"
+                  href="mailto:skuhandran@yahoo.com"
                   className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-colors"
                 >
                   <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -313,7 +313,7 @@ export const Contact = () => {
                   </div>
                   <div>
                     <div className="font-semibold">Email</div>
-                    <div className="text-slate-300">kuhandransamudrapandiyan@gmail.com</div>
+                    <div className="text-slate-300">skuhandran@yahoo.com</div>
                   </div>
                 </a>
                 

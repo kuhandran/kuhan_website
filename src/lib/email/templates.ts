@@ -593,7 +593,7 @@ export const getAdminNotificationEmail = (data: EmailTemplateData): string => {
       <div class="footer-divider"></div>
       
       <div class="footer-info">
-        📧 <a href="mailto:kuhandransamudrapandiyan@gmail.com">kuhandransamudrapandiyan@gmail.com</a>
+        📧 <a href="mailto:skuhandran@yahoo.com">skuhandran@yahoo.com</a>
       </div>
       <div class="footer-info">
         📱 +60 14 933 7280 | 📍 Kuala Lumpur, Malaysia
@@ -707,7 +707,7 @@ export const getSenderAutoReplyEmail = (data: EmailTemplateData): string => {
         <div class="contact-heading">📞 Need Immediate Assistance?</div>
         <div class="contact-row">
           <span class="contact-icon">📧</span>
-          <span style="color: #94a3b8;">Email: <a href="mailto:kuhandransamudrapandiyan@gmail.com" class="contact-link">kuhandransamudrapandiyan@gmail.com</a></span>
+          <span style="color: #94a3b8;">Email: <a href="mailto:skuhandran@yahoo.com" class="contact-link">skuhandran@yahoo.com</a></span>
         </div>
         <div class="contact-row">
           <span class="contact-icon">📱</span>
