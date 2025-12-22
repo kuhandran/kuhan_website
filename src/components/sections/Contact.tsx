@@ -92,7 +92,7 @@ export const Contact = () => {
       }
       
       // Send to API Gateway backend
-      const response = await fetch('https://api-gateway-services-7tgk.onrender.com/contact', {
+      const response = await fetch('https://api-gateway-9unh.onrender.com/contact', {
         method: 'POST',
         body: formDataToSend,
       });
