@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: 'Kuhandran SamudraPandiyan',
     images: [
       {
-        url: 'https://www.kuhandranchatbot.info/public/image/profile.png',
+        url: 'https://www.kuhandranchatbot.info/image/profile.png',
         width: 400,
         height: 400,
         alt: 'Kuhandran SamudraPandiyan Profile',
