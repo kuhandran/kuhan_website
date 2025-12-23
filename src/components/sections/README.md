@@ -65,7 +65,7 @@ export function Hero() {
           </div>
           {/* Profile image */}
           <div>
-            <Image src="/profile.jpg" alt="Profile" />
+            <Image src="/profile.png" alt="Profile" />
           </div>
         </div>
       </div>

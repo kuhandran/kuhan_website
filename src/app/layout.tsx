@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: 'Kuhandran SamudraPandiyan',
     images: [
       {
-        url: 'https://www.kuhandranchatbot.info/public/image/profile.jpg',
+        url: 'https://www.kuhandranchatbot.info/public/image/profile.png',
         width: 400,
         height: 400,
         alt: 'Kuhandran SamudraPandiyan Profile',
@@ -64,7 +64,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Preload critical resources */}
-        <link rel="preload" as="image" href="/image/profile.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/image/profile.png" fetchPriority="high" />
         
         {/* DNS Prefetch and Preconnect for external services */}
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
