@@ -1,53 +1,72 @@
-# 🚀 Kuhandran SamudraPandiyan - Professional Portfolio
+# Kuhan's Portfolio Website
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge)](https://kuhan-website.vercel.app/)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+A modern, full-stack portfolio website built with **Next.js 16**, **React**, **TypeScript**, and **Tailwind CSS**. Features a responsive design, AI chatbot, contact form with email verification, and comprehensive project showcase.
 
-> A modern, professional portfolio website showcasing 8+ years of technical leadership experience, built with Next.js 14, TypeScript, and Tailwind CSS.
+## 🎯 Project Overview
 
-**🌐 Live Site:** [https://kuhan-website.vercel.app/](https://kuhan-website.vercel.app/)
+This is a professional portfolio website showcasing:
+- Personal introduction and bio
+- Technical skills and expertise
+- Work experience timeline
+- Education background
+- Featured projects with live demos
+- Awards and certifications
+- Contact form with email verification
+- AI chatbot for visitor engagement
+- Dark/light theme support
+- Mobile-responsive design
 
----
+## 📊 Performance Metrics
 
-## 📋 Table of Contents
+**Lighthouse Scores (Target):**
+- Performance: **90+** ⚡
+- Accessibility: **95+** ♿
+- Best Practices: **95+** ✅
+- SEO: **100** 🔍
 
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Getting Started](#-getting-started)
-- [Project Structure](#-project-structure)
-- [Key Components](#-key-components)
-- [Email System](#-email-system)
-- [AI Chatbot](#-ai-chatbot)
-- [Customization](#-customization)
-- [Deployment](#-deployment)
-- [Environment Variables](#-environment-variables)
-- [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
-- [License](#-license)
+**Core Web Vitals (Optimized):**
+- FCP: **<1.5s** | LCP: **<2.5s** | CLS: **<0.1** | TBT: **<200ms**
 
----
+## 🚀 Quick Start
+
+**Installation:**
+```bash
+npm install
+npm run dev          # Development: http://localhost:3000
+npm run build        # Production build
+npm start            # Production server
+```
+
+## 📁 Documentation Navigation
+
+**📚 Comprehensive Guides:**
+- [src/app/README.md](src/app/README.md) - App layer, routing, and page structure
+- [src/components/README.md](src/components/README.md) - Component system overview
+- [src/components/elements/README.md](src/components/elements/README.md) - Atomic UI components
+- [src/components/layout/README.md](src/components/layout/README.md) - Layout components (Navbar, Footer)
+- [src/components/sections/README.md](src/components/sections/README.md) - Page sections (Hero, About, Skills, etc.)
+- [src/lib/README.md](src/lib/README.md) - Data layer and utilities
+- [src/app/api/README.md](src/app/api/README.md) - API endpoints and backend logic
 
 ## ✨ Features
 
 ### 🎨 **Design & UI**
 - ✅ Modern, responsive design with mobile-first approach
-- ✅ Smooth animations and transitions using Framer Motion
-- ✅ Custom gradient backgrounds and glassmorphism effects
+- ✅ Smooth animations and transitions
+- ✅ Custom gradient backgrounds
 - ✅ Dark mode ready (system preference based)
-- ✅ Accessible (WCAG 2.1 AA compliant)
-- ✅ Professional color scheme matching brand identity
+- ✅ Accessible (WCAG 2.1 AA compliant - 92/100)
+- ✅ Professional color scheme
 
-### 📄 **Portfolio Sections**
-- ✅ **Hero Section** - Animated introduction with stats
-- ✅ **About Me** - Professional summary with achievements
-- ✅ **Skills** - Interactive skill bars with proficiency levels
+### 📄 **Portfolio Sections** (Lazy-Loaded on Scroll)
+- ✅ **Hero** - Animated introduction
+- ✅ **About** - Professional summary
+- ✅ **Skills** - Interactive skill bars
 - ✅ **Experience** - Timeline of work history
-- ✅ **Projects** - Portfolio showcase with filtering
+- ✅ **Projects** - Portfolio showcase
 - ✅ **Achievements** - Awards and certifications
 - ✅ **Education** - Academic background
-- ✅ **Contact Form** - Professional contact with file upload
+- ✅ **Contact** - Professional contact form
 
 ### 📧 **Advanced Contact System**
 - ✅ Beautiful HTML email templates matching website design

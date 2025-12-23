@@ -16,20 +16,36 @@ export const SkillBar = ({ skillName, level, color = 'blue' }: SkillBarProps) =>
   }, [level]);
   
   const colorClass = {
-    blue: 'bg-blue-500',
-    green: 'bg-emerald-500',
-    amber: 'bg-amber-500'
-  }[color] || 'bg-blue-500';
+    blue: 'bg-gradient-to-r from-blue-500 to-blue-600',
+    green: 'bg-gradient-to-r from-emerald-500 to-emerald-600',
+    amber: 'bg-gradient-to-r from-amber-500 to-amber-600',
+    purple: 'bg-gradient-to-r from-purple-500 to-purple-600'
+  }[color] || 'bg-gradient-to-r from-blue-500 to-blue-600';
+  
+  const getLevelLabel = (level: number) => {
+    if (level >= 90) return 'Expert';
+    if (level >= 75) return 'Advanced';
+    if (level >= 50) return 'Intermediate';
+    if (level >= 25) return 'Beginner';
+    return 'Learning';
+  };
   
   return (
-    <div className="mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-medium text-slate-700">{skillName}</span>
-        <span className="text-sm font-semibold text-slate-900">{level}%</span>
+    <div className="mb-6 group">
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex-1">
+          <span className="text-sm font-semibold text-slate-800 group-hover:text-slate-900 transition-colors">{skillName}</span>
+          <span className="ml-2 text-xs font-medium text-slate-500 group-hover:text-slate-600 transition-colors">
+            {getLevelLabel(level)}
+          </span>
+        </div>
+        <span className="text-xs font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-full group-hover:bg-blue-100 transition-colors">
+          {level}%
+        </span>
       </div>
-      <div className="w-full bg-slate-200 rounded-full h-2.5">
+      <div className="w-full bg-gradient-to-r from-slate-100 to-slate-50 rounded-full h-3 overflow-hidden shadow-sm group-hover:shadow-md transition-all">
         <div 
-          className={`h-2.5 rounded-full transition-all duration-1000 ease-out ${colorClass}`}
+          className={`h-3 rounded-full transition-all duration-1000 ease-out shadow-md group-hover:shadow-lg ${colorClass}`}
           style={{ width: `${width}%` }}
         />
       </div>

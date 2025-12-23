@@ -25,7 +25,14 @@ export async function POST(request: NextRequest) {
       console.error('❌ Validation failed: Missing required fields');
       return NextResponse.json(
         { error: 'All fields are required' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
+        }
       );
     }
     
@@ -35,7 +42,14 @@ export async function POST(request: NextRequest) {
       console.error('❌ Validation failed: Invalid email format');
       return NextResponse.json(
         { error: 'Invalid email format' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
+        }
       );
     }
     
@@ -60,7 +74,14 @@ export async function POST(request: NextRequest) {
         console.error('❌ File validation failed: Invalid file type');
         return NextResponse.json(
           { error: 'Only PDF and DOCX files are allowed' },
-          { status: 400 }
+          { 
+            status: 400,
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0',
+            },
+          }
         );
       }
       
@@ -69,7 +90,14 @@ export async function POST(request: NextRequest) {
         console.error('❌ File validation failed: File too large');
         return NextResponse.json(
           { error: 'File size must be less than 5MB' },
-          { status: 400 }
+          { 
+            status: 400,
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0',
+            },
+          }
         );
       }
       
@@ -164,7 +192,14 @@ export async function POST(request: NextRequest) {
         success: true, 
         message: 'Your message has been sent successfully! I will respond within 24-48 hours.' 
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
     );
     
   } catch (error) {
@@ -179,7 +214,14 @@ export async function POST(request: NextRequest) {
         error: 'Failed to send message. Please try again later or contact me directly.',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
     );
   }
 }
@@ -192,5 +234,12 @@ export async function GET() {
     version: '2.0',
     emailTemplates: 'Organized & Professional',
     timestamp: new Date().toISOString(),
+  },
+  {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
   });
 }

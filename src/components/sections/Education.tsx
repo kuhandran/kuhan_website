@@ -3,15 +3,16 @@ import { Card } from '../elements/Card';
 import { Badge } from '../elements/Badge';
 import { educationData } from '../../lib/data/education';
 import { GraduationCap } from 'lucide-react';
+import contentLabels from '../../../public/data/contentLabels.json';
 
 export const Education = () => {
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle="Education"
-          title="Academic Background"
-          description="Continuous learning and formal education"
+          subtitle={contentLabels.education.subtitle}
+          title={contentLabels.education.title}
+          description={contentLabels.education.description}
         />
         
         <div className="max-w-4xl mx-auto space-y-6">

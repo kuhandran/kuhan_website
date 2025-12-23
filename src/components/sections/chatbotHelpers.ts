@@ -1,5 +1,6 @@
 // Chatbot helper functions for state/session management
 import { Dispatch, SetStateAction } from 'react';
+import contentLabels from '../../../public/data/contentLabels.json';
 
 export function resetToEmail(
   setJwt: Dispatch<SetStateAction<string | null>>,
@@ -22,7 +23,7 @@ export function resetToEmail(
   setMessages([
     {
       id: '1',
-      text: "Hi! I'm Kuhandran's AI assistant. Ask me anything about his experience, skills, or projects!",
+      text: contentLabels.chatbot.initialMessage,
       sender: 'bot',
       timestamp: new Date()
     }

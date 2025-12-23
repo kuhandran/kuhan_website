@@ -5,6 +5,7 @@
 'use client';
 import { Button } from '../elements/Button';
 import { ArrowDown, Sparkles, Zap, Globe } from 'lucide-react';
+import contentLabels from '../../../public/data/contentLabels.json';
 
 export const Hero = () => {
   const scrollToSection = (id: string) => {
@@ -36,52 +37,47 @@ export const Hero = () => {
           <div className="mb-6 animate-fade-in">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm font-medium backdrop-blur-sm">
               <Sparkles size={16} className="animate-pulse" />
-              Hi, I&apos;m Kuhandran
+              {contentLabels.hero.badge}
             </span>
           </div>
           
           {/* Main Headline */}
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-slide-up">
-            Technical Leader Driving{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 animate-pulse">
-              Digital Transformation
-            </span>
+            {contentLabels.hero.mainHeading}
           </h1>
           
           {/* Subheadline with roles */}
           <div className="text-xl md:text-2xl text-slate-300 mb-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <span className="inline-flex items-center gap-2 font-semibold text-blue-400">
               <Zap size={20} />
-              Technical Delivery Manager
+              {contentLabels.hero.roles.primary}
             </span>
             {' '}<span className="text-slate-500">|</span>{' '}
-            <span className="font-semibold text-purple-400">Full-Stack Engineer</span>
+            <span className="font-semibold text-purple-400">{contentLabels.hero.roles.secondary}</span>
             {' '}<span className="text-slate-500">|</span>{' '}
-            <span className="font-semibold text-emerald-400">Data Enthusiast</span>
+            <span className="font-semibold text-emerald-400">{contentLabels.hero.roles.tertiary}</span>
           </div>
           
           {/* Description */}
           <p className="text-lg text-slate-400 mb-8 max-w-2xl leading-relaxed animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            Specialized in enterprise applications, React Native development, and data visualization. 
-            Combining 8+ years of technical expertise with strategic business insights to drive 
-            operational efficiency and innovation.
+            {contentLabels.hero.description}
           </p>
           
           {/* Key Highlights */}
           <div className="flex flex-wrap gap-6 mb-10 animate-slide-up" style={{ animationDelay: '0.6s' }}>
             <div className="flex items-center gap-2 text-slate-300 group hover:text-emerald-400 transition-colors">
               <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse group-hover:scale-125 transition-transform"></div>
-              <span className="font-medium">8+ Years Experience</span>
+              <span className="font-medium">{contentLabels.hero.highlights.experience}</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300 group hover:text-blue-400 transition-colors">
               <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse group-hover:scale-125 transition-transform"></div>
-              <span className="font-medium">Based in Malaysia</span>
+              <span className="font-medium">{contentLabels.hero.highlights.location}</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300 group hover:text-purple-400 transition-colors">
               <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse group-hover:scale-125 transition-transform"></div>
               <span className="font-medium inline-flex items-center gap-1">
                 <Globe size={16} />
-                Open to Relocation
+                {contentLabels.hero.highlights.relocation}
               </span>
             </div>
           </div>
@@ -94,7 +90,7 @@ export const Hero = () => {
               onClick={() => scrollToSection('projects')}
               className="group"
             >
-              <span>View My Work</span>
+              <span>{contentLabels.hero.cta.primary}</span>
               <ArrowDown size={20} className="ml-2 group-hover:translate-y-1 transition-transform" />
             </Button>
             <Button 
@@ -102,35 +98,35 @@ export const Hero = () => {
               size="lg"
               onClick={() => scrollToSection('contact')}
             >
-              Let&apos;s Connect
+              {contentLabels.hero.cta.secondary}
             </Button>
           </div>
           
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 pt-16 border-t border-slate-700/50 animate-fade-in" style={{ animationDelay: '1s' }}>
-            <div className="group cursor-default">
-              <div className="text-3xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">
-                8+
+          {/* Stats Grid - Enhanced */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-16 pt-16 border-t border-slate-700/50 animate-fade-in" style={{ animationDelay: '1s' }}>
+            <div className="group cursor-default p-4 rounded-lg hover:bg-blue-500/10 hover:border hover:border-blue-500/30 transition-all duration-300">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                {contentLabels.hero.stats.experience.value}
               </div>
-              <div className="text-sm text-slate-400">Years Experience</div>
+              <div className="text-xs md:text-sm text-slate-400">{contentLabels.hero.stats.experience.label}</div>
             </div>
-            <div className="group cursor-default">
-              <div className="text-3xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
-                15%
+            <div className="group cursor-default p-4 rounded-lg hover:bg-emerald-500/10 hover:border hover:border-emerald-500/30 transition-all duration-300">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                {contentLabels.hero.stats.efficiency.value}
               </div>
-              <div className="text-sm text-slate-400">Efficiency Gains</div>
+              <div className="text-xs md:text-sm text-slate-400">{contentLabels.hero.stats.efficiency.label}</div>
             </div>
-            <div className="group cursor-default">
-              <div className="text-3xl font-bold text-white mb-1 group-hover:text-purple-400 transition-colors">
-                2
+            <div className="group cursor-default p-4 rounded-lg hover:bg-purple-500/10 hover:border hover:border-purple-500/30 transition-all duration-300">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                {contentLabels.hero.stats.countries.value}
               </div>
-              <div className="text-sm text-slate-400">Countries</div>
+              <div className="text-xs md:text-sm text-slate-400">{contentLabels.hero.stats.countries.label}</div>
             </div>
-            <div className="group cursor-default">
-              <div className="text-3xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">
-                MBA
+            <div className="group cursor-default p-4 rounded-lg hover:bg-amber-500/10 hover:border hover:border-amber-500/30 transition-all duration-300">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
+                {contentLabels.hero.stats.education.value}
               </div>
-              <div className="text-sm text-slate-400">Business Analytics</div>
+              <div className="text-xs md:text-sm text-slate-400">{contentLabels.hero.stats.education.label}</div>
             </div>
           </div>
         </div>
@@ -141,9 +137,9 @@ export const Hero = () => {
         <button
           onClick={() => scrollToSection('about')}
           className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group"
-          aria-label="Scroll to about section"
+          aria-label={contentLabels.hero.scroll.ariaLabel}
         >
-          <span className="text-xs uppercase tracking-wider">Scroll Down</span>
+          <span className="text-xs uppercase tracking-wider">{contentLabels.hero.scroll.text}</span>
           <ArrowDown className="w-6 h-6 group-hover:translate-y-1 transition-transform" />
         </button>
       </div>

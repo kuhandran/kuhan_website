@@ -8,6 +8,8 @@ import ChatProcess from './ChatProcess';
 import type { ChatbotStep } from './ChatbotState';
 import { resetToEmail, resetToOtp } from './chatbotHelpers';
 import { MessageCircle, X, Bot } from 'lucide-react';
+import contentLabels from '../../../public/data/contentLabels.json';
+import apiConfig from '../../../public/config/apiConfig.json';
 
 
 export function Chatbot() {
@@ -162,9 +164,9 @@ export function Chatbot() {
     let botResponse = '';
     try {
       if (!jwt || !sessionId) {
-        botResponse = 'Session expired or not verified. Please refresh and verify your email again.';
+        botResponse = contentLabels.chatbot.messages.sessionExpired;
       } else {
-        const response = await fetch('https://api-gateway-9unh.onrender.com/chat/send', {
+        const response = await fetch(apiConfig.fullUrls.chatSend, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -182,19 +184,19 @@ export function Chatbot() {
             setStep,
             setStatusMsg,
             setInactivitySeconds,
-            'Your session has expired. Please re-enter the OTP sent to your email.'
+            contentLabels.chatbot.messages.sessionExpiredOtp
           );
-          botResponse = 'Your session has expired. Please re-enter the OTP sent to your email.';
+          botResponse = contentLabels.chatbot.messages.sessionExpiredOtp;
         } else if (data.answer) {
           botResponse = data.answer;
         } else if (data.error) {
           botResponse = data.error;
         } else {
-          botResponse = 'Sorry, I did not understand the response.';
+          botResponse = contentLabels.chatbot.messages.noResponse;
         }
       }
     } catch (error) {
-      botResponse = "Sorry, I'm having trouble connecting. Please try again later.";
+      botResponse = contentLabels.chatbot.messages.connectionError;
     }
     setIsTyping(false);
     // Add bot message
@@ -228,7 +230,7 @@ export function Chatbot() {
             ? 'bg-red-500 hover:bg-red-600' 
             : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
         }`}
-        aria-label="Toggle chat"
+        aria-label={contentLabels.chatbot.toggleChat}
       >
         {isOpen ? (
           <X className="w-6 h-6 text-white" />
@@ -250,13 +252,13 @@ export function Chatbot() {
               <Bot className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-lg">AI Assistant</h3>
-              <p className="text-xs text-white/80">Ask me anything about Kuhandran</p>
+            <h3 className="font-bold text-lg">{contentLabels.chatbot.header.title}</h3>
+            <p className="text-xs text-white/80">{contentLabels.chatbot.header.subtitle}</p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-              aria-label="Close chat"
+              aria-label={contentLabels.chatbot.closeChat}
             >
               <X className="w-5 h-5" />
             </button>
@@ -295,7 +297,7 @@ export function Chatbot() {
               messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
               handleSendMessage={handleSendMessage}
               handleKeyPress={handleKeyPress}
-              quickActions={['Experience', 'Skills', 'Projects', 'Contact']}
+              quickActions={contentLabels.chatbot.quickActions}
               setQuickAction={(action) => {
                 setInputValue(action);
                 setTimeout(() => handleSendMessage(), 100);
@@ -310,12 +312,12 @@ export function Chatbot() {
   async function handleRequestOtp() {
     setStatusMsg(null);
     if (!captchaToken) {
-      setStatusMsg('Please complete the captcha.');
+      setStatusMsg(contentLabels.chatbot.messages.captchaRequired);
       return;
     }
     setLoading(true);
     try {
-      const res = await fetch('https://api-gateway-9unh.onrender.com/auth/request-otp', {
+      const res = await fetch(apiConfig.fullUrls.requestOtp, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, recaptcha: captchaToken })
@@ -323,12 +325,12 @@ export function Chatbot() {
       const data = await res.json();
       if (data.otp_generated) {
         setStep('otp');
-        setStatusMsg('OTP sent to your email. Please check your inbox.');
+        setStatusMsg(contentLabels.chatbot.messages.otpSent);
       } else {
-        setStatusMsg('Failed to send OTP. Try again.');
+        setStatusMsg(contentLabels.chatbot.messages.otpFailed);
       }
     } catch (e) {
-      setStatusMsg('Error sending OTP. Try again.');
+      setStatusMsg(contentLabels.chatbot.messages.otpError);
     }
     setLoading(false);
   }
@@ -338,7 +340,7 @@ export function Chatbot() {
     setStatusMsg(null);
     setLoading(true);
     try {
-      const res = await fetch('https://api-gateway-9unh.onrender.com/auth/verify-otp', {
+      const res = await fetch(apiConfig.fullUrls.verifyOtp, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp })
@@ -348,12 +350,12 @@ export function Chatbot() {
         setJwt(data.jwt || data.token);
         setSessionId(data.session_id);
         setStep('chat');
-        setStatusMsg('Email verified! You can now chat.');
+        setStatusMsg(contentLabels.chatbot.messages.verifySuccess);
       } else {
         setStatusMsg(data.detail || 'Invalid OTP. Try again.');
       }
     } catch (e) {
-      setStatusMsg('Error verifying OTP. Try again.');
+      setStatusMsg(contentLabels.chatbot.messages.otpError2);
     }
     setLoading(false);
   }

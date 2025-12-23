@@ -8,6 +8,8 @@ import { SectionHeader } from '../elements/SectionHeader';
 import { Button } from '../elements/Button';
 import { Card } from '../elements/Card';
 import { Mail, Phone, MapPin, Linkedin, Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import contentLabels from '../../../public/data/contentLabels.json';
+import apiConfig from '../../../public/config/apiConfig.json';
 
 interface FormData {
   name: string;
@@ -43,7 +45,7 @@ export const Contact = () => {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     
     if (!allowedTypes.includes(file.type) && !['pdf', 'docx'].includes(fileExtension || '')) {
-      setErrorMessage('Only PDF and DOCX files are allowed');
+      setErrorMessage(contentLabels.contact.form.fileUpload.invalidType);
       setSubmitStatus('error');
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -55,7 +57,7 @@ export const Contact = () => {
     
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setErrorMessage('File size must be less than 5MB');
+      setErrorMessage(contentLabels.contact.form.fileUpload.invalidSize);
       setSubmitStatus('error');
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -92,7 +94,7 @@ export const Contact = () => {
       }
       
       // Send to API Gateway backend
-      const response = await fetch('https://api-gateway-9unh.onrender.com/contact', {
+      const response = await fetch(apiConfig.fullUrls.contact, {
         method: 'POST',
         body: formDataToSend,
       });
@@ -134,54 +136,61 @@ export const Contact = () => {
   };
   
   return (
-    <section id="contact" className="py-20 bg-gradient-to-br from-slate-900 to-blue-900">
+    <section id="contact" className="py-20 bg-gradient-to-b from-blue-50 to-indigo-50">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle="Get In Touch"
-          title="Let's Work Together"
-          description="Open to new opportunities and collaborations"
+          subtitle={contentLabels.contact.subtitle}
+          title={contentLabels.contact.title}
+          description={contentLabels.contact.description}
         />
         
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <div>
-            <Card className="p-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-6">Send Me a Message</h3>
+        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 mt-12">
+          {/* Contact Form - 2 columns */}
+          <div className="md:col-span-2">
+            <Card className="p-8 md:p-10 bg-white border-2 border-slate-100">
+              <div className="mb-8">
+                <h3 className="text-3xl font-bold text-slate-900 mb-2">{contentLabels.contact.form.heading}</h3>
+                <p className="text-slate-600">Fill out the form below and I'll get back to you within 24 hours.</p>
+              </div>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-black"
-                    placeholder="John Doe"
-                  />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name & Email Row */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-800 mb-3">
+                      {contentLabels.contact.form.labels.name} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
+                      placeholder={contentLabels.contact.form.placeholders.name}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-800 mb-3">
+                      {contentLabels.contact.form.labels.email} <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
+                      placeholder={contentLabels.contact.form.placeholders.email}
+                    />
+                  </div>
                 </div>
                 
+                {/* Subject */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-black"
-                    placeholder="john@example.com"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Subject *
+                  <label className="block text-sm font-semibold text-slate-800 mb-3">
+                    {contentLabels.contact.form.labels.subject} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -189,90 +198,97 @@ export const Contact = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-black"
-                    placeholder="Project Inquiry"
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
+                    placeholder={contentLabels.contact.form.placeholders.subject}
                   />
                 </div>
                 
+                {/* Message */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Message *
+                  <label className="block text-sm font-semibold text-slate-800 mb-3">
+                    {contentLabels.contact.form.labels.message} <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    rows={5}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none text-black"
-                    placeholder="Tell me about your project..."
+                    rows={6}
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
+                    placeholder={contentLabels.contact.form.placeholders.message}
                   />
                 </div>
                 
                 {/* File Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Attach File (Optional)
+                  <label className="block text-sm font-semibold text-slate-800 mb-3">
+                    {contentLabels.contact.form.labels.file}
                   </label>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label 
                       htmlFor="file-upload"
-                      className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-500 cursor-pointer transition-colors group"
+                      className="flex flex-col items-center justify-center gap-3 w-full px-6 py-8 border-2 border-dashed border-slate-300 rounded-xl hover:border-blue-500 hover:bg-blue-50/30 cursor-pointer transition-all group"
                     >
-                      <Upload className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
-                      <span className="text-sm text-slate-600 group-hover:text-blue-600 transition-colors">
-                        Click to upload PDF or DOCX (Max 5MB)
-                      </span>
+                      <Upload className="w-6 h-6 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                      <div className="text-center">
+                        <span className="text-sm font-medium text-slate-700 group-hover:text-blue-600 block">
+                          {contentLabels.contact.form.fileUpload.text}
+                        </span>
+                        <span className="text-xs text-slate-500 mt-1 block">Max 5MB (PDF, DOCX)</span>
+                      </div>
                       <input
                         id="file-upload"
                         type="file"
                         accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                         onChange={handleFileChange}
-                        className="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 text-black"
+                        className="hidden"
                       />
                     </label>
                     
                     {/* Attached File Display */}
                     {attachedFile && (
-                      <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center justify-between p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
                         <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-blue-600" />
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <FileText className="w-5 h-5 text-blue-600" />
+                          </div>
                           <div>
-                            <p className="text-sm font-medium text-slate-900">{attachedFile.name}</p>
+                            <p className="text-sm font-semibold text-slate-900">{attachedFile.name}</p>
                             <p className="text-xs text-slate-500">{formatFileSize(attachedFile.size)}</p>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={removeFile}
-                          className="p-1 hover:bg-blue-100 rounded transition-colors"
-                          aria-label="Remove file"
+                          className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
+                          aria-label={contentLabels.contact.form.fileUpload.removeButton}
                         >
-                          <X className="w-4 h-4 text-slate-600" />
+                          <X className="w-5 h-5" />
                         </button>
                       </div>
                     )}
                   </div>
                 </div>
                 
+                {/* Submit Button */}
                 <Button 
                   type="submit" 
                   variant="primary" 
-                  className="w-full"
+                  className="w-full h-12 text-base font-semibold rounded-xl"
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                  {isSubmitting ? contentLabels.contact.form.buttons.submitting : contentLabels.contact.form.buttons.submit}
                 </Button>
                 
                 {/* Success Message */}
                 {submitStatus === 'success' && (
-                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-3">
+                  <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-emerald-700 font-medium">Message sent successfully!</p>
-                      <p className="text-emerald-600 text-sm mt-1">
-                        Thank you for reaching out. I&apos;ll get back to you soon.
+                      <p className="text-emerald-900 font-semibold">{contentLabels.contact.form.messages.successTitle}</p>
+                      <p className="text-emerald-700 text-sm mt-1">
+                        {contentLabels.contact.form.messages.successDescription}
                       </p>
                     </div>
                   </div>
@@ -280,12 +296,12 @@ export const Contact = () => {
                 
                 {/* Error Message */}
                 {submitStatus === 'error' && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                  <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-red-700 font-medium">Failed to send message</p>
-                      <p className="text-red-600 text-sm mt-1">
-                        {errorMessage || 'Please try again later or contact me directly via email.'}
+                      <p className="text-red-900 font-semibold">{contentLabels.contact.form.messages.errorTitle}</p>
+                      <p className="text-red-700 text-sm mt-1">
+                        {errorMessage || contentLabels.contact.form.messages.errorDescription}
                       </p>
                     </div>
                   </div>
@@ -294,79 +310,85 @@ export const Contact = () => {
             </Card>
           </div>
           
-          {/* Contact Information */}
+          {/* Contact Information - 1 column */}
           <div className="space-y-6">
-            <div className="text-white">
-              <h3 className="text-2xl font-bold mb-4">Contact Information</h3>
-              <p className="text-slate-300 mb-8">
-                Feel free to reach out through any of these channels. I&apos;m always open to 
-                discussing new projects, opportunities, or collaborations.
+            {/* Contact Info Card */}
+            <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">{contentLabels.contact.contactInfo.heading}</h3>
+              <p className="text-slate-600 text-sm mb-6">
+                {contentLabels.contact.contactInfo.description}
               </p>
               
               <div className="space-y-4">
+                {/* Email */}
                 <a 
-                  href="mailto:skuhandran@yahoo.com"
-                  className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-colors"
+                  href={`mailto:${contentLabels.contact.contactInfo.email.value}`}
+                  className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
-                  <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <Mail size={24} />
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Mail size={20} className="text-white" />
                   </div>
-                  <div>
-                    <div className="font-semibold">Email</div>
-                    <div className="text-slate-300">skuhandran@yahoo.com</div>
+                  <div className="flex-1">
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.email.label}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{contentLabels.contact.contactInfo.email.value}</div>
                   </div>
                 </a>
                 
+                {/* Phone */}
                 <a 
-                  href="tel:+60149337280"
-                  className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-colors"
+                  href={`tel:${contentLabels.contact.contactInfo.phone.value.replace(/\s+/g, '')}`}
+                  className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
-                  <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
-                    <Phone size={24} />
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Phone size={20} className="text-white" />
                   </div>
-                  <div>
-                    <div className="font-semibold">Phone</div>
-                    <div className="text-slate-300">+60 14 933 7280</div>
+                  <div className="flex-1">
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.phone.label}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">{contentLabels.contact.contactInfo.phone.value}</div>
                   </div>
                 </a>
                 
-                <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
-                  <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                    <MapPin size={24} />
+                {/* Location */}
+                <div className="flex items-start gap-4 p-4 bg-white rounded-xl">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MapPin size={20} className="text-white" />
                   </div>
-                  <div>
-                    <div className="font-semibold">Location</div>
-                    <div className="text-slate-300">Kuala Lumpur, Malaysia</div>
+                  <div className="flex-1">
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.location.label}</div>
+                    <div className="text-sm font-semibold text-slate-900">{contentLabels.contact.contactInfo.location.value}</div>
                   </div>
                 </div>
                 
+                {/* LinkedIn */}
                 <a 
                   href="https://linkedin.com/in/kuhandran-samudrapandiyan"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-colors"
+                  className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
-                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <Linkedin size={24} />
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Linkedin size={20} className="text-white" />
                   </div>
-                  <div>
-                    <div className="font-semibold">LinkedIn</div>
-                    <div className="text-slate-300">Connect with me</div>
+                  <div className="flex-1">
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.linkedin.label}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">{contentLabels.contact.contactInfo.linkedin.value}</div>
                   </div>
                 </a>
               </div>
-            </div>
+            </Card>
             
             {/* Availability Badge */}
-            <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-lg p-6 text-white">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span className="font-semibold text-lg">Available for Opportunities</span>
+            <Card className="p-6 bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200">
+              <div className="flex items-start gap-3">
+                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse mt-1 flex-shrink-0"></div>
+                <div>
+                  <span className="font-bold text-slate-900 block text-lg">{contentLabels.contact.availability.title}</span>
+                  <p className="text-slate-700 text-sm mt-2">
+                    {contentLabels.contact.availability.description}
+                  </p>
+                </div>
               </div>
-              <p className="text-slate-300 text-sm">
-                Open to full-time positions, consulting, and relocation opportunities globally.
-              </p>
-            </div>
+            </Card>
           </div>
         </div>
       </div>

@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import dynamic from 'next/dynamic';
+import './critical.css';
 import './globals.css';
-import AnalyticsWrapper from '../components/AnalyticsWrapper';
 
-const inter = Inter({ subsets: ['latin'] });
+// Lazy load Analytics - deferred until after initial render
+const AnalyticsWrapper = dynamic(
+  () => import('../components/AnalyticsWrapper'),
+  { loading: () => null }
+);
 
 export const metadata: Metadata = {
   title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager & Full-Stack Engineer',
@@ -59,6 +63,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preload critical resources */}
+        <link rel="preload" as="image" href="/image/profile.jpg" fetchPriority="high" />
+        
+        {/* DNS Prefetch and Preconnect for external services */}
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="https://resume-chatbot-services-v2-0.onrender.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api-gateway-715i.onrender.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api-gateway-9unh.onrender.com" crossOrigin="anonymous" />
+        
         {/* Security and trust meta tags for Zscaler and SEO */}
         <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -71,7 +84,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
         <link rel="canonical" href="https://www.kuhandranchatbot.info" />
       </head>
-      <body className={inter.className}>
+      <body>
         {children}
         <AnalyticsWrapper />
       </body>

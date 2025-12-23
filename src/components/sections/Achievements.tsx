@@ -2,53 +2,91 @@ import { SectionHeader } from '../elements/SectionHeader';
 import { Card } from '../elements/Card';
 import { Badge } from '../elements/Badge';
 import { achievementsData } from '../../lib/data/achievements';
-import { Trophy, Award } from 'lucide-react';
+import { Trophy, Award, Sparkles, Zap } from 'lucide-react';
+import contentLabels from '../../../public/data/contentLabels.json';
 
 export const Achievements = () => {
   return (
-    <section className="py-20 bg-slate-50">
+    <section className="py-20 bg-gradient-to-b from-white to-slate-50">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle="Recognition"
-          title="Achievements & Certifications"
-          description="Awards and professional certifications"
+          subtitle={contentLabels.achievements.subtitle}
+          title={contentLabels.achievements.title}
+          description={contentLabels.achievements.description}
         />
         
-        <div className="max-w-6xl mx-auto">
-          {/* Awards */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <Trophy className="text-amber-500" />
-              Awards & Honors
-            </h3>
+        <div className="max-w-6xl mx-auto mt-12">
+          {/* Awards Section - Enhanced */}
+          <div className="mb-16">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-3 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg">
+                <Trophy className="text-amber-600" size={28} />
+              </div>
+              <h3 className="text-3xl font-bold text-slate-900">
+                {contentLabels.achievements.sections.awards}
+              </h3>
+              <Sparkles className="text-amber-500 animate-pulse" size={24} />
+            </div>
+            
             <div className="grid md:grid-cols-3 gap-6">
               {achievementsData.awards.map((award, index) => (
-                <Card key={index}>
-                  <div className="text-4xl mb-4">{award.icon}</div>
-                  <h4 className="font-bold text-slate-900 mb-2">{award.name}</h4>
-                  <p className="text-sm text-slate-600 mb-2">{award.organization}</p>
-                  <Badge variant="amber" size="sm">{award.year}</Badge>
+                <Card 
+                  key={index}
+                  className="p-6 bg-gradient-to-br from-amber-50 to-orange-50 border-t-4 border-t-amber-500 hover:shadow-xl transition-all duration-300 group cursor-default"
+                >
+                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">{award.icon}</div>
+                  <h4 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-amber-600 transition-colors">
+                    {award.name}
+                  </h4>
+                  <p className="text-sm text-slate-600 mb-3">{award.organization}</p>
+                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">{award.description}</p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="amber" size="sm">{award.year}</Badge>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
+                      <Sparkles size={12} />
+                      Award
+                    </span>
+                  </div>
                 </Card>
               ))}
             </div>
           </div>
           
-          {/* Certifications */}
+          {/* Certifications Section - Enhanced */}
           <div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <Award className="text-blue-500" />
-              Professional Certifications
-            </h3>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-3 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg">
+                <Award className="text-blue-600" size={28} />
+              </div>
+              <h3 className="text-3xl font-bold text-slate-900">
+                {contentLabels.achievements.sections.certifications}
+              </h3>
+              <Zap className="text-blue-500 animate-pulse" size={24} />
+            </div>
+            
             <div className="grid md:grid-cols-2 gap-6">
               {achievementsData.certifications.map((cert, index) => (
-                <Card key={index} className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl">{cert.icon}</span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-slate-900 mb-1">{cert.name}</h4>
-                    <p className="text-sm text-slate-600 mb-2">{cert.provider}</p>
-                    <Badge variant="blue" size="sm">{cert.year}</Badge>
+                <Card 
+                  key={index}
+                  className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border-l-4 border-l-blue-500 hover:shadow-xl transition-all duration-300 group cursor-default"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                      <span className="text-3xl">{cert.icon}</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
+                        {cert.name}
+                      </h4>
+                      <p className="text-sm text-slate-600 mb-3">{cert.provider}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant="blue" size="sm">{cert.year}</Badge>
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                          <Zap size={12} />
+                          Certified
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </Card>
               ))}
