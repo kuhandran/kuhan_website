@@ -76,6 +76,33 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: '/(.*).css',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/css',
+          },
+        ],
+      },
+      {
+        source: '/(.*).js',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/chunks/(.*).js',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript',
+          },
+        ],
+      },
     ];
   },
   /* Optimize React rendering */

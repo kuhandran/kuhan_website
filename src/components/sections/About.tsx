@@ -19,14 +19,22 @@ export const About = () => {
           <div>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl transform rotate-3"></div>
-              <picture>
-                <source srcSet={contentLabels.about.image.src.replace(/\.(png|jpg|jpeg)$/i, '.webp')} type="image/webp" />
-                <img
-                  src={contentLabels.about.image.src}
-                  alt={contentLabels.about.image.alt}
-                  className="relative rounded-2xl shadow-xl w-full"
-                />
-              </picture>
+              
+              {(() => {
+                const imageSrc = '/image/profile.png';
+                const webpSrc = '/image/profile.webp';
+
+                return (
+                  <picture>
+                    <source srcSet={webpSrc} type="image/webp" />
+                    <img
+                      src={imageSrc}
+                      alt={contentLabels.about.image.alt}
+                      className="relative rounded-2xl shadow-xl w-full"
+                    />
+                  </picture>
+                );
+              })()}
             </div>
             
             {/* Stats Cards */}
