@@ -1,0 +1,41 @@
+{
+  "name": "Kuhandran SamudraPandiyan",
+  "short_name": "Kuhandran",
+  "description": "Technical Delivery Manager & Full-Stack Engineer | 8+ years in enterprise applications, React Native, and banking solutions",
+  "start_url": "https://www.kuhandranchatbot.info",
+  "scope": "https://www.kuhandranchatbot.info",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://static.kuhandranchatbot.info/image/profile.webp",
+      "sizes": "400x400",
+      "type": "image/webp",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["technology", "business"],
+  "screenshots_wide": [
+    {
+      "src": "https://static.kuhandranchatbot.info/image/profile.webp",
+      "sizes": "800x800",
+      "type": "image/webp",
+      "form_factor": "wide"
+    }
+  ]
+}

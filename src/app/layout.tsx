@@ -58,9 +58,20 @@ export const metadata: Metadata = {
   category: 'technology',
   metadataBase: new URL('https://www.kuhandranchatbot.info'),
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/logo.svg', type: 'image/svg+xml' }
+    ],
     shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    apple: [
+      { url: '/apple-touch-icon.svg', type: 'image/svg+xml' }
+    ],
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Kuhandran SamudraPandiyan',
   },
 };
 
@@ -79,6 +90,19 @@ export default function RootLayout({
         <link rel="preconnect" href="https://resume-chatbot-services-v2-0.onrender.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api-gateway-715i.onrender.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api-gateway-9unh.onrender.com" crossOrigin="anonymous" />
+        
+        {/* Favicon and Web App Icons */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" type="image/svg+xml" />
+        <link rel="manifest" href="/manifest.json" />
+        
+        {/* Mobile Web App Meta Tags */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Kuhandran" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
         
         {/* Security and trust meta tags for Zscaler and SEO */}
         <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
