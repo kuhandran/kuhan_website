@@ -1,5 +1,5 @@
 import React from 'react';
-import contentLabels from '../../../public/data/contentLabels.json';
+import { contentLabels } from '../../lib/data/contentLabels';
 
 interface OtpEntryProps {
   otp: string;

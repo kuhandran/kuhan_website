@@ -48,6 +48,18 @@ npm start            # Production server
 - [src/lib/README.md](src/lib/README.md) - Data layer and utilities
 - [src/app/api/README.md](src/app/api/README.md) - API endpoints and backend logic
 
+## ⚙️ Configuration & Data Management
+
+**📋 Configuration System:**
+- [public/config/README.md](public/config/README.md) - URL configuration and app settings
+- [public/data/README.md](public/data/README.md) - Error messages, data files, and default labels
+- [src/lib/data/README.md](src/lib/data/README.md) - Data loading modules (Skills, Projects, Experience, Education, Achievements)
+- [src/lib/email/README.md](src/lib/email/README.md) - Email template functions
+- [src/lib/config/EXAMPLES.md](src/lib/config/EXAMPLES.md) - Code examples for configuration loading
+
+**🔧 Utilities:**
+- [scripts/README.md](scripts/README.md) - Build and automation scripts
+
 ## ✨ Features
 
 ### 🎨 **Design & UI**

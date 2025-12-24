@@ -1,11 +1,21 @@
+import { useEffect, useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Card } from '../elements/Card';
 import { Badge } from '../elements/Badge';
 import { educationData } from '../../lib/data/education';
 import { GraduationCap } from 'lucide-react';
-import contentLabels from '../../../public/data/contentLabels.json';
+import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 export const Education = () => {
+  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
+
+  useEffect(() => {
+    const labels = getStaticContentLabels();
+    if (labels && Object.keys(labels).length > 0) {
+      setContentLabels(labels);
+    }
+  }, []);
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">

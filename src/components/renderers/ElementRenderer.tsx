@@ -2,6 +2,7 @@
 
 import React, { Suspense, lazy, ComponentType as ReactComponentType } from 'react';
 import { ElementConfig, ComponentType } from '@/lib/config/types';
+import { getErrorMessageSync } from '@/lib/config/appConfig';
 
 // Import all reusable elements
 import { ProjectCard } from '@/components/elements/ProjectCard';
@@ -78,7 +79,7 @@ export const ElementRenderer: React.FC<ElementRendererProps> = ({
   const Component = componentMap[type as ComponentType];
 
   if (!Component) {
-    console.warn(`Component type "${type}" not found in componentMap`);
+    console.warn(getErrorMessageSync('warnings.componentNotFound', `Component type \"${type}\" not found in componentMap`));
     return null;
   }
 

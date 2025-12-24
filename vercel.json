@@ -1,0 +1,11 @@
+{
+  "build": {
+    "ignoreBuildStep": "git diff --quiet HEAD^ HEAD public/"
+  },
+  "rewrites": [
+    {
+      "source": "/data/:path*",
+      "destination": "/public/:path*"
+    }
+  ]
+}

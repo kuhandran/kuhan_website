@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
-import contentLabels from '../../../public/data/contentLabels.json';
+import { contentLabels } from '../../lib/data/contentLabels';
 
 interface Message {
   id: string;

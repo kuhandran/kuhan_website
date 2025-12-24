@@ -3,6 +3,7 @@
 import React, { Suspense } from 'react';
 import { SectionConfig } from '@/lib/config/types';
 import { sectionRegistry } from '@/lib/config/componentRegistry';
+import { getErrorMessageSync } from '@/lib/config/appConfig';
 
 /**
  * Loading fallback component
@@ -34,7 +35,7 @@ class SectionErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error) {
-    console.error('Section rendering error:', error);
+    console.error(getErrorMessageSync('errors.sectionRendering', 'Section rendering error:'), error);
   }
 
   render() {
@@ -114,7 +115,7 @@ export const CustomSectionRenderer: React.FC<CustomSectionRendererProps> = ({
   const SectionComponent = sectionRegistry[type];
 
   if (!SectionComponent) {
-    console.warn(`Section type "${type}" not found in section registry`);
+    console.warn(getErrorMessageSync('warnings.sectionNotFound', `Section type \"${type}\" not found in section registry`));
     return null;
   }
 

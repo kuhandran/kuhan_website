@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: 'Kuhandran SamudraPandiyan',
     images: [
       {
-        url: 'https://www.kuhandranchatbot.info/image/profile.png',
+        url: 'https://static.kuhandranchatbot.info/images/profile.png',
         width: 400,
         height: 400,
         alt: 'Kuhandran SamudraPandiyan Profile',
@@ -63,17 +63,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Preload critical resources */}
-        <link rel="preload" as="image" href="/image/profile.png" fetchPriority="high" />
-        
         {/* DNS Prefetch and Preconnect for external services */}
+        <link rel="dns-prefetch" href="https://static.kuhandranchatbot.info" />
+        <link rel="preconnect" href="https://static.kuhandranchatbot.info" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="preconnect" href="https://resume-chatbot-services-v2-0.onrender.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api-gateway-715i.onrender.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api-gateway-9unh.onrender.com" crossOrigin="anonymous" />
         
         {/* Security and trust meta tags for Zscaler and SEO */}
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <meta name="googlebot" content="index, follow, noimageindex:off, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />

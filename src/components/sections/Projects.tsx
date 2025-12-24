@@ -1,9 +1,19 @@
+import { useEffect, useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { ProjectCard } from '../elements/ProjectCard';
 import { projectsData } from '../../lib/data/projects';
-import contentLabels from '../../../public/data/contentLabels.json';
+import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 export const Projects = () => {
+  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
+
+  useEffect(() => {
+    const labels = getStaticContentLabels();
+    if (labels && Object.keys(labels).length > 0) {
+      setContentLabels(labels);
+    }
+  }, []);
+
   return (
     <section id="projects" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

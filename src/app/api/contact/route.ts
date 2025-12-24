@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as nodemailer from 'nodemailer';
 import { getAdminNotificationEmail, getSenderAutoReplyEmail } from '../../../lib/email/templates';
+import { getErrorMessageSync } from '../../../lib/config/appConfig';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (!name || !email || !subject || !message) {
       console.error('❌ Validation failed: Missing required fields');
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: getErrorMessageSync('contact.validation.missingFields', 'All fields are required') },
         { 
           status: 400,
           headers: {
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
     if (!emailRegex.test(email)) {
       console.error('❌ Validation failed: Invalid email format');
       return NextResponse.json(
-        { error: 'Invalid email format' },
+        { error: getErrorMessageSync('contact.validation.invalidEmail', 'Invalid email format') },
         { 
           status: 400,
           headers: {
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       if (!allowedTypes.includes(file.type) && !['pdf', 'docx'].includes(fileExtension || '')) {
         console.error('❌ File validation failed: Invalid file type');
         return NextResponse.json(
-          { error: 'Only PDF and DOCX files are allowed' },
+          { error: getErrorMessageSync('contact.file.invalidType', 'Only PDF and DOCX files are allowed') },
           { 
             status: 400,
             headers: {
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       if (file.size > 5 * 1024 * 1024) {
         console.error('❌ File validation failed: File too large');
         return NextResponse.json(
-          { error: 'File size must be less than 5MB' },
+          { error: getErrorMessageSync('contact.file.invalidSize', 'File size must be less than 5MB') },
           { 
             status: 400,
             headers: {
@@ -190,7 +191,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         success: true, 
-        message: 'Your message has been sent successfully! I will respond within 24-48 hours.' 
+        message: getErrorMessageSync('contact.submission.success', 'Your message has been sent successfully! I will respond within 24-48 hours.') 
       },
       { 
         status: 200,
@@ -211,8 +212,8 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(
       { 
-        error: 'Failed to send message. Please try again later or contact me directly.',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: getErrorMessageSync('contact.submission.failedWithDetails', 'Failed to send message. Please try again later or contact me directly.'),
+        details: error instanceof Error ? error.message : getErrorMessageSync('common.unknownError', 'Unknown error')
       },
       { 
         status: 500,

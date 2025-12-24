@@ -3,13 +3,14 @@
 // ============================================
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Button } from '../elements/Button';
 import { Card } from '../elements/Card';
 import { Mail, Phone, MapPin, Linkedin, Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
-import contentLabels from '../../../public/data/contentLabels.json';
-import apiConfig from '../../../public/config/apiConfig.json';
+import { getStaticContentLabels } from '../../lib/data/contentLabels';
+import { fetchApiConfig, getApiConfigSync } from '@/lib/config/configLoader';
+import { getErrorMessageSync } from '@/lib/config/appConfig';
 
 interface FormData {
   name: string;
@@ -19,12 +20,23 @@ interface FormData {
 }
 
 export const Contact = () => {
+  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
+  const [apiConfig, setApiConfig] = useState<any>({});
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     subject: '',
     message: ''
   });
+  
+  useEffect(() => {
+    // Fetch content labels and API config from CDN
+    const labels = getStaticContentLabels();
+    if (labels && Object.keys(labels).length > 0) {
+      setContentLabels(labels);
+    }
+    fetchApiConfig().then(config => setApiConfig(config));
+  }, []);
   
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +57,7 @@ export const Contact = () => {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     
     if (!allowedTypes.includes(file.type) && !['pdf', 'docx'].includes(fileExtension || '')) {
-      setErrorMessage(contentLabels.contact.form.fileUpload.invalidType);
+      setErrorMessage(contentLabels?.contact?.form?.fileUpload?.invalidType || getErrorMessageSync('contact.file.invalidType', 'Invalid file type'));
       setSubmitStatus('error');
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -57,7 +69,7 @@ export const Contact = () => {
     
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setErrorMessage(contentLabels.contact.form.fileUpload.invalidSize);
+      setErrorMessage(contentLabels?.contact?.form?.fileUpload?.invalidSize || getErrorMessageSync('contact.file.invalidSize', 'File size exceeds 5MB'));
       setSubmitStatus('error');
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -102,7 +114,7 @@ export const Contact = () => {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
+        throw new Error(data.error || getErrorMessageSync('contact.submission.failed', 'Failed to send message'));
       }
       
       setIsSubmitting(false);
@@ -115,10 +127,10 @@ export const Contact = () => {
       setTimeout(() => setSubmitStatus('idle'), 5000);
       
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error(getErrorMessageSync('contact.submission.failedWithDetails', 'Form submission error:'), error);
       setIsSubmitting(false);
       setSubmitStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
+      setErrorMessage(error instanceof Error ? error.message : getErrorMessageSync('contact.submission.failedWithDetails', 'Failed to send message. Please try again.'));
       
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -139,9 +151,9 @@ export const Contact = () => {
     <section id="contact" className="py-20 bg-gradient-to-b from-blue-50 to-indigo-50">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle={contentLabels.contact.subtitle}
-          title={contentLabels.contact.title}
-          description={contentLabels.contact.description}
+          subtitle={contentLabels?.contact?.subtitle || ''}
+          title={contentLabels?.contact?.title || 'Get In Touch'}
+          description={contentLabels?.contact?.description || ''}
         />
         
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 mt-12">
@@ -149,7 +161,7 @@ export const Contact = () => {
           <div className="md:col-span-2">
             <Card className="p-8 md:p-10 bg-white border-2 border-slate-100">
               <div className="mb-8">
-                <h3 className="text-3xl font-bold text-slate-900 mb-2">{contentLabels.contact.form.heading}</h3>
+                <h3 className="text-3xl font-bold text-slate-900 mb-2">{contentLabels?.contact?.form?.heading || 'Send Me a Message'}</h3>
                 <p className="text-slate-600">Fill out the form below and I'll get back to you within 24 hours.</p>
               </div>
               
@@ -158,7 +170,7 @@ export const Contact = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-slate-800 mb-3">
-                      {contentLabels.contact.form.labels.name} <span className="text-red-500">*</span>
+                      {contentLabels?.contact?.form?.labels?.name || 'Name'} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -167,13 +179,13 @@ export const Contact = () => {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
-                      placeholder={contentLabels.contact.form.placeholders.name}
+                      placeholder={contentLabels?.contact?.form?.placeholders?.name || 'Your name'}
                     />
                   </div>
                   
                   <div>
                     <label className="block text-sm font-semibold text-slate-800 mb-3">
-                      {contentLabels.contact.form.labels.email} <span className="text-red-500">*</span>
+                      {contentLabels?.contact?.form?.labels?.email || 'Email'} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
@@ -182,7 +194,7 @@ export const Contact = () => {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
-                      placeholder={contentLabels.contact.form.placeholders.email}
+                      placeholder={contentLabels?.contact?.form?.placeholders?.email || 'Your email'}
                     />
                   </div>
                 </div>
@@ -190,7 +202,7 @@ export const Contact = () => {
                 {/* Subject */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-800 mb-3">
-                    {contentLabels.contact.form.labels.subject} <span className="text-red-500">*</span>
+                    {contentLabels?.contact?.form?.labels?.subject || 'Subject'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -199,14 +211,14 @@ export const Contact = () => {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
-                    placeholder={contentLabels.contact.form.placeholders.subject}
+                    placeholder={contentLabels?.contact?.form?.placeholders?.subject || 'Subject'}
                   />
                 </div>
                 
                 {/* Message */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-800 mb-3">
-                    {contentLabels.contact.form.labels.message} <span className="text-red-500">*</span>
+                    {contentLabels?.contact?.form?.labels?.message || 'Message'} <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     name="message"
@@ -215,14 +227,14 @@ export const Contact = () => {
                     required
                     rows={6}
                     className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none bg-slate-50 hover:bg-white text-slate-900 placeholder-slate-400"
-                    placeholder={contentLabels.contact.form.placeholders.message}
+                    placeholder={contentLabels?.contact?.form?.placeholders?.message || 'Your message'}
                   />
                 </div>
                 
                 {/* File Upload */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-800 mb-3">
-                    {contentLabels.contact.form.labels.file}
+                    {contentLabels?.contact?.form?.labels?.file || 'Attachment'}
                   </label>
                   <div className="space-y-3">
                     <label 
@@ -232,7 +244,7 @@ export const Contact = () => {
                       <Upload className="w-6 h-6 text-slate-400 group-hover:text-blue-500 transition-colors" />
                       <div className="text-center">
                         <span className="text-sm font-medium text-slate-700 group-hover:text-blue-600 block">
-                          {contentLabels.contact.form.fileUpload.text}
+                          {contentLabels?.contact?.form?.fileUpload?.text || 'Click to upload'}
                         </span>
                         <span className="text-xs text-slate-500 mt-1 block">Max 5MB (PDF, DOCX)</span>
                       </div>
@@ -261,7 +273,7 @@ export const Contact = () => {
                           type="button"
                           onClick={removeFile}
                           className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-slate-600 hover:text-slate-900"
-                          aria-label={contentLabels.contact.form.fileUpload.removeButton}
+                          aria-label={contentLabels?.contact?.form?.fileUpload?.removeButton || 'Remove file'}
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -278,7 +290,7 @@ export const Contact = () => {
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? contentLabels.contact.form.buttons.submitting : contentLabels.contact.form.buttons.submit}
+                  {isSubmitting ? contentLabels?.contact?.form?.buttons?.submitting || 'Sending...' : contentLabels?.contact?.form?.buttons?.submit || 'Send Message'}
                 </Button>
                 
                 {/* Success Message */}
@@ -286,9 +298,9 @@ export const Contact = () => {
                   <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-emerald-900 font-semibold">{contentLabels.contact.form.messages.successTitle}</p>
+                      <p className="text-emerald-900 font-semibold">{contentLabels?.contact?.form?.messages?.successTitle || 'Success!'}</p>
                       <p className="text-emerald-700 text-sm mt-1">
-                        {contentLabels.contact.form.messages.successDescription}
+                        {contentLabels?.contact?.form?.messages?.successDescription || 'Message sent successfully'}
                       </p>
                     </div>
                   </div>
@@ -299,9 +311,9 @@ export const Contact = () => {
                   <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-red-900 font-semibold">{contentLabels.contact.form.messages.errorTitle}</p>
+                      <p className="text-red-900 font-semibold">{contentLabels?.contact?.form?.messages?.errorTitle || 'Error'}</p>
                       <p className="text-red-700 text-sm mt-1">
-                        {errorMessage || contentLabels.contact.form.messages.errorDescription}
+                        {errorMessage || contentLabels?.contact?.form?.messages?.errorDescription || 'Something went wrong'}
                       </p>
                     </div>
                   </div>
@@ -314,37 +326,37 @@ export const Contact = () => {
           <div className="space-y-6">
             {/* Contact Info Card */}
             <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">{contentLabels.contact.contactInfo.heading}</h3>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">{contentLabels?.contact?.contactInfo?.heading || 'Contact Information'}</h3>
               <p className="text-slate-600 text-sm mb-6">
-                {contentLabels.contact.contactInfo.description}
+                {contentLabels?.contact?.contactInfo?.description || ''}
               </p>
               
               <div className="space-y-4">
                 {/* Email */}
                 <a 
-                  href={`mailto:${contentLabels.contact.contactInfo.email.value}`}
+                  href={`mailto:${contentLabels?.contact?.contactInfo?.email?.value || 'contact@example.com'}`}
                   className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     <Mail size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.email.label}</div>
-                    <div className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{contentLabels.contact.contactInfo.email.value}</div>
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.email?.label || 'Email'}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{contentLabels?.contact?.contactInfo?.email?.value || 'contact@example.com'}</div>
                   </div>
                 </a>
                 
                 {/* Phone */}
                 <a 
-                  href={`tel:${contentLabels.contact.contactInfo.phone.value.replace(/\s+/g, '')}`}
+                  href={`tel:${(contentLabels?.contact?.contactInfo?.phone?.value || '').replace(/\s+/g, '')}`}
                   className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     <Phone size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.phone.label}</div>
-                    <div className="text-sm font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">{contentLabels.contact.contactInfo.phone.value}</div>
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.phone?.label || 'Phone'}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">{contentLabels?.contact?.contactInfo?.phone?.value || '+1 (555) 000-0000'}</div>
                   </div>
                 </a>
                 
@@ -354,8 +366,8 @@ export const Contact = () => {
                     <MapPin size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.location.label}</div>
-                    <div className="text-sm font-semibold text-slate-900">{contentLabels.contact.contactInfo.location.value}</div>
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.location?.label || 'Location'}</div>
+                    <div className="text-sm font-semibold text-slate-900">{contentLabels?.contact?.contactInfo?.location?.value || 'Chennai, India'}</div>
                   </div>
                 </div>
                 
@@ -370,8 +382,8 @@ export const Contact = () => {
                     <Linkedin size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels.contact.contactInfo.linkedin.label}</div>
-                    <div className="text-sm font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">{contentLabels.contact.contactInfo.linkedin.value}</div>
+                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.linkedin?.label || 'LinkedIn'}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">{contentLabels?.contact?.contactInfo?.linkedin?.value || 'Connect on LinkedIn'}</div>
                   </div>
                 </a>
               </div>
@@ -382,9 +394,9 @@ export const Contact = () => {
               <div className="flex items-start gap-3">
                 <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse mt-1 flex-shrink-0"></div>
                 <div>
-                  <span className="font-bold text-slate-900 block text-lg">{contentLabels.contact.availability.title}</span>
+                  <span className="font-bold text-slate-900 block text-lg">{contentLabels?.contact?.availability?.title || 'Available for Work'}</span>
                   <p className="text-slate-700 text-sm mt-2">
-                    {contentLabels.contact.availability.description}
+                    {contentLabels?.contact?.availability?.description || 'Open to new opportunities'}
                   </p>
                 </div>
               </div>

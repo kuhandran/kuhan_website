@@ -1,6 +1,6 @@
 // Chatbot helper functions for state/session management
 import { Dispatch, SetStateAction } from 'react';
-import contentLabels from '../../../public/data/contentLabels.json';
+import { contentLabels } from '../../lib/data/contentLabels';
 
 export function resetToEmail(
   setJwt: Dispatch<SetStateAction<string | null>>,

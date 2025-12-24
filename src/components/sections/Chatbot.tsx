@@ -8,8 +8,8 @@ import ChatProcess from './ChatProcess';
 import type { ChatbotStep } from './ChatbotState';
 import { resetToEmail, resetToOtp } from './chatbotHelpers';
 import { MessageCircle, X, Bot } from 'lucide-react';
-import contentLabels from '../../../public/data/contentLabels.json';
-import apiConfig from '../../../public/config/apiConfig.json';
+import { contentLabels } from '../../lib/data/contentLabels';
+import { fetchApiConfig, getApiConfigSync } from '@/lib/config/configLoader';
 
 
 export function Chatbot() {
@@ -23,11 +23,17 @@ export function Chatbot() {
   }
 
   // State and refs for chatbot session, input, and timers
+  const [apiConfig, setApiConfig] = useState<any>({});
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [inactivitySeconds, setInactivitySeconds] = useState(300);
   const [isTyping, setIsTyping] = useState(false);
+  
+  useEffect(() => {
+    // Fetch API config from CDN
+    fetchApiConfig().then(config => setApiConfig(config));
+  }, []);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [jwt, setJwt] = useState<string | null>(null);
@@ -230,7 +236,7 @@ export function Chatbot() {
             ? 'bg-red-500 hover:bg-red-600' 
             : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
         }`}
-        aria-label={contentLabels.chatbot.toggleChat}
+        aria-label={contentLabels?.chatbot?.toggleChat || 'Toggle chat'}
       >
         {isOpen ? (
           <X className="w-6 h-6 text-white" />

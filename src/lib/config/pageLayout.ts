@@ -5,11 +5,11 @@ import { skillsData } from '@/lib/data/skills';
 import { educationData } from '@/lib/data/education';
 import { achievementsData } from '@/lib/data/achievements';
 import { contentLabels } from '@/lib/data/contentLabels';
-import layoutConfigJson from '../../../public/config/pageLayout.json';
+import { fetchPageLayout, getPageLayoutSync } from '@/lib/config/configLoader';
 
 /**
  * Main Page Layout Configuration
- * Loaded from public/config/pageLayout.json
+ * Loaded from CDN: https://static.kuhandranchatbot.info/config/pageLayout.json
  * Returns configuration as a function to avoid serialization issues
  * Defines the structure, order, and styling of all sections
  * Data-driven rendering with reusable components
@@ -56,6 +56,16 @@ function resolveDataSources(config: any): PageLayoutConfig {
   };
 }
 
-export function getPageLayoutConfig(): PageLayoutConfig {
+export async function getPageLayoutConfig(): Promise<PageLayoutConfig> {
+  const layoutConfigJson = await fetchPageLayout();
+  return resolveDataSources(layoutConfigJson);
+}
+
+/**
+ * Synchronous version using cached data
+ * Must ensure fetchPageLayout has been called first
+ */
+export function getPageLayoutConfigSync(): PageLayoutConfig {
+  const layoutConfigJson = getPageLayoutSync();
   return resolveDataSources(layoutConfigJson);
 }

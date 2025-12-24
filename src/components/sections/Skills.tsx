@@ -1,16 +1,24 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Card } from '../elements/Card';
 import { SkillBar } from '../elements/SkillBar';
 import { skillsData } from '../../lib/data/skills';
-import contentLabels from '../../../public/data/contentLabels.json';
+import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 type SkillsData = Record<string, { name: string; icon: string; skills: Array<{ name: string; level: number; color: string }> }>;
 
 export const Skills = () => {
   const [activeTab, setActiveTab] = useState('frontend');
+  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
   const typedSkillsData = skillsData as SkillsData;
+
+  useEffect(() => {
+    const labels = getStaticContentLabels();
+    if (labels && Object.keys(labels).length > 0) {
+      setContentLabels(labels);
+    }
+  }, []);
   
   const tabs = Object.entries(typedSkillsData);
   
@@ -45,17 +53,17 @@ export const Skills = () => {
         <div className="max-w-4xl mx-auto">
           <Card className="p-8 md:p-12 bg-gradient-to-br from-slate-50 to-white">
             <div className="flex items-center gap-4 mb-8">
-              <span className="text-5xl">{typedSkillsData[activeTab].icon}</span>
+              <span className="text-5xl">{typedSkillsData[activeTab]?.icon || ''}</span>
               <h3 className="text-3xl md:text-4xl font-bold text-slate-900">
-                {typedSkillsData[activeTab].name}
+                {typedSkillsData[activeTab]?.name || ''}
               </h3>
               <div className="ml-auto">
                 <div className="text-right">
                   <div className="text-2xl font-bold text-blue-600">
-                    {Math.round(
+                    {typedSkillsData[activeTab]?.skills && Array.isArray(typedSkillsData[activeTab]?.skills) && typedSkillsData[activeTab].skills.length > 0 ? Math.round(
                       typedSkillsData[activeTab].skills.reduce((sum, skill) => sum + skill.level, 0) / 
                       typedSkillsData[activeTab].skills.length
-                    )}%
+                    ) : 0}%
                   </div>
                   <div className="text-xs text-slate-500 font-medium">Avg. Proficiency</div>
                 </div>
@@ -63,14 +71,14 @@ export const Skills = () => {
             </div>
             
             <div className="grid md:grid-cols-2 gap-x-8 gap-y-1 mt-8">
-              {typedSkillsData[activeTab].skills.map((skill, index) => (
+              {typedSkillsData[activeTab]?.skills && Array.isArray(typedSkillsData[activeTab]?.skills) ? typedSkillsData[activeTab].skills.map((skill, index) => (
                 <SkillBar
                   key={index}
                   skillName={skill.name}
                   level={skill.level}
                   color={skill.color}
                 />
-              ))}
+              )) : null}
             </div>
           </Card>
         </div>

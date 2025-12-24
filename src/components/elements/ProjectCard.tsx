@@ -81,7 +81,7 @@ export const ProjectCard = ({
         <div className="mb-4">
           <p className="text-xs font-semibold text-slate-500 mb-2.5 uppercase tracking-wide">Technologies</p>
           <div className="flex flex-wrap gap-2">
-            {techStack.map((tech, index) => (
+            {(techStack || []).map((tech, index) => (
               <span 
                 key={index} 
                 className="px-2.5 py-1 bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 text-xs font-medium rounded-lg border border-slate-200 hover:border-slate-300 transition-all hover:shadow-sm whitespace-nowrap"

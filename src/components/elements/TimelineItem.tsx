@@ -72,7 +72,7 @@ export const TimelineItem = ({
               Key Achievements
             </h4>
             <ul className="space-y-3">
-              {description.map((item, index) => (
+              {(Array.isArray(description) ? description : []).map((item, index) => (
                 <li key={index} className="text-slate-600 flex items-start gap-3 group hover:bg-blue-50/50 p-2 rounded-lg transition-colors">
                   <CheckCircle2 size={18} className="text-emerald-500 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
                   <span className="font-medium">{item}</span>
@@ -85,7 +85,7 @@ export const TimelineItem = ({
           <div className="border-t border-slate-200 pt-4">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Technologies</p>
             <div className="flex flex-wrap gap-2">
-              {techStack.map((tech, index) => (
+              {(techStack || []).map((tech, index) => (
                 <div key={index} className="group">
                   <Badge 
                     variant="blue" 

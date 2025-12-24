@@ -1,10 +1,10 @@
 /**
  * Data Loader Module
- * Loads all data from JSON files in the public/data folder
- * This allows easy migration to backend services later
+ * Loads all data from remote CDN endpoints
+ * All data sources from: https://static.kuhandranchatbot.info/data/
  */
 
-// These will be populated from JSON imports
+// Cache for fetched data
 let projectsData: any = null;
 let experienceData: any = null;
 let skillsData: any = null;
@@ -12,24 +12,38 @@ let educationData: any = null;
 let achievementsData: any = null;
 let contentLabels: any = null;
 
-// Dynamic imports of JSON data
+const CDN_BASE_URL = 'https://static.kuhandranchatbot.info/data';
+
+// Generic fetch function with caching and error handling
+async function fetchDataFromCDN(filename: string, defaultValue: any = null) {
+  try {
+    const response = await fetch(`${CDN_BASE_URL}/${filename}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching ${filename}:`, error);
+    return defaultValue;
+  }
+}
+
+// Dynamic imports of JSON data from remote CDN
 export async function loadAllData() {
   try {
-    const [projects, experience, skills, education, achievements, labels] = await Promise.all([
-      import('../../../public/data/projects.json'),
-      import('../../../public/data/experience.json'),
-      import('../../../public/data/skills.json'),
-      import('../../../public/data/education.json'),
-      import('../../../public/data/achievements.json'),
-      import('../../../public/data/contentLabels.json'),
+    const [projects, experience, skills, education, labels, achievements] = await Promise.all([
+      fetchDataFromCDN('projects.json', []),
+      fetchDataFromCDN('experience.json', []),
+      fetchDataFromCDN('skills.json', {}),
+      fetchDataFromCDN('education.json', []),
+      fetchDataFromCDN('contentLabels.json', {}),
+      fetchDataFromCDN('achievements.json', { awards: [], certifications: [] }),
     ]);
 
-    projectsData = projects.default;
-    experienceData = experience.default;
-    skillsData = skills.default;
-    educationData = education.default;
-    achievementsData = achievements.default;
-    contentLabels = labels.default;
+    projectsData = projects;
+    experienceData = experience;
+    skillsData = skills;
+    educationData = education;
+    contentLabels = labels;
+    achievementsData = achievements;
   } catch (error) {
     console.error('Error loading data files:', error);
   }
