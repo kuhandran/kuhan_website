@@ -10,24 +10,33 @@ const AnalyticsWrapper = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager & Full-Stack Engineer',
-  description: 'Technical leader specializing in enterprise applications, React Native development, and data visualization. 8+ years experience in banking and insurance sectors.',
-  keywords: 'Technical Delivery Manager, Full-Stack Engineer, React Native, React.js, Data Visualization, Power BI, AWS, Spring Boot',
-  authors: [{ name: 'Kuhandran SamudraPandiyan' }],
+  title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager | FWD Malaysia | Maybank | TDM Malaysia',
+  description: 'Technical Delivery Manager & Full-Stack Engineer with 8+ years experience at FWD Insurance Malaysia, Maybank, and leading tech companies. Expertise in React Native, React.js, Power BI, microservices, and enterprise banking solutions. INTI International University & UOW Malaysia alumnus.',
+  keywords: 'Kuhandran SamudraPandiyan, Technical Delivery Manager, TDM Malaysia, Full-Stack Engineer, React Native developer, React.js expert, Power BI specialist, Data Visualization, FWD Insurance, FWD Malaysia, FWD Technology and Innovation Malaysia Sdn. Bhd, Maybank, Maybank Tech, Maybank Shared Services, Banking solutions, Enterprise applications, Software Engineer Malaysia, INTI International University, INTI Alumni, UOW Malaysia, UOW Australia, Kuala Lumpur, Microservices architecture, Project Management, Cross-functional Teams, Agile methodologies',
+  authors: [{ name: 'Kuhandran SamudraPandiyan', url: 'https://www.kuhandranchatbot.info' }],
   openGraph: {
-    title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager',
-    description: 'Technical leader with 8+ years experience in enterprise applications',
+    title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager & Full-Stack Engineer',
+    description: 'Technical Delivery Manager & Full-Stack Engineer with 8+ years experience in enterprise applications, React Native, and banking solutions.',
     type: 'website',
     url: 'https://www.kuhandranchatbot.info',
     siteName: 'Kuhandran SamudraPandiyan',
+    locale: 'en_MY',
     images: [
       {
-        url: 'https://static.kuhandranchatbot.info/images/profile.png',
+        url: 'https://static.kuhandranchatbot.info/image/profile.webp',
         width: 400,
         height: 400,
         alt: 'Kuhandran SamudraPandiyan Profile',
+        type: 'image/webp',
       },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager',
+    description: 'Full-Stack Engineer & Technical Leader | 8+ years in enterprise applications',
+    images: ['https://static.kuhandranchatbot.info/image/profile.webp'],
+    creator: '@kuhan_samudra',
   },
   robots: {
     index: true,
@@ -82,6 +91,77 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#3b82f6" />
         <meta name="theme-color" content="#3b82f6" />
         <link rel="canonical" href="https://www.kuhandranchatbot.info" />
+        
+        {/* JSON-LD Schema for better search results */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "name": "Kuhandran SamudraPandiyan",
+              "url": "https://www.kuhandranchatbot.info",
+              "image": "https://static.kuhandranchatbot.info/image/profile.webp",
+              "jobTitle": "Technical Delivery Manager",
+              "worksFor": [
+                {
+                  "@type": "Organization",
+                  "name": "FWD Insurance",
+                  "url": "https://www.fwd.com",
+                  "alternateName": ["FWD Malaysia", "FWD Technology and Innovation Malaysia Sdn. Bhd"]
+                },
+                {
+                  "@type": "Organization",
+                  "name": "Maybank",
+                  "url": "https://www.maybank.com",
+                  "alternateName": ["Maybank Tech", "Maybank Shared Services"]
+                }
+              ],
+              "sameAs": [
+                "https://www.linkedin.com/in/kuhandran-samudrapandiyan/",
+                "https://instagram.com/kuhan_samudra"
+              ],
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Kuala Lumpur",
+                "addressRegion": "Malaysia",
+                "addressCountry": "MY"
+              },
+              "alumniOf": [
+                {
+                  "@type": "Organization",
+                  "name": "INTI International University",
+                  "url": "https://www.newinti.edu.my",
+                  "alternateName": ["INTI Alumni", "INTI International"]
+                },
+                {
+                  "@type": "Organization",
+                  "name": "University of Wollongong Malaysia",
+                  "url": "https://www.uow.edu.au",
+                  "alternateName": ["UOW Malaysia", "UOW Australia"]
+                }
+              ],
+              "description": "Technical Delivery Manager and Full-Stack Engineer with 8+ years of experience in enterprise applications, React Native development, and banking/insurance solutions. Experienced with Maybank, FWD Insurance Malaysia, and other leading technology companies.",
+              "knowsAbout": [
+                "React Native",
+                "React.js",
+                "Power BI",
+                "Data Visualization",
+                "Full-Stack Development",
+                "Microservices",
+                "Enterprise Applications",
+                "Banking Solutions",
+                "Project Management",
+                "Agile Methodologies",
+                "Cross-functional Teams",
+                "RESTful APIs",
+                "Spring Boot",
+                "TypeScript"
+              ]
+            })
+          }}
+        />
+        <link rel="sitemap" href="https://www.kuhandranchatbot.info/sitemap.xml" />
       </head>
       <body>
         {children}

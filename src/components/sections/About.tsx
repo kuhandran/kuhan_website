@@ -31,8 +31,8 @@ export const About = () => {
               
               {(() => {
                 // Images are loaded from external static web service
-                const imageSrc = 'https://static.kuhandranchatbot.info/images/profile.png';
-                const webpSrc = 'https://static.kuhandranchatbot.info/images/profile.webp';
+                const imageSrc = 'https://static.kuhandranchatbot.info/image/profile.webp';
+                const webpSrc = 'https://static.kuhandranchatbot.info/image/profile.webp';
 
                 return (
                   <picture>

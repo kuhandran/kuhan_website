@@ -21,7 +21,7 @@ const defaultExperienceData = [
       'Applied agile methodologies to optimize workflows and adapt to project demands'
     ],
     techStack: ['React Native', 'Agile', 'Project Management', 'Cross-functional Teams'],
-    logo: '/image/fwd-logo.png'
+    logo: 'https://static.kuhandranchatbot.info/image/fwd-logo.png'
   },
   {
     title: 'Senior Software Engineer',
@@ -35,7 +35,7 @@ const defaultExperienceData = [
       'Designed and implemented RESTful APIs, improving application functionalities'
     ],
     techStack: ['React.js', 'Redux', 'RESTful APIs', 'React Hooks', 'Git'],
-    logo: '/image/maybank-logo.png'
+    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
   },
   {
     title: 'Software Engineer',
@@ -49,7 +49,7 @@ const defaultExperienceData = [
       'Collaborated remotely using Agile methodologies with global teams'
     ],
     techStack: ['React', 'Redux', 'Axios', 'SPA Architecture', 'Agile'],
-    logo: '/image/maybank-logo.png'
+    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
   },
   {
     title: 'UI/UX Developer',
@@ -63,7 +63,7 @@ const defaultExperienceData = [
       'Enhanced project modularity through component-based architecture'
     ],
     techStack: ['React', 'Redux', 'UI/UX Design', 'Component Architecture'],
-    logo: '/image/maybank-logo.png'
+    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
   },
   {
     title: 'Junior Developer',
@@ -77,7 +77,7 @@ const defaultExperienceData = [
       'Supported API integration for insurance renewal and purchases'
     ],
     techStack: ['Java', 'API Integration', 'Security', 'SDLC'],
-    logo: '/image/maybank-logo.png'
+    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
   }
 ];
 

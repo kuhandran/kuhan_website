@@ -13,7 +13,7 @@ const defaultProjectsData = [
     title: 'FWD Insurance React Native App',
     description: 'Enterprise insurance platform with DMS, OWB, and UnderWrite Me modules for streamlined operations and enhanced user experience.',
     fullDescription: 'A comprehensive insurance platform built with React Native, providing agents with digital tools for managing customer policies, underwriting, and claims processing. Features include real-time synchronization, offline capabilities, and cross-platform compatibility.',
-    image: '/image/Project1.png',
+    image: 'https://static.kuhandranchatbot.info/image/Project1.png',
     techStack: ['React Native', 'RESTful APIs', 'Redux', 'TypeScript'],
     metrics: '15% efficiency improvement',
     liveUrl: 'https://www.fwd.com/en/the-fwd-difference/doing-more-with-digital-technology/giving-our-agents-the-digital-tools-they-need/',
@@ -23,7 +23,7 @@ const defaultProjectsData = [
     title: 'Maybank Digital Banking Platform',
     description: 'Modern single-page application for digital banking services with optimized performance and seamless user experience.',
     fullDescription: 'A feature-rich digital banking platform that enables customers to manage their finances, transfer funds, pay bills, and apply for banking products. Built with React and optimized for fast load times and responsive design.',
-    image: '/image/Project2.png',
+    image: 'https://static.kuhandranchatbot.info/image/Project2.png',
     techStack: ['React.js', 'Redux', 'React Hooks', 'Axios'],
     metrics: '15% faster load speed',
     liveUrl: 'https://www.maybank2u.com.my/home/m2u/common/login.do',
@@ -33,7 +33,7 @@ const defaultProjectsData = [
     title: 'Banking API Integration',
     description: 'RESTful API development for insurance product integration, enabling seamless renewals and purchases through banking partners.',
     fullDescription: 'A robust API layer that enables insurance product integration within banking platforms. Supports policy renewals, new purchases, claims submission, and customer service integrations across multiple banking partners.',
-    image: '/image/Project3.png',
+    image: 'https://static.kuhandranchatbot.info/image/Project3.png',
     techStack: ['Spring Boot', 'RESTful APIs', 'Microservices', 'Java'],
     highlights: ['Microservices architecture', 'API-first design', 'High availability', 'Bank partner integration'],
     githubUrl: '#'
@@ -42,7 +42,7 @@ const defaultProjectsData = [
     title: 'Power BI Analytics Dashboard',
     description: 'Comprehensive data visualization solution providing actionable business insights and real-time analytics for decision-making.',
     fullDescription: 'An advanced analytics dashboard that consolidates data from multiple sources, providing real-time insights on business metrics, customer trends, and operational performance. Features interactive visualizations and custom KPI tracking.',
-    image: '/image/Project4.png',
+    image: 'https://static.kuhandranchatbot.info/image/Project4.png',
     techStack: ['Power BI', 'Data Visualization', 'SQL', 'DAX'],
     highlights: ['Real-time analytics', 'Custom KPIs', 'Data consolidation', 'Interactive dashboards'],
     liveUrl: '#'
@@ -51,7 +51,7 @@ const defaultProjectsData = [
     title: 'Cross-Border Team Portal',
     description: 'Project management and collaboration platform for distributed teams with real-time updates and performance tracking.',
     fullDescription: 'A comprehensive collaboration platform designed for teams distributed across multiple countries. Features project management, real-time communication, file sharing, and performance analytics for distributed team collaboration.',
-    image: '/image/Project5.png',
+    image: 'https://static.kuhandranchatbot.info/image/Project5.png',
     techStack: ['React', 'Node.js', 'MongoDB', 'WebSocket'],
     highlights: ['Real-time collaboration', 'Project management', 'Team analytics', 'File sharing'],
     liveUrl: '#'
@@ -60,7 +60,7 @@ const defaultProjectsData = [
     title: 'Cybersecurity Compliance Tool',
     description: 'Security vulnerability assessment and compliance monitoring system for Bank Negara standards.',
     fullDescription: 'An enterprise-grade security monitoring and compliance tool that identifies vulnerabilities, tracks compliance with banking regulations, and provides automated remediation recommendations. Ensures adherence to Bank Negara Malaysia security standards.',
-    image: '/image/Project6.png',
+    image: 'https://static.kuhandranchatbot.info/image/Project6.png',
     techStack: ['Java', 'Spring Security', 'PostgreSQL', 'Docker'],
     highlights: ['Vulnerability scanning', 'Compliance monitoring', 'Security automation', 'Regulatory adherence'],
     githubUrl: '#'

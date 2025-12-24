@@ -1,0 +1,39 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Kuhandran SamudraPandiyan",
+  "url": "https://www.kuhandranchatbot.info",
+  "image": "https://static.kuhandranchatbot.info/image/profile.webp",
+  "jobTitle": "Technical Delivery Manager",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "FWD Insurance"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/in/kuhandran-samudrapandiyan/",
+    "https://instagram.com/kuhan_samudra",
+    "https://github.com/kuhandran"
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Kuala Lumpur",
+    "addressRegion": "Malaysia",
+    "addressCountry": "MY"
+  },
+  "alumniOf": {
+    "@type": "Organization",
+    "name": "INTI International University"
+  },
+  "description": "Technical Delivery Manager and Full-Stack Engineer with 8+ years of experience in enterprise applications, React Native development, and banking/insurance solutions.",
+  "knowsAbout": [
+    "React Native",
+    "React.js",
+    "Power BI",
+    "Data Visualization",
+    "Full-Stack Development",
+    "Microservices",
+    "Enterprise Applications",
+    "Banking Solutions",
+    "Project Management"
+  ]
+}
