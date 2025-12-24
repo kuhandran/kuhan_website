@@ -1,7 +1,5 @@
 {
-  "build": {
-    "ignoreBuildStep": "git diff --quiet HEAD^ HEAD public/"
-  },
+  "buildCommand": "next build",
   "rewrites": [
     {
       "source": "/data/:path*",
