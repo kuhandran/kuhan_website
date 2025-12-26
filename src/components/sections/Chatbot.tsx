@@ -170,7 +170,7 @@ export function Chatbot() {
     let botResponse = '';
     try {
       if (!jwt || !sessionId) {
-        botResponse = contentLabels.chatbot.messages.sessionExpired;
+        botResponse = contentLabels?.chatbot?.messages?.sessionExpired || 'Session expired. Please log in again.';
       } else {
         const response = await fetch(apiConfig.fullUrls.chatSend, {
           method: 'POST',
@@ -183,6 +183,7 @@ export function Chatbot() {
         const data = await response.json();
         if (data.detail === 'Token expired') {
           // Clear session and reset to OTP screen
+          const sessionExpiredMsg = contentLabels?.chatbot?.messages?.sessionExpiredOtp || 'Session expired. Please log in again.';
           resetToOtp(
             setJwt,
             setSessionId,
@@ -190,19 +191,19 @@ export function Chatbot() {
             setStep,
             setStatusMsg,
             setInactivitySeconds,
-            contentLabels.chatbot.messages.sessionExpiredOtp
+            sessionExpiredMsg
           );
-          botResponse = contentLabels.chatbot.messages.sessionExpiredOtp;
+          botResponse = sessionExpiredMsg;
         } else if (data.answer) {
           botResponse = data.answer;
         } else if (data.error) {
           botResponse = data.error;
         } else {
-          botResponse = contentLabels.chatbot.messages.noResponse;
+          botResponse = contentLabels?.chatbot?.messages?.noResponse || 'No response received. Please try again.';
         }
       }
     } catch (error) {
-      botResponse = contentLabels.chatbot.messages.connectionError;
+      botResponse = contentLabels?.chatbot?.messages?.connectionError || 'Connection error. Please try again.';
     }
     setIsTyping(false);
     // Add bot message
@@ -258,13 +259,13 @@ export function Chatbot() {
               <Bot className="w-6 h-6" />
             </div>
             <div className="flex-1">
-            <h3 className="font-bold text-lg">{contentLabels.chatbot.header.title}</h3>
-            <p className="text-xs text-white/80">{contentLabels.chatbot.header.subtitle}</p>
+            <h3 className="font-bold text-lg">{contentLabels?.chatbot?.header?.title || 'Chat with me'}</h3>
+            <p className="text-xs text-white/80">{contentLabels?.chatbot?.header?.subtitle || 'Ask me anything'}</p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-              aria-label={contentLabels.chatbot.closeChat}
+              aria-label={contentLabels?.chatbot?.closeChat || 'Close chat'}
             >
               <X className="w-5 h-5" />
             </button>
@@ -303,7 +304,7 @@ export function Chatbot() {
               messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
               handleSendMessage={handleSendMessage}
               handleKeyPress={handleKeyPress}
-              quickActions={contentLabels.chatbot.quickActions}
+              quickActions={contentLabels?.chatbot?.quickActions || []}
               setQuickAction={(action) => {
                 setInputValue(action);
                 setTimeout(() => handleSendMessage(), 100);
@@ -318,7 +319,7 @@ export function Chatbot() {
   async function handleRequestOtp() {
     setStatusMsg(null);
     if (!captchaToken) {
-      setStatusMsg(contentLabels.chatbot.messages.captchaRequired);
+      setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || 'Please complete the captcha.');
       return;
     }
     setLoading(true);
@@ -331,12 +332,12 @@ export function Chatbot() {
       const data = await res.json();
       if (data.otp_generated) {
         setStep('otp');
-        setStatusMsg(contentLabels.chatbot.messages.otpSent);
+        setStatusMsg(contentLabels?.chatbot?.messages?.otpSent || 'OTP sent successfully.');
       } else {
-        setStatusMsg(contentLabels.chatbot.messages.otpFailed);
+        setStatusMsg(contentLabels?.chatbot?.messages?.otpFailed || 'Failed to send OTP.');
       }
     } catch (e) {
-      setStatusMsg(contentLabels.chatbot.messages.otpError);
+      setStatusMsg(contentLabels?.chatbot?.messages?.otpError || 'Error sending OTP. Please try again.');
     }
     setLoading(false);
   }
@@ -356,12 +357,12 @@ export function Chatbot() {
         setJwt(data.jwt || data.token);
         setSessionId(data.session_id);
         setStep('chat');
-        setStatusMsg(contentLabels.chatbot.messages.verifySuccess);
+        setStatusMsg(contentLabels?.chatbot?.messages?.verifySuccess || 'Verified successfully!');
       } else {
         setStatusMsg(data.detail || 'Invalid OTP. Try again.');
       }
     } catch (e) {
-      setStatusMsg(contentLabels.chatbot.messages.otpError2);
+      setStatusMsg(contentLabels?.chatbot?.messages?.otpError2 || 'Error verifying OTP. Please try again.');
     }
     setLoading(false);
   }

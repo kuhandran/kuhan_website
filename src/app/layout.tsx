@@ -9,6 +9,12 @@ const AnalyticsWrapper = dynamic(
   { loading: () => null }
 );
 
+// Lazy load Analytics Consent Banner
+const AnalyticsConsentBanner = dynamic(
+  () => import('../components/AnalyticsConsentBanner').then(mod => ({ default: mod.AnalyticsConsentBanner })),
+  { loading: () => null }
+);
+
 export const metadata: Metadata = {
   title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager | FWD Malaysia | Maybank | TDM Malaysia',
   description: 'Technical Delivery Manager & Full-Stack Engineer with 8+ years experience at FWD Insurance Malaysia, Maybank, and leading tech companies. Expertise in React Native, React.js, Power BI, microservices, and enterprise banking solutions. INTI International University & UOW Malaysia alumnus.',
@@ -190,6 +196,7 @@ export default function RootLayout({
       <body>
         {children}
         <AnalyticsWrapper />
+        <AnalyticsConsentBanner />
       </body>
     </html>
   );
