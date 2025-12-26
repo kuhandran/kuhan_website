@@ -41,6 +41,7 @@ const ChatProcess: React.FC<ChatProcessProps> = ({
   const contentLabels = defaultLabels || {
     chatbot: {
       sessionExpiry: 'Session will expire in',
+      placeholder: 'Type your message...',
       sendButton: 'Send message',
       ariaLabel: 'Send message'
     },
@@ -108,7 +109,7 @@ const ChatProcess: React.FC<ChatProcessProps> = ({
     </div>
     <div className="p-4 bg-white border-t border-slate-200 rounded-b-2xl">
       <div className="mb-2 text-center text-xs text-slate-500 font-semibold">
-        {`${contentLabels.chatbot.sessionExpiry} ${Math.floor(inactivitySeconds / 60)}:${(inactivitySeconds % 60).toString().padStart(2, '0')}`}
+        {`${contentLabels?.chatbot?.sessionExpiry || 'Session will expire in'} ${Math.floor(inactivitySeconds / 60)}:${(inactivitySeconds % 60).toString().padStart(2, '0')}`}
       </div>
       <div className="flex gap-2">
         <input
@@ -117,7 +118,7 @@ const ChatProcess: React.FC<ChatProcessProps> = ({
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder={contentLabels.chatbot.placeholder}
+          placeholder={contentLabels?.chatbot?.placeholder || 'Type your message...'}
           className="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
           disabled={isTyping}
         />
@@ -125,7 +126,7 @@ const ChatProcess: React.FC<ChatProcessProps> = ({
           onClick={handleSendMessage}
           disabled={!inputValue.trim() || isTyping}
           className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95"
-          aria-label={contentLabels.chatbot.ariaLabel}
+          aria-label={contentLabels?.chatbot?.ariaLabel || 'Send message'}
         >
           {isTyping ? (
             <Loader2 className="w-5 h-5 animate-spin" />
