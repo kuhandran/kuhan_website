@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
-import { contentLabels } from '../../lib/data/contentLabels';
+import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
 
 interface Message {
   id: string;
@@ -36,8 +36,22 @@ const ChatProcess: React.FC<ChatProcessProps> = ({
   handleSendMessage,
   quickActions,
   setQuickAction
-}) => (
-  <>
+}) => {
+  // Safe fallback for contentLabels
+  const contentLabels = defaultLabels || {
+    chatbot: {
+      sessionExpiry: 'Session will expire in',
+      sendButton: 'Send message',
+      ariaLabel: 'Send message'
+    },
+    common: {
+      loading: 'Loading...'
+    }
+  };
+
+  return (
+    <>
+
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
       {messages.map((message) => (
         <div
@@ -133,6 +147,7 @@ const ChatProcess: React.FC<ChatProcessProps> = ({
       </div>
     </div>
   </>
-);
+  );
+};
 
 export default ChatProcess;

@@ -1,6 +1,10 @@
 // Chatbot helper functions for state/session management
 import { Dispatch, SetStateAction } from 'react';
-import { contentLabels } from '../../lib/data/contentLabels';
+import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
+
+// Safe defaults
+const defaultMessage = "Hi! I'm Kuhandran's AI assistant. Ask me anything about his experience, skills, or projects!";
+const contentLabels = defaultLabels || { chatbot: { initialMessage: defaultMessage } };
 
 export function resetToEmail(
   setJwt: Dispatch<SetStateAction<string | null>>,
@@ -23,7 +27,7 @@ export function resetToEmail(
   setMessages([
     {
       id: '1',
-      text: contentLabels.chatbot.initialMessage,
+      text: contentLabels?.chatbot?.initialMessage || defaultMessage,
       sender: 'bot',
       timestamp: new Date()
     }

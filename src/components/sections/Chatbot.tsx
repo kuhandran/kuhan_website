@@ -8,11 +8,35 @@ import ChatProcess from './ChatProcess';
 import type { ChatbotStep } from './ChatbotState';
 import { resetToEmail, resetToOtp } from './chatbotHelpers';
 import { MessageCircle, X, Bot } from 'lucide-react';
-import { contentLabels } from '../../lib/data/contentLabels';
+import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
 import { fetchApiConfig, getApiConfigSync } from '@/lib/config/configLoader';
 
+// Safe defaults in case contentLabels is undefined
+const defaultContentLabels = {
+  chatbot: {
+    title: 'AI Assistant',
+    subtitle: 'Ask me anything about Kuhandran',
+    initialMessage: "Hi! I'm Kuhandran's AI assistant.",
+    messages: {
+      sessionExpired: 'Session expired. Please refresh.',
+      sessionExpiredOtp: 'Session expired. Please re-enter OTP.',
+      noResponse: 'Sorry, I did not understand the response.',
+      connectionError: 'Sorry, I\'m having trouble connecting.',
+    },
+    otp: {
+      label: 'Enter OTP',
+      placeholder: '6-digit OTP',
+      verifyButton: 'Verify OTP',
+      verifying: 'Verifying...',
+      changeEmail: 'Change email'
+    }
+  }
+};
 
 export function Chatbot() {
+
+  // Use provided labels or fallback to defaults
+  const contentLabels = defaultLabels || defaultContentLabels;
 
   // Message type for chat messages
   interface Message {
