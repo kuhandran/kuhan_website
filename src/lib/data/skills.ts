@@ -59,7 +59,7 @@ const defaultSkillsData = {
   }
 };
 
-export let skillsData = defaultSkillsData;
+export const skillsData = defaultSkillsData;
 
 const fetchSkills = async () => {
   try {

@@ -31,6 +31,7 @@ const SectionHeaderLoadingFallback: React.FC = () => (
 /**
  * Convert data to element configs based on section type
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getElementsFromData = (
   sectionType: string,
   data: any[],

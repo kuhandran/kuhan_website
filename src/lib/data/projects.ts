@@ -4,7 +4,10 @@
  * Falls back to local data if CDN is unavailable
  */
 
-import React from 'react';import { getErrorMessageSync } from '@/lib/config/appConfig';
+import React from 'react';
+import { getErrorMessageSync } from '@/lib/config/appConfig';
+import { ProjectCardProps } from '@/lib/config/types';
+
 const CDN_URL = 'https://static.kuhandranchatbot.info/data/projects.json';
 
 // Default/fallback data
@@ -67,7 +70,7 @@ const defaultProjectsData = [
   }
 ];
 
-export let projectsData: any[] = defaultProjectsData;
+export const projectsData: ProjectCardProps[] = defaultProjectsData;
 
 const fetchProjects = async () => {
   try {

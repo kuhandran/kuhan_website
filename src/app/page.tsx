@@ -6,6 +6,7 @@ import { PageRenderer } from '../components/renderers/PageRenderer';
 import { getPageLayoutConfig } from '@/lib/config/pageLayout';
 import { initializeContentLabels } from '@/lib/data/contentLabels';
 import { fetchPageLayout } from '@/lib/config/configLoader';
+import { PageLayoutConfig } from '@/lib/config/types';
 import { useEffect, useState } from 'react';
 
 /**
@@ -14,7 +15,7 @@ import { useEffect, useState } from 'react';
  * Easily reorder, add, or modify sections by editing getPageLayoutConfig
  */
 export default function Home() {
-  const [pageLayoutConfig, setPageLayoutConfig] = useState<any>(null);
+  const [pageLayoutConfig, setPageLayoutConfig] = useState<PageLayoutConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

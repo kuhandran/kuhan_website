@@ -19,7 +19,8 @@ import { FormElement, FormButton } from '@/components/elements/FormElement';
  * Lazy load components for better performance
  * Components are code-split and loaded on demand
  */
-const lazyComponentMap: Record<string, React.LazyExoticComponent<ReactComponentType<any>>> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const lazyComponentMap: Record<string, React.LazyExoticComponent<any>> = {
   ProjectCard: lazy(() => Promise.resolve({ default: ProjectCard })),
   TimelineItem: lazy(() => Promise.resolve({ default: TimelineItem })),
   SkillBar: lazy(() => Promise.resolve({ default: SkillBar })),
@@ -33,7 +34,8 @@ const lazyComponentMap: Record<string, React.LazyExoticComponent<ReactComponentT
 /**
  * Synchronous component map for immediate rendering
  */
-const componentMap: Record<ComponentType, ReactComponentType<any>> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const componentMap: Record<ComponentType, any> = {
   ProjectCard,
   TimelineItem,
   SkillBar,

@@ -1,5 +1,5 @@
-const chokidar = require('chokidar');
-const { exec } = require('child_process');
+import chokidar from 'chokidar';
+import { exec } from 'child_process';
 
 // Watch the public folder for changes
 const watcher = chokidar.watch('./public', {
