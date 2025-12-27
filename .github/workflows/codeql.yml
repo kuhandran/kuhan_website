@@ -16,8 +16,8 @@ on:
   workflow_dispatch:
 
 env:
-  # Set node version
-  NODE_VERSION: '18'
+  # Set node version (Next.js 16 requires Node.js >=20.9.0)
+  NODE_VERSION: '20'
 
 permissions:
   # Required for all workflows
