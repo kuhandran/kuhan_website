@@ -8,8 +8,22 @@ import { Button } from '../elements/Button';
 import { ArrowDown, Sparkles, Zap, Globe } from 'lucide-react';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
+// Default fallback values for Hero section
+const DEFAULT_HERO_LABELS = {
+  hero: {
+    badge: 'Welcome to my portfolio',
+    mainHeading: 'Hi, I\'m Kuhandran',
+    subheading: 'Full-Stack Developer & AI Enthusiast',
+    description: 'Building scalable applications and innovative solutions',
+    cta: 'Explore My Work',
+  }
+};
+
 export const Hero = () => {
-  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
+  const [contentLabels, setContentLabels] = useState(() => {
+    const labels = getStaticContentLabels();
+    return labels && Object.keys(labels).length > 0 ? labels : DEFAULT_HERO_LABELS;
+  });
 
   useEffect(() => {
     // Get the latest cached labels when component mounts
@@ -48,30 +62,30 @@ export const Hero = () => {
           <div className="mb-6 animate-fade-in">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-sm font-medium backdrop-blur-sm">
               <Sparkles size={16} className="animate-pulse" />
-              {contentLabels.hero.badge}
+              {contentLabels?.hero?.badge || 'Welcome to my portfolio'}
             </span>
           </div>
           
           {/* Main Headline */}
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight animate-slide-up">
-            {contentLabels.hero.mainHeading}
+            {contentLabels?.hero?.mainHeading || 'Hi, I\'m Kuhandran'}
           </h1>
           
           {/* Subheadline with roles */}
           <div className="text-xl md:text-2xl text-slate-300 mb-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <span className="inline-flex items-center gap-2 font-semibold text-blue-400">
               <Zap size={20} />
-              {contentLabels.hero.roles.primary}
+              {contentLabels?.hero?.roles?.primary || 'Full-Stack Developer'}
             </span>
             {' '}<span className="text-slate-500">|</span>{' '}
-            <span className="font-semibold text-purple-400">{contentLabels.hero.roles.secondary}</span>
+            <span className="font-semibold text-purple-400">{contentLabels?.hero?.roles?.secondary || 'AI Enthusiast'}</span>
             {' '}<span className="text-slate-500">|</span>{' '}
-            <span className="font-semibold text-emerald-400">{contentLabels.hero.roles.tertiary}</span>
+            <span className="font-semibold text-emerald-400">{contentLabels?.hero?.roles?.tertiary || 'Problem Solver'}</span>
           </div>
           
           {/* Description */}
           <p className="text-lg text-slate-400 mb-8 max-w-2xl leading-relaxed animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            {contentLabels.hero.description}
+            {contentLabels?.hero?.description || 'Building scalable applications and innovative solutions'}
           </p>
           
           {/* Key Highlights */}
@@ -101,7 +115,7 @@ export const Hero = () => {
               onClick={() => scrollToSection('projects')}
               className="group"
             >
-              <span>{contentLabels.hero.cta.primary}</span>
+              <span>{contentLabels?.hero?.cta?.primary || 'Explore My Work'}</span>
               <ArrowDown size={20} className="ml-2 group-hover:translate-y-1 transition-transform" />
             </Button>
             <Button 
@@ -109,7 +123,7 @@ export const Hero = () => {
               size="lg"
               onClick={() => scrollToSection('contact')}
             >
-              {contentLabels.hero.cta.secondary}
+              {contentLabels?.hero?.cta?.secondary || 'Get in Touch'}
             </Button>
           </div>
           
