@@ -6,16 +6,39 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../elements/Button';
 import { ArrowDown, Sparkles, Zap, Globe } from 'lucide-react';
-import { getStaticContentLabels } from '../../lib/data/contentLabels';
+import { getStaticContentLabels, initializeContentLabels } from '../../lib/data/contentLabels';
 
 // Default fallback values for Hero section
 const DEFAULT_HERO_LABELS = {
   hero: {
-    badge: 'Welcome to my portfolio',
-    mainHeading: 'Hi, I\'m Kuhandran',
+    badge: 'Hi, I\'m Kuhandran',
+    mainHeading: 'Technical Leader Driving Digital Transformation',
     subheading: 'Full-Stack Developer & AI Enthusiast',
-    description: 'Building scalable applications and innovative solutions',
-    cta: 'Explore My Work',
+    description: 'Specialized in enterprise applications, React Native development, and data visualization. Combining 8+ years of technical expertise with strategic business insights to drive operational efficiency and innovation.',
+    roles: {
+      primary: 'Technical Delivery Manager',
+      secondary: 'Full-Stack Engineer',
+      tertiary: 'Data Enthusiast'
+    },
+    highlights: {
+      experience: '8+ Years Experience',
+      location: 'Based in Malaysia',
+      relocation: 'Open to Relocation'
+    },
+    cta: {
+      primary: 'View My Work',
+      secondary: 'Let\'s Connect'
+    },
+    stats: {
+      experience: { value: '8+', label: 'Years Experience' },
+      efficiency: { value: '15%', label: 'Efficiency Gains' },
+      countries: { value: '2', label: 'Countries' },
+      education: { value: 'MBA', label: 'Business Analytics' }
+    },
+    scroll: {
+      text: 'Scroll Down',
+      ariaLabel: 'Scroll to about section'
+    }
   }
 };
 
@@ -26,11 +49,20 @@ export const Hero = () => {
   });
 
   useEffect(() => {
-    // Get the latest cached labels when component mounts
-    const labels = getStaticContentLabels();
-    if (labels && Object.keys(labels).length > 0) {
-      setContentLabels(labels);
-    }
+    // Ensure content labels are initialized from CDN
+    const loadLabels = async () => {
+      try {
+        await initializeContentLabels();
+        const labels = getStaticContentLabels();
+        if (labels && Object.keys(labels).length > 0) {
+          setContentLabels(labels);
+        }
+      } catch (error) {
+        console.error('Failed to load content labels:', error);
+      }
+    };
+    
+    loadLabels();
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -149,7 +181,7 @@ export const Hero = () => {
             </div>
             <div className="group cursor-default p-4 rounded-lg hover:bg-amber-500/10 hover:border hover:border-amber-500/30 transition-all duration-300">
               <div className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
-                {contentLabels?.hero?.stats?.education?.value || 'B.E'}
+                {contentLabels?.hero?.stats?.education?.value || 'MBA'}
               </div>
               <div className="text-xs md:text-sm text-slate-400">{contentLabels?.hero?.stats?.education?.label || 'Education'}</div>
             </div>

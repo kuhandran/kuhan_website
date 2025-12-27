@@ -20,9 +20,9 @@ export const Education = () => {
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle={contentLabels.education.subtitle}
-          title={contentLabels.education.title}
-          description={contentLabels.education.description}
+          subtitle={contentLabels?.education?.subtitle || ''}
+          title={contentLabels?.education?.title || 'Education'}
+          description={contentLabels?.education?.description || ''}
         />
         
         <div className="max-w-4xl mx-auto space-y-6">

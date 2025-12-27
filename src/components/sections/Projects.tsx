@@ -18,9 +18,9 @@ export const Projects = () => {
     <section id="projects" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          subtitle={contentLabels.projects.subtitle}
-          title={contentLabels.projects.title}
-          description={contentLabels.projects.description}
+          subtitle={contentLabels?.projects?.subtitle || ''}
+          title={contentLabels?.projects?.title || 'Projects'}
+          description={contentLabels?.projects?.description || ''}
         />
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginTop: '48px' }}>

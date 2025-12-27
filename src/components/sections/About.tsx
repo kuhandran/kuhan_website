@@ -1,41 +1,71 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { StatCard } from '../elements/StatCard';
 import { Button } from '../elements/Button';
 import { Users, Briefcase, TrendingUp } from 'lucide-react';
-import { getStaticContentLabels } from '../../lib/data/contentLabels';
+import { getStaticContentLabels, initializeContentLabels } from '../../lib/data/contentLabels';
 
-// Default fallback for About section
+// Default fallback for About section - matches CDN data exactly
 const DEFAULT_ABOUT_LABELS = {
   about: {
-    subtitle: 'Learn More',
-    title: 'About Me',
-    description: 'Software developer with experience in full-stack development',
-    stats: [],
+    subtitle: 'Who I Am',
+    title: 'Bridging Technology & Business Strategy',
+    description: 'Technical leader with a passion for building scalable solutions',
+    image: {
+      src: '/image/profile.png',
+      alt: 'Kuhandran SamudraPandiyan'
+    },
+    stats: [
+      { icon: 'Users', value: '8+', label: 'Years Experience' },
+      { icon: 'Briefcase', value: '2', label: 'Countries' },
+      { icon: 'TrendingUp', value: '15%', label: 'Efficiency Gains' }
+    ],
     paragraphs: {
-      current_role: '',
-      previous_experience: '',
-      education: ''
+      current_role: 'Currently serving as a Technical Project Manager at FWD Insurance, I lead cross-border delivery teams and drive continuous improvement initiatives that have reduced aging incident tickets by 15%. My role combines technical architecture, system analysis, and strategic project management.',
+      previous_experience: 'With over 6 years at Maybank, I progressed from Junior Developer to Senior Software Engineer, building React.js applications, implementing RESTful APIs, and optimizing user experiences that improved load speeds by 15%.',
+      education: 'I hold an MBA in Business Analytics from Cardiff Metropolitan University, which allows me to bridge technical expertise with strategic business insights—a unique combination that drives innovation in enterprise environments.'
     },
     highlights: {
       heading: 'Key Highlights',
-      items: []
+      items: [
+        'Cross-border team management & Agile methodologies',
+        'Full-stack development: React, React Native, Spring Boot',
+        'Data visualization & analytics with Power BI',
+        'AWS certified developer with cloud expertise',
+        'Domain experience: Banking & Insurance sectors',
+        'Sri Lankan with EP in Malaysia - Open to relocation'
+      ]
+    },
+    cta: {
+      resume: 'Download Resume',
+      linkedin: 'View LinkedIn'
     }
   }
 };
 
 export const About = () => {
-  const [contentLabels] = useState(() => {
+  const [contentLabels, setContentLabels] = useState(() => {
     const labels = getStaticContentLabels();
     return labels && Object.keys(labels).length > 0 ? labels : DEFAULT_ABOUT_LABELS;
   });
+
+  useEffect(() => {
+    const loadContentLabels = async () => {
+      await initializeContentLabels();
+      const updatedLabels = getStaticContentLabels();
+      if (updatedLabels && Object.keys(updatedLabels).length > 0) {
+        setContentLabels(updatedLabels);
+      }
+    };
+    loadContentLabels();
+  }, []);
   return (
     <section id="about" className="py-20 bg-slate-50">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle={contentLabels.about.subtitle}
-          title={contentLabels.about.title}
-          description={contentLabels.about.description}
+          subtitle={contentLabels?.about?.subtitle || 'Learn More'}
+          title={contentLabels?.about?.title || 'About Me'}
+          description={contentLabels?.about?.description || ''}
         />
         
         <div className="grid md:grid-cols-2 gap-12 items-start max-w-6xl mx-auto">
@@ -109,8 +139,8 @@ export const About = () => {
             
             {/* CTA */}
             <div className="flex gap-4">
-              <Button variant="primary">{contentLabels.about.cta.resume}</Button>
-              <Button variant="secondary">{contentLabels.about.cta.linkedin}</Button>
+              <Button variant="primary">{contentLabels?.about?.cta?.resume || 'Download Resume'}</Button>
+              <Button variant="secondary">{contentLabels?.about?.cta?.linkedin || 'Connect on LinkedIn'}</Button>
             </div>
           </div>
         </div>

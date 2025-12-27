@@ -26,9 +26,9 @@ export const Skills = () => {
     <section id="skills" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle={contentLabels.skills.subtitle}
-          title={contentLabels.skills.title}
-          description={contentLabels.skills.description}
+          subtitle={contentLabels?.skills?.subtitle || ''}
+          title={contentLabels?.skills?.title || 'Skills'}
+          description={contentLabels?.skills?.description || ''}
         />
         
         {/* Tab Navigation - Enhanced */}

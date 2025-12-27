@@ -35,9 +35,9 @@ export const Achievements = () => {
     <section className="py-20 bg-gradient-to-b from-white to-slate-50">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle={contentLabels.achievements.subtitle}
-          title={contentLabels.achievements.title}
-          description={contentLabels.achievements.description}
+          subtitle={contentLabels?.achievements?.subtitle || ''}
+          title={contentLabels?.achievements?.title || 'Achievements'}
+          description={contentLabels?.achievements?.description || ''}
         />
         
         <div className="max-w-6xl mx-auto mt-12">

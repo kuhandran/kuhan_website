@@ -155,7 +155,7 @@ const jobApplicationFormExample = {
       inputType: 'tel',
       name: 'phone',
       label: 'Phone Number',
-      placeholder: '+1 (555) 000-0000',
+      placeholder: '+60149337280',
       required: true
     },
     {

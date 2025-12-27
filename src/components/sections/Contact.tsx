@@ -334,7 +334,7 @@ export const Contact = () => {
               <div className="space-y-4">
                 {/* Email */}
                 <a 
-                  href={`mailto:${contentLabels?.contact?.contactInfo?.email?.value || 'contact@example.com'}`}
+                  href={`mailto:${contentLabels?.contact?.contactInfo?.email?.value || 'skuhandran@yahoo.com'}`}
                   className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -342,7 +342,7 @@ export const Contact = () => {
                   </div>
                   <div className="flex-1">
                     <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.email?.label || 'Email'}</div>
-                    <div className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{contentLabels?.contact?.contactInfo?.email?.value || 'contact@example.com'}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{contentLabels?.contact?.contactInfo?.email?.value || 'skuhandran@yahoo.com'}</div>
                   </div>
                 </a>
                 
@@ -356,7 +356,7 @@ export const Contact = () => {
                   </div>
                   <div className="flex-1">
                     <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.phone?.label || 'Phone'}</div>
-                    <div className="text-sm font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">{contentLabels?.contact?.contactInfo?.phone?.value || '+1 (555) 000-0000'}</div>
+                    <div className="text-sm font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">{contentLabels?.contact?.contactInfo?.phone?.value || '+60149337280'}</div>
                   </div>
                 </a>
                 
@@ -367,7 +367,7 @@ export const Contact = () => {
                   </div>
                   <div className="flex-1">
                     <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.location?.label || 'Location'}</div>
-                    <div className="text-sm font-semibold text-slate-900">{contentLabels?.contact?.contactInfo?.location?.value || 'Chennai, India'}</div>
+                    <div className="text-sm font-semibold text-slate-900">{contentLabels?.contact?.contactInfo?.location?.value || 'Kuala Lumpur, Malaysia'}</div>
                   </div>
                 </div>
                 
