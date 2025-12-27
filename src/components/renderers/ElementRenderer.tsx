@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, lazy, ComponentType as ReactComponentType } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { ElementConfig, ComponentType } from '@/lib/config/types';
 import { getErrorMessageSync } from '@/lib/config/appConfig';
 

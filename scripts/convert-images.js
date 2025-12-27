@@ -22,7 +22,7 @@ let converted = 0;
 let skipped = 0;
 let failed = 0;
 
-files.forEach((file, index) => {
+files.forEach((file) => {
   const inputPath = path.join(imageDir, file);
   const outputWebp = inputPath.replace(/\.(png|jpg|jpeg)$/i, '.webp');
   const filename = path.basename(file);

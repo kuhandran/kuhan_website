@@ -3,7 +3,7 @@
 import React, { Suspense, lazy } from 'react';
 import { SectionConfig } from '@/lib/config/types';
 import { SectionHeader } from '@/components/elements/SectionHeader';
-import { ElementRenderer, BatchElementRenderer } from './ElementRenderer';
+import { BatchElementRenderer } from './ElementRenderer';
 
 interface SectionRendererProps {
   config: SectionConfig;

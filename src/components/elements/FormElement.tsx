@@ -16,7 +16,6 @@ export interface FormElementProps extends FormInputConfig {
 }
 
 export const FormElement: React.FC<FormElementProps> = ({
-  type,
   inputType,
   name,
   label,

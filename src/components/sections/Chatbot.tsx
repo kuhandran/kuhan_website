@@ -6,10 +6,10 @@ import EmailCaptcha from './EmailCaptcha';
 import OtpEntry from './OtpEntry';
 import ChatProcess from './ChatProcess';
 import type { ChatbotStep } from './ChatbotState';
-import { resetToEmail, resetToOtp } from './chatbotHelpers';
-import { MessageCircle, X, Bot } from 'lucide-react';
+import { resetToOtp } from './chatbotHelpers';
+import { MessageCircle, Bot, X } from 'lucide-react';
 import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
-import { fetchApiConfig, getApiConfigSync } from '@/lib/config/configLoader';
+import { fetchApiConfig } from '@/lib/config/configLoader';
 
 // Safe defaults in case contentLabels is undefined
 const defaultContentLabels = {

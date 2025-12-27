@@ -78,7 +78,7 @@ export const CustomSectionRenderer: React.FC<CustomSectionRendererProps> = ({
   config,
   useLazyLoad = true,
 }) => {
-  const { id, type } = config;
+  const { type } = config;
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = React.useState(false);
 
