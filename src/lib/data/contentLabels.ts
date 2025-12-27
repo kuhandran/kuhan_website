@@ -11,7 +11,7 @@ import { getErrorMessageSync } from '../../lib/config/appConfig';
 const CDN_URL = 'https://static.kuhandranchatbot.info/data/contentLabels.json';
 const FALLBACK_URL = '/data/defaultContentLabels.json';
 
-let cachedLabels: any = null;
+let cachedLabels: any = {};
 let labelsFetchPromise: Promise<any> | null = null;
 let defaultLabelsData: any = null;
 
@@ -109,6 +109,5 @@ export const getLabel = (path: string, defaultValue?: string): string => {
 
 // Export default for backward compatibility
 // Type as 'any' to avoid strict type checking issues with CDN-loaded data
-const contentLabels: any = cachedLabels || {};
-export { contentLabels };
-export default contentLabels;
+export { cachedLabels as contentLabels };
+export default cachedLabels;

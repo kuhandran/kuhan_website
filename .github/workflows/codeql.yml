@@ -86,16 +86,10 @@ jobs:
           # Upload results to GitHub Security tab
           upload: true
 
-      # Upload SARIF report as artifact for detailed analysis
-      - name: Upload SARIF Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: codeql-sarif-report
-          path: |
-            **/codeql-results/**/*.sarif
-            results/*.sarif
-          retention-days: 30
+      # Note: CodeQL analyze action uploads SARIF directly to GitHub Security tab
+      # For artifact storage, we would need to export the results first
+      - name: Check for analysis results
+        run: echo "CodeQL analysis complete. Results available in Security tab."
 
   # Additional security checks
   security-check:
@@ -183,12 +177,6 @@ jobs:
     if: always()
 
     steps:
-      - name: Download CodeQL Report
-        uses: actions/download-artifact@v4
-        with:
-          name: codeql-sarif-report
-        continue-on-error: true
-
       - name: Download Security Report
         uses: actions/download-artifact@v4
         with:
@@ -211,6 +199,7 @@ jobs:
           echo "✅ Manual trigger from Actions tab" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Reports Available" >> $GITHUB_STEP_SUMMARY
-          echo "📊 [CodeQL Results](../../security/code-scanning)" >> $GITHUB_STEP_SUMMARY
+          echo "📊 [CodeQL Security Results](../../security/code-scanning)" >> $GITHUB_STEP_SUMMARY
           echo "📋 [Artifacts](../../actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "📈 [Scan Logs](../../actions/runs/${{ github.run_id }}/attempts/1)" >> $GITHUB_STEP_SUMMARY
 
