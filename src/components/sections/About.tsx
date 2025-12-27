@@ -1,19 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { StatCard } from '../elements/StatCard';
 import { Button } from '../elements/Button';
 import { Users, Briefcase, TrendingUp } from 'lucide-react';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
-export const About = () => {
-  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
-
-  useEffect(() => {
-    const labels = getStaticContentLabels();
-    if (labels && Object.keys(labels).length > 0) {
-      setContentLabels(labels);
+// Default fallback for About section
+const DEFAULT_ABOUT_LABELS = {
+  about: {
+    subtitle: 'Learn More',
+    title: 'About Me',
+    description: 'Software developer with experience in full-stack development',
+    stats: [],
+    paragraphs: {
+      current_role: '',
+      previous_experience: '',
+      education: ''
+    },
+    highlights: {
+      heading: 'Key Highlights',
+      items: []
     }
-  }, []);
+  }
+};
+
+export const About = () => {
+  const [contentLabels] = useState(() => {
+    const labels = getStaticContentLabels();
+    return labels && Object.keys(labels).length > 0 ? labels : DEFAULT_ABOUT_LABELS;
+  });
   return (
     <section id="about" className="py-20 bg-slate-50">
       <div className="container mx-auto px-4">
@@ -49,14 +64,14 @@ export const About = () => {
             
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-4 mt-8">
-              {(contentLabels as any)?.about?.stats?.map((stat: any, index: number) => {
-                const IconComponent = { Users, Briefcase, TrendingUp }[stat.icon as string] || Users;
+              {(contentLabels?.about?.stats || [])?.map((stat: { icon?: string; value?: string; label?: string }, index: number) => {
+                const IconComponent = { Users, Briefcase, TrendingUp }[stat?.icon as string] || Users;
                 return (
                   <StatCard
                     key={index}
                     icon={<IconComponent />}
-                    value={stat.value}
-                    label={stat.label}
+                    value={stat?.value || ''}
+                    label={stat?.label || ''}
                   />
                 );
               })}
@@ -81,9 +96,9 @@ export const About = () => {
             
             {/* Key Highlights */}
             <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">{(contentLabels as any)?.about?.highlights?.heading}</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-4">{contentLabels?.about?.highlights?.heading || 'Key Highlights'}</h3>
               <ul className="space-y-3">
-                {(contentLabels as any)?.about?.highlights?.items?.map((highlight: any, index: number) => (
+                {(contentLabels?.about?.highlights?.items || [])?.map((highlight: string, index: number) => (
                   <li key={index} className="flex items-start gap-3 text-slate-600">
                     <span className="text-emerald-500 mt-1">✓</span>
                     {highlight}

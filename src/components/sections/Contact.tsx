@@ -9,7 +9,7 @@ import { Button } from '../elements/Button';
 import { Card } from '../elements/Card';
 import { Mail, Phone, MapPin, Linkedin, Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
-import { fetchApiConfig, getApiConfigSync } from '@/lib/config/configLoader';
+import { fetchApiConfig } from '@/lib/config/configLoader';
 import { getErrorMessageSync } from '@/lib/config/appConfig';
 
 interface FormData {
