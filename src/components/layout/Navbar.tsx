@@ -5,11 +5,13 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from '../elements/Button';
+import { ResumePDFViewer } from '../elements/ResumePDFViewer';
 import { Menu, X, Download } from 'lucide-react';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isResumePDFOpen, setIsResumePDFOpen] = useState(false);
   
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -41,8 +43,7 @@ export const Navbar = () => {
   };
   
   const handleDownloadResume = () => {
-    // Replace with your actual resume URL
-    window.open('/resume/resume.pdf', '_blank');
+    setIsResumePDFOpen(true);
   };
   
   return (
@@ -183,6 +184,13 @@ export const Navbar = () => {
           }
         }
       `}</style>
+
+      {/* PDF Viewer Modal */}
+      <ResumePDFViewer
+        isOpen={isResumePDFOpen}
+        onClose={() => setIsResumePDFOpen(false)}
+        resumeUrl="https://static.kuhandranchatbot.info/resume/resume.pdf"
+      />
     </>
   );
 };

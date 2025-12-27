@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { StatCard } from '../elements/StatCard';
 import { Button } from '../elements/Button';
+import { ResumePDFViewer } from '../elements/ResumePDFViewer';
 import { Users, Briefcase, TrendingUp } from 'lucide-react';
 import { getStaticContentLabels, initializeContentLabels } from '../../lib/data/contentLabels';
 
@@ -48,6 +49,7 @@ export const About = () => {
     const labels = getStaticContentLabels();
     return labels && Object.keys(labels).length > 0 ? labels : DEFAULT_ABOUT_LABELS;
   });
+  const [isResumePDFOpen, setIsResumePDFOpen] = useState(false);
 
   useEffect(() => {
     const loadContentLabels = async () => {
@@ -139,12 +141,21 @@ export const About = () => {
             
             {/* CTA */}
             <div className="flex gap-4">
-              <Button variant="primary">{contentLabels?.about?.cta?.resume || 'Download Resume'}</Button>
+              <Button variant="primary" onClick={() => setIsResumePDFOpen(true)}>
+                {contentLabels?.about?.cta?.resume || 'Download Resume'}
+              </Button>
               <Button variant="secondary">{contentLabels?.about?.cta?.linkedin || 'Connect on LinkedIn'}</Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* PDF Viewer Modal */}
+      <ResumePDFViewer
+        isOpen={isResumePDFOpen}
+        onClose={() => setIsResumePDFOpen(false)}
+        resumeUrl="https://static.kuhandranchatbot.info/resume/resume.pdf"
+      />
     </section>
   );
 };
