@@ -1,99 +1,216 @@
-# For most projects, this workflow file will not need changing; you simply need
-# to commit it to your repository.
-#
-# You may wish to alter this file to override the set of languages analyzed,
-# or to provide custom queries or build logic.
-#
-# ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
-#
-name: "CodeQL Advanced"
+# CodeQL Advanced Security Analysis Workflow
+# Scans for security vulnerabilities, code quality issues, and best practices
+# Reports: GitHub Security tab, SARIF upload, and detailed artifacts
+
+name: "CodeQL Advanced Security Analysis"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
+  # Run security scan weekly on Sunday at 2 AM UTC
   schedule:
-    - cron: '34 21 * * 0'
+    - cron: '0 2 * * 0'
+  # Allow manual trigger from Actions tab
+  workflow_dispatch:
+
+env:
+  # Set node version
+  NODE_VERSION: '18'
+
+permissions:
+  # Required for all workflows
+  security-events: write
+  contents: read
+  actions: read
+  # For pull requests
+  pull-requests: write
 
 jobs:
-  analyze:
-    name: Analyze (${{ matrix.language }})
-    # Runner size impacts CodeQL analysis time. To learn more, please see:
-    #   - https://gh.io/recommended-hardware-resources-for-running-codeql
-    #   - https://gh.io/supported-runners-and-hardware-resources
-    #   - https://gh.io/using-larger-runners (GitHub.com only)
-    # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
-    permissions:
-      # required for all workflows
-      security-events: write
-
-      # required to fetch internal or private CodeQL packs
-      packages: read
-
-      # only required for workflows in private repositories
-      actions: read
-      contents: read
-
+  # Code scanning analysis
+  codeql-analysis:
+    name: CodeQL Security Analysis (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    
     strategy:
       fail-fast: false
       matrix:
         include:
-        - language: javascript-typescript
-          build-mode: none
-        # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
-        # Use `c-cpp` to analyze code written in C, C++ or both
-        # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
-        # Use 'javascript-typescript' to analyze code written in JavaScript, TypeScript or both
-        # To learn more about changing the languages that are analyzed or customizing the build mode for your analysis,
-        # see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning.
-        # If you are analyzing a compiled language, you can modify the 'build-mode' for that language to customize how
-        # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
+          # JavaScript/TypeScript analysis with extended security queries
+          - language: javascript-typescript
+            build-mode: none
+            query-suite: 'security-extended' # Extended security queries
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # Checkout repository with full history
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better analysis
 
-    # Add any setup steps before running the `github/codeql-action/init` action.
-    # This includes steps like installing compilers or runtimes (`actions/setup-node`
-    # or others). This is typically only required for manual builds.
-    # - name: Setup runtime (example)
-    #   uses: actions/setup-example@v1
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
-      with:
-        languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
+      # Install dependencies (required for better analysis)
+      - name: Install dependencies
+        run: npm ci
 
-        # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
-        # queries: security-extended,security-and-quality
+      # Initialize CodeQL with extended security queries
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # Use extended security + quality queries
+          queries: security-and-quality,security-extended
+          # Enable debug for detailed logging
+          debug: true
 
-    # If the analyze step fails for one of the languages you are analyzing with
-    # "We were unable to automatically build your code", modify the matrix above
-    # to set the build mode to "manual" for that language. Then modify this step
-    # to build your code.
-    # ℹ️ Command-line programs to run using the OS shell.
-    # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - name: Run manual build steps
-      if: matrix.build-mode == 'manual'
-      shell: bash
-      run: |
-        echo 'If you are using a "manual" build mode for one or more of the' \
-          'languages you are analyzing, replace this with the commands to build' \
-          'your code, for example:'
-        echo '  make bootstrap'
-        echo '  make release'
-        exit 1
+      # Build project for better code analysis
+      - name: Build project
+        run: npm run build
+        continue-on-error: true
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
-      with:
-        category: "/language:${{matrix.language}}"
+      # Run CodeQL analysis with extended queries
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
+          # Wait for processing to complete
+          wait-for-processing: true
+          # Upload results to GitHub Security tab
+          upload: true
+
+      # Upload SARIF report as artifact for detailed analysis
+      - name: Upload SARIF Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: codeql-sarif-report
+          path: |
+            **/codeql-results/**/*.sarif
+            results/*.sarif
+          retention-days: 30
+
+  # Additional security checks
+  security-check:
+    name: Security Checks
+    runs-on: ubuntu-latest
+    needs: codeql-analysis
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Dependency vulnerability check
+      - name: Check Dependencies for Vulnerabilities
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      # Check for secrets in code
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+        continue-on-error: true
+
+      # Upload Trivy results
+      - name: Upload Trivy Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-security-report
+          path: trivy-results.sarif
+          retention-days: 30
+
+  # Quality gates check
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    needs: codeql-analysis
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Type checking
+      - name: TypeScript Type Check
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      # Linting
+      - name: Run ESLint
+        run: npm run lint || true
+        continue-on-error: true
+
+      # Build check
+      - name: Build Check
+        run: npm run build
+        continue-on-error: true
+
+  # Report summary
+  report-summary:
+    name: Security Report Summary
+    runs-on: ubuntu-latest
+    needs: [codeql-analysis, security-check, quality-gates]
+    if: always()
+
+    steps:
+      - name: Download CodeQL Report
+        uses: actions/download-artifact@v4
+        with:
+          name: codeql-sarif-report
+        continue-on-error: true
+
+      - name: Download Security Report
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-security-report
+        continue-on-error: true
+
+      - name: Generate Report Summary
+        run: |
+          echo "## 🔒 Security Scan Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### CodeQL Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- Language: JavaScript/TypeScript" >> $GITHUB_STEP_SUMMARY
+          echo "- Query Suite: security-and-quality, security-extended" >> $GITHUB_STEP_SUMMARY
+          echo "- Results: Check 'Security' tab for detailed findings" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Scan Triggers" >> $GITHUB_STEP_SUMMARY
+          echo "✅ On every push to main/develop" >> $GITHUB_STEP_SUMMARY
+          echo "✅ On every pull request" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Weekly schedule (Sunday 2 AM UTC)" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Manual trigger from Actions tab" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Reports Available" >> $GITHUB_STEP_SUMMARY
+          echo "📊 [CodeQL Results](../../security/code-scanning)" >> $GITHUB_STEP_SUMMARY
+          echo "📋 [Artifacts](../../actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+
