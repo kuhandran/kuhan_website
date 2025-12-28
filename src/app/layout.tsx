@@ -16,8 +16,8 @@ const AnalyticsConsentBanner = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager | FWD Malaysia | Maybank | TDM Malaysia',
-  description: 'Technical Delivery Manager & Full-Stack Engineer with 8+ years experience at FWD Insurance Malaysia, Maybank, and leading tech companies. Expertise in React Native, React.js, Power BI, microservices, and enterprise banking solutions. INTI International University & UOW Malaysia alumnus.',
+  title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager & Full-Stack Engineer',
+  description: 'Technical Delivery Manager and Full-Stack Engineer with 8+ years delivering enterprise-grade software. Expertise in React, Power BI, microservices, and data visualization for banking and insurance clients.',
   keywords: 'Kuhandran SamudraPandiyan, Technical Delivery Manager, TDM Malaysia, Full-Stack Engineer, React Native developer, React.js expert, Power BI specialist, Data Visualization, FWD Insurance, FWD Malaysia, FWD Technology and Innovation Malaysia Sdn. Bhd, Maybank, Maybank Tech, Maybank Shared Services, Banking solutions, Enterprise applications, Software Engineer Malaysia, INTI International University, INTI Alumni, UOW Malaysia, UOW Australia, Kuala Lumpur, Microservices architecture, Project Management, Cross-functional Teams, Agile methodologies',
   authors: [{ name: 'Kuhandran SamudraPandiyan', url: 'https://www.kuhandranchatbot.info' }],
   openGraph: {

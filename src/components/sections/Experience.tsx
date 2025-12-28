@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { TimelineItem } from '../elements/TimelineItem';
-import { experienceData } from '../../lib/data/experience';
+import { useExperience } from '../../lib/data/experience';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 export const Experience = () => {
+  const { experience: experienceData, loading } = useExperience();
   const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
 
   useEffect(() => {
@@ -13,6 +14,21 @@ export const Experience = () => {
       setContentLabels(labels);
     }
   }, []);
+
+  if (loading) {
+    return (
+      <section id="experience" className="py-20 bg-gradient-to-b from-slate-50 to-white">
+        <div className="container mx-auto px-4">
+          <SectionHeader
+            subtitle={contentLabels?.experience?.subtitle || ''}
+            title={contentLabels?.experience?.title || 'Experience'}
+            description={contentLabels?.experience?.description || ''}
+          />
+          <div className="text-center text-gray-500 mt-8">Loading experience...</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="experience" className="py-20 bg-gradient-to-b from-slate-50 to-white">

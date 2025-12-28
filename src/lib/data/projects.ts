@@ -1,100 +1,56 @@
 /**
- * Projects Data
- * Loaded from: https://static.kuhandranchatbot.info/data/projects.json
- * Falls back to local data if CDN is unavailable
+ * Projects Data Loader
+ * Loads projects from JSON:
+ * - Development: /data/projects.json (local)
+ * - Production: https://static.kuhandranchatbot.info/data/projects.json (CDN)
  */
 
 import React from 'react';
-import { getErrorMessageSync } from '@/lib/config/appConfig';
 import { ProjectCardProps } from '@/lib/config/types';
+import { getDataSourceUrl } from '@/lib/config/dataConfig';
 
-const CDN_URL = 'https://static.kuhandranchatbot.info/data/projects.json';
+const DATA_URL = getDataSourceUrl('projects.json');
 
-// Default/fallback data
-const defaultProjectsData = [
-  {
-    title: 'FWD Insurance React Native App',
-    description: 'Enterprise insurance platform with DMS, OWB, and UnderWrite Me modules for streamlined operations and enhanced user experience.',
-    fullDescription: 'A comprehensive insurance platform built with React Native, providing agents with digital tools for managing customer policies, underwriting, and claims processing. Features include real-time synchronization, offline capabilities, and cross-platform compatibility.',
-    image: 'https://static.kuhandranchatbot.info/image/Project1.png',
-    techStack: ['React Native', 'RESTful APIs', 'Redux', 'TypeScript'],
-    metrics: '15% efficiency improvement',
-    liveUrl: 'https://www.fwd.com/en/the-fwd-difference/doing-more-with-digital-technology/giving-our-agents-the-digital-tools-they-need/',
-    highlights: ['DMS integration', 'Online/Offline functionality', 'Real-time data sync', 'Multi-platform support']
-  },
-  {
-    title: 'Maybank Digital Banking Platform',
-    description: 'Modern single-page application for digital banking services with optimized performance and seamless user experience.',
-    fullDescription: 'A feature-rich digital banking platform that enables customers to manage their finances, transfer funds, pay bills, and apply for banking products. Built with React and optimized for fast load times and responsive design.',
-    image: 'https://static.kuhandranchatbot.info/image/Project2.png',
-    techStack: ['React.js', 'Redux', 'React Hooks', 'Axios'],
-    metrics: '15% faster load speed',
-    liveUrl: 'https://www.maybank2u.com.my/home/m2u/common/login.do',
-    highlights: ['Fast load times', 'Responsive design', 'Secure authentication', 'Multiple banking features']
-  },
-  {
-    title: 'Banking API Integration',
-    description: 'RESTful API development for insurance product integration, enabling seamless renewals and purchases through banking partners.',
-    fullDescription: 'A robust API layer that enables insurance product integration within banking platforms. Supports policy renewals, new purchases, claims submission, and customer service integrations across multiple banking partners.',
-    image: 'https://static.kuhandranchatbot.info/image/Project3.png',
-    techStack: ['Spring Boot', 'RESTful APIs', 'Microservices', 'Java'],
-    highlights: ['Microservices architecture', 'API-first design', 'High availability', 'Bank partner integration'],
-    githubUrl: '#'
-  },
-  {
-    title: 'Power BI Analytics Dashboard',
-    description: 'Comprehensive data visualization solution providing actionable business insights and real-time analytics for decision-making.',
-    fullDescription: 'An advanced analytics dashboard that consolidates data from multiple sources, providing real-time insights on business metrics, customer trends, and operational performance. Features interactive visualizations and custom KPI tracking.',
-    image: 'https://static.kuhandranchatbot.info/image/Project4.png',
-    techStack: ['Power BI', 'Data Visualization', 'SQL', 'DAX'],
-    highlights: ['Real-time analytics', 'Custom KPIs', 'Data consolidation', 'Interactive dashboards'],
-    liveUrl: '#'
-  },
-  {
-    title: 'Cross-Border Team Portal',
-    description: 'Project management and collaboration platform for distributed teams with real-time updates and performance tracking.',
-    fullDescription: 'A comprehensive collaboration platform designed for teams distributed across multiple countries. Features project management, real-time communication, file sharing, and performance analytics for distributed team collaboration.',
-    image: 'https://static.kuhandranchatbot.info/image/Project5.png',
-    techStack: ['React', 'Node.js', 'MongoDB', 'WebSocket'],
-    highlights: ['Real-time collaboration', 'Project management', 'Team analytics', 'File sharing'],
-    liveUrl: '#'
-  },
-  {
-    title: 'Cybersecurity Compliance Tool',
-    description: 'Security vulnerability assessment and compliance monitoring system for Bank Negara standards.',
-    fullDescription: 'An enterprise-grade security monitoring and compliance tool that identifies vulnerabilities, tracks compliance with banking regulations, and provides automated remediation recommendations. Ensures adherence to Bank Negara Malaysia security standards.',
-    image: 'https://static.kuhandranchatbot.info/image/Project6.png',
-    techStack: ['Java', 'Spring Security', 'PostgreSQL', 'Docker'],
-    highlights: ['Vulnerability scanning', 'Compliance monitoring', 'Security automation', 'Regulatory adherence'],
-    githubUrl: '#'
-  }
-];
-
-export const projectsData: ProjectCardProps[] = defaultProjectsData;
+// Empty array as ultimate fallback
+const EMPTY_PROJECTS: ProjectCardProps[] = [];
 
 const fetchProjects = async () => {
   try {
-    const response = await fetch(CDN_URL);
+    console.log(`[Projects] Fetching from: ${DATA_URL}`);
+    const response = await fetch(DATA_URL);
     if (!response.ok) {
-      console.warn(getErrorMessageSync('warnings.projectsData'));
-      return defaultProjectsData;
+      console.warn(`[Projects] HTTP ${response.status}: ${DATA_URL}`);
+      return EMPTY_PROJECTS;
     }
-    return response.json();
+    const data = await response.json();
+    console.log(`[Projects] ✓ Successfully loaded ${data.length} projects`);
+    return data;
   } catch (error) {
-    console.error(getErrorMessageSync('data.projects'), error);
-    return defaultProjectsData;
+    console.error(`[Projects] Error loading: ${error}`);
+    return EMPTY_PROJECTS;
   }
 };
 
+export const projectsData: ProjectCardProps[] = [];
+
 export const useProjects = () => {
-  const [projects, setProjects] = React.useState(projectsData);
-  const [error, setError] = React.useState(null);
+  const [projects, setProjects] = React.useState<ProjectCardProps[]>(EMPTY_PROJECTS);
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    setLoading(true);
     fetchProjects()
-      .then((data) => setProjects(data))
-      .catch((err) => setError(err));
+      .then((data) => {
+        setProjects(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setProjects(EMPTY_PROJECTS);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  return { projects, error };
+  return { projects, error, loading };
 };

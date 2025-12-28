@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Card } from '../elements/Card';
 import { Badge } from '../elements/Badge';
-import { educationData } from '../../lib/data/education';
+import { useEducation } from '../../lib/data/education';
 import { GraduationCap } from 'lucide-react';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 export const Education = () => {
+  const { education: educationData, loading } = useEducation();
   const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
 
   useEffect(() => {
@@ -15,6 +16,21 @@ export const Education = () => {
       setContentLabels(labels);
     }
   }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <SectionHeader
+            subtitle={contentLabels?.education?.subtitle || ''}
+            title={contentLabels?.education?.title || 'Education'}
+            description={contentLabels?.education?.description || ''}
+          />
+          <div className="text-center text-gray-500 mt-8">Loading education...</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-white">

@@ -144,7 +144,9 @@ export const About = () => {
               <Button variant="primary" onClick={() => setIsResumePDFOpen(true)}>
                 {contentLabels?.about?.cta?.resume || 'Download Resume'}
               </Button>
-              <Button variant="secondary">{contentLabels?.about?.cta?.linkedin || 'Connect on LinkedIn'}</Button>
+              <a href="https://www.linkedin.com/in/kuhandran-samudrapandiyan/" target="_blank" rel="noopener noreferrer">
+                <Button variant="secondary">{contentLabels?.about?.cta?.linkedin || 'Connect on LinkedIn'}</Button>
+              </a>
             </div>
           </div>
         </div>

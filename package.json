@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_ENV=development next dev -p 3000",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production next start -p 3000",
+    "prod": "npm run build && npm run start",
+    "sync-json": "node scripts/sync-json.js",
+    "setup": "npm run sync-json && npm install",
     "lint": "eslint",
     "watch-public": "node watch-public.js"
   },

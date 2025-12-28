@@ -1,69 +1,54 @@
 /**
  * Education Data
- * Loaded from: https://static.kuhandranchatbot.info/data/education.json
- * Falls back to local data if CDN is unavailable
+ * Loaded from: /data/education.json (dev) or https://static.kuhandranchatbot.info/data/education.json (prod)
  */
 
-import React from 'react';import { getErrorMessageSync } from '@/lib/config/appConfig';
-const CDN_URL = 'https://static.kuhandranchatbot.info/data/education.json';
+import React from 'react';
+import { getDataSourceUrl } from '@/lib/config/dataConfig';
 
-// Default/fallback data
-const defaultEducationData = [
-  {
-    degree: 'Master of Business Administration (MBA)',
-    institution: 'Cardiff Metropolitan University',
-    duration: 'April 2022 - August 2024',
-    location: 'United Kingdom (Remote)',
-    focus: 'Business Analytics - Bridging technical expertise with strategic business insights'
-  },
-  {
-    degree: 'Bachelor of Science (BSc)',
-    institution: 'University of Wollongong',
-    duration: '2014 - 2016',
-    location: 'Malaysia',
-    focus: 'Computer Software Engineering & Digital Systems Security'
-  },
-  {
-    degree: 'Foundation in Information Technology',
-    institution: 'INTI College Subang Jaya',
-    duration: '2013 - 2014',
-    location: 'Malaysia',
-    focus: 'Core IT fundamentals and programming principles'
-  },
-  {
-    degree: 'GCE Cambridge Advanced Level',
-    institution: 'Wycherley International School',
-    duration: '2009 - 2011',
-    location: 'Sri Lanka',
-    focus: 'A-Level education preparing for university studies'
-  }
-];
+interface EducationItem {
+  degree: string;
+  institution: string;
+  duration: string;
+  location: string;
+  focus: string;
+}
 
-export let educationData: any[] = defaultEducationData;
+const DATA_URL = getDataSourceUrl('education.json');
+
+const EMPTY_EDUCATION: EducationItem[] = [];
 
 const fetchEducation = async () => {
   try {
-    const response = await fetch(CDN_URL);
-    if (!response.ok) {
-      console.warn(getErrorMessageSync('warnings.educationData'));
-      return defaultEducationData;
-    }
-    return response.json();
+    const response = await fetch(DATA_URL);
+    if (!response.ok) return EMPTY_EDUCATION;
+    return await response.json();
   } catch (error) {
-    console.error(getErrorMessageSync('data.education'), error);
-    return defaultEducationData;
+    console.error('[Data Loader] Error fetching education:', error);
+    return EMPTY_EDUCATION;
   }
 };
 
+export let educationData: EducationItem[] = EMPTY_EDUCATION;
+
 export const useEducation = () => {
   const [education, setEducation] = React.useState(educationData);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<Error | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    setLoading(true);
     fetchEducation()
-      .then((data) => setEducation(data))
-      .catch((err) => setError(err));
+      .then((data) => {
+        setEducation(data);
+        educationData = data;
+      })
+      .catch((err) => {
+        console.error('[Data Loader] Error in useEducation:', err);
+        setError(err);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  return { education, error };
+  return { education, error, loading };
 };

@@ -1,111 +1,47 @@
 /**
  * Experience Data
- * Loaded from: https://static.kuhandranchatbot.info/data/experience.json
- * Falls back to local data if CDN is unavailable
+ * Loaded from: /data/experience.json (dev) or https://static.kuhandranchatbot.info/data/experience.json (prod)
  */
 
-import React from 'react';import { getErrorMessageSync } from '@/lib/config/appConfig';
-const CDN_URL = 'https://static.kuhandranchatbot.info/data/experience.json';
+import React from 'react';
+import { TimelineItemProps } from '@/lib/config/types';
+import { getDataSourceUrl } from '@/lib/config/dataConfig';
 
-// Default/fallback data
-const defaultExperienceData = [
-  {
-    title: 'Technical Project Manager',
-    company: 'FWD Insurance',
-    duration: 'August 2023 - Present',
-    location: 'Kuala Lumpur, Malaysia',
-    description: [
-      'Leading cross-border delivery teams, ensuring alignment across regional operations',
-      'Drove continuous improvement initiatives, reducing aging incident tickets by 15%',
-      'Managing React Native application development for DMS, OWB, and UnderWrite Me modules',
-      'Applied agile methodologies to optimize workflows and adapt to project demands'
-    ],
-    techStack: ['React Native', 'Agile', 'Project Management', 'Cross-functional Teams'],
-    logo: 'https://static.kuhandranchatbot.info/image/fwd-logo.png'
-  },
-  {
-    title: 'Senior Software Engineer',
-    company: 'Maybank',
-    duration: 'August 2021 - August 2023',
-    location: 'Kuala Lumpur, Malaysia',
-    description: [
-      'Developed and maintained React.js applications, ensuring alignment with business requirements',
-      'Utilized React Hooks to create dynamic forms, achieving cost reduction in development',
-      'Managed codebase, approved merges, and allocated tasks to enhance team efficiency',
-      'Designed and implemented RESTful APIs, improving application functionalities'
-    ],
-    techStack: ['React.js', 'Redux', 'RESTful APIs', 'React Hooks', 'Git'],
-    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
-  },
-  {
-    title: 'Software Engineer',
-    company: 'Maybank',
-    duration: 'November 2020 - August 2021',
-    location: 'Kuala Lumpur, Malaysia',
-    description: [
-      'Developed React, Redux, Router, and Axios components to enhance UI/UX',
-      'Improved user experience and load speed by 15%',
-      'Implemented single-page application architectures for scalability',
-      'Collaborated remotely using Agile methodologies with global teams'
-    ],
-    techStack: ['React', 'Redux', 'Axios', 'SPA Architecture', 'Agile'],
-    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
-  },
-  {
-    title: 'UI/UX Developer',
-    company: 'Maybank',
-    duration: 'January 2019 - November 2020',
-    location: 'Kuala Lumpur, Malaysia',
-    description: [
-      'Developed and upgraded UI/UX using React, Redux, and router libraries',
-      'Created reusable components and data schemas to streamline development',
-      'Improved application performance by designing common interface solutions',
-      'Enhanced project modularity through component-based architecture'
-    ],
-    techStack: ['React', 'Redux', 'UI/UX Design', 'Component Architecture'],
-    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
-  },
-  {
-    title: 'Junior Developer',
-    company: 'Maybank',
-    duration: 'January 2018 - January 2019',
-    location: 'Kuala Lumpur, Malaysia',
-    description: [
-      'Collaborated within SDLC to enhance product quality',
-      'Participated in code reviews, improving programming techniques',
-      'Addressed cybersecurity vulnerabilities ensuring Bank Negara compliance',
-      'Supported API integration for insurance renewal and purchases'
-    ],
-    techStack: ['Java', 'API Integration', 'Security', 'SDLC'],
-    logo: 'https://static.kuhandranchatbot.info/image/maybank-logo.webp'
-  }
-];
+const DATA_URL = getDataSourceUrl('experience.json');
 
-export let experienceData: any[] = defaultExperienceData;
+const EMPTY_EXPERIENCE: TimelineItemProps[] = [];
 
 const fetchExperience = async () => {
   try {
-    const response = await fetch(CDN_URL);
-    if (!response.ok) {
-      console.warn(getErrorMessageSync('warnings.experienceData'));
-      return defaultExperienceData;
-    }
-    return response.json();
+    const response = await fetch(DATA_URL);
+    if (!response.ok) return EMPTY_EXPERIENCE;
+    return await response.json();
   } catch (error) {
-    console.error(getErrorMessageSync('data.experience'), error);
-    return defaultExperienceData;
+    console.error('[Data Loader] Error fetching experience:', error);
+    return EMPTY_EXPERIENCE;
   }
 };
 
+export let experienceData: TimelineItemProps[] = EMPTY_EXPERIENCE;
+
 export const useExperience = () => {
   const [experience, setExperience] = React.useState(experienceData);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<Error | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    setLoading(true);
     fetchExperience()
-      .then((data) => setExperience(data))
-      .catch((err) => setError(err));
+      .then((data) => {
+        setExperience(data);
+        experienceData = data;
+      })
+      .catch((err) => {
+        console.error('[Data Loader] Error in useExperience:', err);
+        setError(err);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  return { experience, error };
+  return { experience, error, loading };
 };

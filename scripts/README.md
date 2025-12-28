@@ -4,6 +4,37 @@ This directory contains utility scripts for automating development and build tas
 
 ## Scripts
 
+### `sync-json.js`
+**Purpose**: Downloads all JSON files from CDN and saves to local `public/data/` folder for development.
+
+**Usage**:
+```bash
+npm run sync-json
+# or
+node scripts/sync-json.js
+```
+
+**What It Does**:
+- ✅ Downloads all JSON files from `https://static.kuhandranchatbot.info/data/`
+- ✅ Saves to local `public/data/` directory
+- ✅ Shows download progress with file sizes
+- ✅ Handles missing files gracefully
+- ✅ Complete in seconds
+
+**Benefits**:
+- Always have latest production data locally
+- Fast iteration in development (no network delay)
+- Test content before uploading to CDN
+- Color-coded output for easy reading
+
+**Files Downloaded**:
+- `projects.json` - Project and case study data
+- `experience.json` - Professional experience
+- `skills.json` - Technical skills
+- `education.json` - Educational background
+- `achievements.json` - Awards and certifications
+- `contentLabels.json` - UI text and labels
+
 ### `convert-images.js`
 **Purpose**: Converts PNG and JPG images to optimized WebP format for better performance.
 

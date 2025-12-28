@@ -1,78 +1,53 @@
 /**
  * Data Loader Module
- * Loads all data from remote CDN endpoints
- * All data sources from: https://static.kuhandranchatbot.info/data/
+ * Implements lazy loading pattern:
+ * - Each component loads its own data via useXXX() hooks
+ * - Data is fetched on-demand when component renders
+ * - No eager/bulk loading - better performance
+ * Development: http://localhost:3000/data/ (local public/data/)
+ * Production: https://static.kuhandranchatbot.info/data/
  */
 
-// Cache for fetched data
-let projectsData: any = null;
-let experienceData: any = null;
-let skillsData: any = null;
-let educationData: any = null;
-let achievementsData: any = null;
-let contentLabels: any = null;
+import { getDataBaseUrl } from '@/lib/config/dataConfig';
 
-const CDN_BASE_URL = 'https://static.kuhandranchatbot.info/data';
+// Individual data loaders are in their respective files:
+// - src/lib/data/projects.ts (useProjects hook)
+// - src/lib/data/experience.ts (useExperience hook)
+// - src/lib/data/skills.ts (useSkills hook)
+// - src/lib/data/education.ts (useEducation hook)
+// - src/lib/data/achievements.ts (fetchAchievementsData)
+// - src/lib/data/contentLabels.ts (useContentLabels hook)
 
-// Generic fetch function with caching and error handling
-async function fetchDataFromCDN(filename: string, defaultValue: any = null) {
+// Each hook implements lazy loading via React.useEffect
+// Data is only fetched when component mounts, not at app startup
+
+// Optional: Preload specific data in the background
+export async function preloadData(filenames: string[]) {
+  const DATA_BASE_URL = getDataBaseUrl();
+
+  console.log(`[Data Loader] Preloading data: ${filenames.join(', ')}`);
+  
   try {
-    const response = await fetch(`${CDN_BASE_URL}/${filename}`);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
+    await Promise.allSettled(
+      filenames.map(async (filename) => {
+        try {
+          const url = `${DATA_BASE_URL}/${filename}`;
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          await response.json();
+          console.log(`[Data Loader] ✓ Preloaded ${filename}`);
+        } catch (error) {
+          console.warn(`[Data Loader] Preload failed for ${filename}:`, error);
+        }
+      })
+    );
   } catch (error) {
-    console.error(`Error fetching ${filename}:`, error);
-    return defaultValue;
+    console.error('[Data Loader] Preload error:', error);
   }
 }
 
-// Dynamic imports of JSON data from remote CDN
+// Legacy function for backwards compatibility (now a no-op)
 export async function loadAllData() {
-  try {
-    const [projects, experience, skills, education, labels, achievements] = await Promise.all([
-      fetchDataFromCDN('projects.json', []),
-      fetchDataFromCDN('experience.json', []),
-      fetchDataFromCDN('skills.json', {}),
-      fetchDataFromCDN('education.json', []),
-      fetchDataFromCDN('contentLabels.json', {}),
-      fetchDataFromCDN('achievements.json', { awards: [], certifications: [] }),
-    ]);
-
-    projectsData = projects;
-    experienceData = experience;
-    skillsData = skills;
-    educationData = education;
-    contentLabels = labels;
-    achievementsData = achievements;
-  } catch (error) {
-    console.error('Error loading data files:', error);
-  }
+  console.log('[Data Loader] Using lazy loading pattern - data loaded per component');
 }
 
-// Getters for data (with fallback for synchronous usage)
-export function getProjectsData() {
-  return projectsData || [];
-}
-
-export function getExperienceData() {
-  return experienceData || [];
-}
-
-export function getSkillsData() {
-  return skillsData || {};
-}
-
-export function getEducationData() {
-  return educationData || [];
-}
-
-export function getAchievementsData() {
-  return achievementsData || { awards: [], certifications: [] };
-}
-
-export function getContentLabels() {
-  return contentLabels || {};
-}
-
-// Export data directly for synchronous imports
-export { projectsData, experienceData, skillsData, educationData, achievementsData, contentLabels };

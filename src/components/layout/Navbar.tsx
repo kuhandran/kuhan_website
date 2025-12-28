@@ -33,13 +33,20 @@ export const Navbar = () => {
     { name: 'Skills', href: '#skills' },
     { name: 'Experience', href: '#experience' },
     { name: 'Projects', href: '#projects' },
+    { name: 'Case Studies', href: '/case-studies' },
     { name: 'Contact', href: '#contact' }
   ];
   
   const handleNavClick = (href: string) => {
     setIsMobileMenuOpen(false);
-    const element = document.querySelector(href);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    if (href.startsWith('/')) {
+      // External internal route
+      window.location.href = href;
+    } else {
+      // Anchor link
+      const element = document.querySelector(href);
+      element?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
   
   const handleDownloadResume = () => {

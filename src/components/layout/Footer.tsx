@@ -13,10 +13,10 @@ export const Footer = () => {
               KS<span className="text-blue-400">.</span>
             </h3>
             <p className="text-slate-400 mb-4">
-              Technical Delivery Manager specializing in enterprise applications and full-stack development.
+              Technical Delivery Manager delivering enterprise software with strong full-stack capabilities, modern architecture, and cross-functional leadership.
             </p>
             <div className="flex gap-4">
-              <a href="https://linkedin.com/in/kuhandran-samudrapandiyan" target="_blank" rel="noopener noreferrer" 
+              <a href="https://www.linkedin.com/in/kuhandran-samudrapandiyan/" target="_blank" rel="noopener noreferrer" 
                  className="text-slate-400 hover:text-blue-400 transition-colors">
                 <Linkedin size={20} />
               </a>
@@ -45,21 +45,19 @@ export const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-slate-400">
-                <Mail size={16} />
-                <a href="mailto:skuhandran@yahoo.com" className="hover:text-white transition-colors">
-                  skuhandran@yahoo.com
+              <li>
+                <a href="mailto:skuhandran@yahoo.com" className="text-slate-400 hover:text-white transition-colors font-medium">
+                  📧 Email me
                 </a>
               </li>
-              <li className="flex items-center gap-2 text-slate-400">
-                <Phone size={16} />
-                <a href="tel:+60149337280" className="hover:text-white transition-colors">
-                  +60 14 933 7280
+              <li>
+                <a href="tel:+60149337280" className="text-slate-400 hover:text-white transition-colors font-medium">
+                  📞 Call me
                 </a>
               </li>
-              <li className="flex items-center gap-2 text-slate-400">
-                <MapPin size={16} />
-                <span>Kuala Lumpur, Malaysia</span>
+              <li className="text-slate-400 pt-2 border-t border-slate-700">
+                <p className="text-sm">📍 Based in Kuala Lumpur, Malaysia</p>
+                <p className="text-sm mt-2">Open to remote and relocation opportunities</p>
               </li>
             </ul>
           </div>

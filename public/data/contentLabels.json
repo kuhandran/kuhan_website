@@ -1,31 +1,32 @@
 {
   "navigation": {
     "home": "Home",
-    "about": "About Me",
-    "skills": "Core Skills",
-    "experience": "Work Experience",
-    "projects": "Featured Projects",
-    "caseStudies": "Case Studies",
-    "contact": "Get In Touch"
+    "about": "About",
+    "skills": "Skills",
+    "experience": "Experience",
+    "projects": "Projects",
+    "achievements": "Achievements",
+    "education": "Education",
+    "contact": "Contact"
   },
   "hero": {
     "greeting": "Hi, I'm Kuhandran",
-    "badge": "Technical Delivery Manager & Full-Stack Engineer",
-    "mainHeading": "I Help Enterprises Deliver Complex Software at Scale",
+    "badge": "Hi, I'm Kuhandran",
+    "mainHeading": "Technical Leader Driving Digital Transformation",
     "roles": {
       "primary": "Technical Delivery Manager",
       "secondary": "Full-Stack Engineer",
-      "tertiary": "Enterprise Solutions Architect"
+      "tertiary": "Data Enthusiast"
     },
-    "description": "With 8+ years delivering mission-critical software for banking and insurance leaders, I combine technical depth with strategic leadership to drive clarity, velocity, and measurable outcomes. Explore my experience, projects, and how I can support your team.",
+    "description": "Specialized in enterprise applications, React Native development, and data visualization. Combining 8+ years of technical expertise with strategic business insights to drive operational efficiency and innovation.",
     "highlights": {
       "experience": "8+ Years Experience",
       "location": "Based in Malaysia",
       "relocation": "Open to Relocation"
     },
     "cta": {
-      "primary": "Explore My Projects",
-      "secondary": "Schedule a Conversation"
+      "primary": "View My Work",
+      "secondary": "Let's Connect"
     },
     "stats": {
       "experience": {
@@ -51,9 +52,9 @@
     }
   },
   "about": {
-    "subtitle": "About Me",
-    "title": "Technical Leadership Delivering Enterprise Impact",
-    "description": "I partner with organizations to architect and deliver complex software that drives efficiency, reduces costs, and accelerates digital transformation.",
+    "subtitle": "Who I Am",
+    "title": "Bridging Technology & Business Strategy",
+    "description": "Technical leader with a passion for building scalable solutions",
     "image": {
       "src": "/image/profile.png",
       "alt": "Kuhandran SamudraPandiyan"
@@ -144,8 +145,8 @@
   },
   "contact": {
     "subtitle": "Get In Touch",
-    "title": "Ready to Discuss Your Project?",
-    "description": "Let's explore how my expertise can support your team's goals and deliver measurable results.",
+    "title": "Let's Work Together",
+    "description": "Open to new opportunities and collaborations",
     "form": {
       "heading": "Send Me a Message",
       "labels": {

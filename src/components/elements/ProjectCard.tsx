@@ -1,4 +1,5 @@
 
+import Link from 'next/link';
 import { Badge } from './Badge';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 
@@ -12,6 +13,7 @@ interface ProjectCardProps {
   githubUrl?: string;
   metrics?: string;
   highlights?: string[];
+  caseStudySlug?: string;
 }
 
 export const ProjectCard = ({ 
@@ -22,7 +24,8 @@ export const ProjectCard = ({
   liveUrl, 
   githubUrl,
   metrics,
-  highlights
+  highlights,
+  caseStudySlug
 }: ProjectCardProps) => {
   return (
     <div className="w-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group flex flex-col">
@@ -95,7 +98,16 @@ export const ProjectCard = ({
         <div className="border-t border-slate-200 my-4 mt-auto" />
         
         {/* Links */}
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 pt-2 flex-wrap">
+          {caseStudySlug && (
+            <Link 
+              href={`/case-studies/${caseStudySlug}`}
+              className="inline-flex items-center gap-1.5 text-purple-600 hover:text-purple-700 font-medium text-sm transition-colors group/link"
+            >
+              <ArrowRight size={16} className="group-hover/link:translate-x-0.5 transition-transform flex-shrink-0" />
+              View Case Study
+            </Link>
+          )}
           {liveUrl && liveUrl !== '#' && (
             <a 
               href={liveUrl}

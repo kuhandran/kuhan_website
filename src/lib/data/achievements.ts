@@ -1,46 +1,53 @@
 /**
  * Achievements Data
- * Loaded from: https://static.kuhandranchatbot.info/data/achievements.json
- * Falls back to local data if CDN is unavailable
+ * Loaded from: /data/achievements.json (dev) or https://static.kuhandranchatbot.info/data/achievements.json (prod)
  */
 
-import { getErrorMessageSync } from '@/lib/config/appConfig';
+import { getDataSourceUrl } from '@/lib/config/dataConfig';
 
-const defaultAchievementsData = {
-  awards: [
-    {
-      name: 'Award Winner',
-      organization: 'Professional Organization',
-      year: '2023',
-      icon: '🏆',
-      description: 'Recognized for outstanding contributions'
-    }
-  ],
-  certifications: [
-    {
-      name: 'Certified Developer',
-      issuer: 'Tech Institute',
-      year: '2023',
-      icon: '📜',
-      description: 'Professional certification in modern technologies'
-    }
-  ]
+interface Award {
+  name: string;
+  organization: string;
+  year: string;
+  icon: string;
+  description: string;
+}
+
+interface Certification {
+  name: string;
+  provider: string;
+  year: string;
+  icon: string;
+  credentialUrl: string;
+}
+
+interface AchievementsData {
+  awards: Award[];
+  certifications: Certification[];
+}
+
+const DATA_URL = getDataSourceUrl('achievements.json');
+
+const EMPTY_ACHIEVEMENTS: AchievementsData = {
+  awards: [],
+  certifications: []
 };
 
-let cachedData: any = null;
+let cachedData: AchievementsData | null = null;
 
-export async function fetchAchievementsData() {
+export async function fetchAchievementsData(): Promise<AchievementsData> {
   if (cachedData) return cachedData;
   
   try {
-    const response = await fetch('https://static.kuhandranchatbot.info/data/achievements.json');
-    if (!response.ok) throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));
-    cachedData = await response.json();
-    return cachedData;
+    const response = await fetch(DATA_URL);
+    if (!response.ok) return EMPTY_ACHIEVEMENTS;
+    const result = await response.json();
+    cachedData = result;
+    return result;
   } catch (error) {
-    console.error(getErrorMessageSync('data.achievements'), error);
-    return defaultAchievementsData;
+    console.error('[Data Loader] Error fetching achievements:', error);
+    return EMPTY_ACHIEVEMENTS;
   }
 }
 
-export const achievementsData: any = defaultAchievementsData;
+export const achievementsData: AchievementsData = EMPTY_ACHIEVEMENTS;

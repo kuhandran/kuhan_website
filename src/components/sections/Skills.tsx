@@ -3,12 +3,13 @@ import { useState, useEffect } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Card } from '../elements/Card';
 import { SkillBar } from '../elements/SkillBar';
-import { skillsData } from '../../lib/data/skills';
+import { useSkills } from '../../lib/data/skills';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 type SkillsData = Record<string, { name: string; icon: string; skills: Array<{ name: string; level: number; color: string }> }>;
 
 export const Skills = () => {
+  const { skills: skillsData, loading } = useSkills();
   const [activeTab, setActiveTab] = useState('frontend');
   const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
   const typedSkillsData = skillsData as SkillsData;
@@ -21,6 +22,21 @@ export const Skills = () => {
   }, []);
   
   const tabs = Object.entries(typedSkillsData);
+
+  if (loading) {
+    return (
+      <section id="skills" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <SectionHeader
+            subtitle={contentLabels?.skills?.subtitle || ''}
+            title={contentLabels?.skills?.title || 'Skills'}
+            description={contentLabels?.skills?.description || ''}
+          />
+          <div className="text-center text-gray-500">Loading skills...</div>
+        </div>
+      </section>
+    );
+  }
   
   return (
     <section id="skills" className="py-20 bg-white">
