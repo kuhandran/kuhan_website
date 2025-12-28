@@ -20,7 +20,7 @@ export const Footer = () => {
                  className="text-slate-400 hover:text-blue-400 transition-colors">
                 <Linkedin size={20} />
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+              <a href="https://github.com/kuhandran" target="_blank" rel="noopener noreferrer"
                  className="text-slate-400 hover:text-blue-400 transition-colors">
                 <Github size={20} />
               </a>
@@ -31,10 +31,16 @@ export const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              {['About', 'Skills', 'Experience', 'Projects', 'Contact'].map((link) => (
-                <li key={link}>
-                  <a href={`#${link.toLowerCase()}`} className="text-slate-400 hover:text-white transition-colors">
-                    {link}
+              {[
+                { label: 'About', id: 'about' },
+                { label: 'Skills', id: 'skills' },
+                { label: 'Experience', id: 'experience' },
+                { label: 'Projects', id: 'projects' },
+                { label: 'Contact', id: 'contact' }
+              ].map((link) => (
+                <li key={link.id}>
+                  <a href={`#${link.id}`} className="text-slate-400 hover:text-white transition-colors">
+                    {link.label}
                   </a>
                 </li>
               ))}
