@@ -3,7 +3,7 @@
   "@type": "Person",
   "name": "Kuhandran SamudraPandiyan",
   "url": "https://www.kuhandranchatbot.info",
-  "image": "https://static.kuhandranchatbot.info/image/profile.webp",
+  "image": "/image/profile.png",
   "jobTitle": "Technical Delivery Manager",
   "worksFor": {
     "@type": "Organization",

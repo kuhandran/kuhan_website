@@ -24,7 +24,6 @@ const fetchEducation = async () => {
     if (!response.ok) return EMPTY_EDUCATION;
     return await response.json();
   } catch (error) {
-    console.error('[Data Loader] Error fetching education:', error);
     return EMPTY_EDUCATION;
   }
 };
@@ -44,7 +43,6 @@ export const useEducation = () => {
         educationData = data;
       })
       .catch((err) => {
-        console.error('[Data Loader] Error in useEducation:', err);
         setError(err);
       })
       .finally(() => setLoading(false));

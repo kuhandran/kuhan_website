@@ -33,7 +33,6 @@ const fetchSkills = async () => {
     if (!response.ok) return EMPTY_SKILLS;
     return await response.json();
   } catch (error) {
-    console.error('[Data Loader] Error fetching skills:', error);
     return EMPTY_SKILLS;
   }
 };
@@ -53,7 +52,6 @@ export const useSkills = () => {
         skillsData = data;
       })
       .catch((err) => {
-        console.error('[Data Loader] Error in useSkills:', err);
         setError(err);
       })
       .finally(() => setLoading(false));

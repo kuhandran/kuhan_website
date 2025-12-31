@@ -17,7 +17,6 @@ const fetchExperience = async () => {
     if (!response.ok) return EMPTY_EXPERIENCE;
     return await response.json();
   } catch (error) {
-    console.error('[Data Loader] Error fetching experience:', error);
     return EMPTY_EXPERIENCE;
   }
 };
@@ -37,7 +36,6 @@ export const useExperience = () => {
         experienceData = data;
       })
       .catch((err) => {
-        console.error('[Data Loader] Error in useExperience:', err);
         setError(err);
       })
       .finally(() => setLoading(false));

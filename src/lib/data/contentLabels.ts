@@ -25,7 +25,6 @@ const loadDefaultLabels = async () => {
     defaultLabelsData = await response.json();
     return defaultLabelsData;
   } catch (error) {
-    console.warn(getErrorMessageSync('warnings.defaultLabels'), error);
     defaultLabelsData = {};
     return defaultLabelsData;
   }
@@ -48,7 +47,6 @@ const fetchContentLabels = async () => {
       cachedLabels = await response.json();
       return cachedLabels;
     } catch (error) {
-      console.error(getErrorMessageSync('data.contentLabels'), error);
       // Fall back to default labels from file
       cachedLabels = await loadDefaultLabels();
       return cachedLabels;

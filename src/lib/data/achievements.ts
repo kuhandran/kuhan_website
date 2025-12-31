@@ -45,7 +45,6 @@ export async function fetchAchievementsData(): Promise<AchievementsData> {
     cachedData = result;
     return result;
   } catch (error) {
-    console.error('[Data Loader] Error fetching achievements:', error);
     return EMPTY_ACHIEVEMENTS;
   }
 }

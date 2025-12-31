@@ -3,6 +3,8 @@ import { SectionHeader } from '../elements/SectionHeader';
 import { StatCard } from '../elements/StatCard';
 import { Button } from '../elements/Button';
 import { ResumePDFViewer } from '../elements/ResumePDFViewer';
+import { HighlightItem } from '../elements/HighlightItem';
+import { SectionCard } from '../elements/SectionCard';
 import { Users, Briefcase, TrendingUp } from 'lucide-react';
 import { getStaticContentLabels, initializeContentLabels } from '../../lib/data/contentLabels';
 
@@ -127,17 +129,15 @@ export const About = () => {
             </div>
             
             {/* Key Highlights */}
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">{contentLabels?.about?.highlights?.heading || 'Key Highlights'}</h3>
+            <SectionCard title={contentLabels?.about?.highlights?.heading || 'Key Highlights'}>
               <ul className="space-y-3">
                 {(contentLabels?.about?.highlights?.items || [])?.map((highlight: string, index: number) => (
-                  <li key={index} className="flex items-start gap-3 text-slate-600">
-                    <span className="text-emerald-500 mt-1">✓</span>
+                  <HighlightItem key={index} variant="emerald">
                     {highlight}
-                  </li>
+                  </HighlightItem>
                 ))}
               </ul>
-            </div>
+            </SectionCard>
             
             {/* CTA */}
             <div className="flex gap-4">

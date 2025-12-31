@@ -4,11 +4,15 @@
 
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '../elements/Button';
 import { ResumePDFViewer } from '../elements/ResumePDFViewer';
+import { LanguageSwitcher } from '../language/LanguageSwitcher';
 import { Menu, X, Download } from 'lucide-react';
 
 export const Navbar = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResumePDFOpen, setIsResumePDFOpen] = useState(false);
@@ -18,6 +22,51 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle hash navigation with improved timing and retry logic
+  useEffect(() => {
+    const scrollToHash = (attempt = 0, maxAttempts = 100) => {
+      const hash = window.location.hash;
+      
+      // Handle empty hash (#) - scroll to top
+      if (hash === '#' || hash === '') {
+        if (attempt === 0) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        return;
+      }
+      
+      if (hash) {
+        const element = document.querySelector(hash);
+        
+        if (element) {
+          // Element found - scroll to it
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        } else if (attempt < maxAttempts) {
+          // Element not found yet - retry with exponential backoff
+          // Very long delays for sections loaded from CDN (achievements, contact)
+          let delay: number;
+          if (attempt < 10) {
+            delay = 300 + (attempt * 100); // 300-1200ms for first 10 attempts
+          } else if (attempt < 25) {
+            delay = 1500 + ((attempt - 10) * 250); // 1500-4250ms for middle attempts
+          } else if (attempt < 50) {
+            delay = 5000; // 5s for attempts 25-50
+          } else if (attempt < 80) {
+            delay = 8000; // 8s for attempts 50-80
+          } else {
+            delay = 10000; // 10s for final attempts (slow CDN)
+          }
+          setTimeout(() => scrollToHash(attempt + 1, maxAttempts), delay);
+        }
+      }
+    };
+
+    // Start the scroll attempt
+    scrollToHash();
+  }, [pathname]);
   
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -33,19 +82,46 @@ export const Navbar = () => {
     { name: 'Skills', href: '#skills' },
     { name: 'Experience', href: '#experience' },
     { name: 'Projects', href: '#projects' },
+    { name: 'Education', href: '#education' },
+    { name: 'Achievements', href: '#achievements' },
     { name: 'Case Studies', href: '/case-studies' },
     { name: 'Contact', href: '#contact' }
   ];
   
   const handleNavClick = (href: string) => {
     setIsMobileMenuOpen(false);
-    if (href.startsWith('/')) {
-      // External internal route
-      window.location.href = href;
-    } else {
+    
+    if (href === '#') {
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (href === '/case-studies') {
+      // Case Studies page - use router.push for proper Next.js navigation
+      router.push('/case-studies');
+    } else if (href.startsWith('#')) {
       // Anchor link
-      const element = document.querySelector(href);
-      element?.scrollIntoView({ behavior: 'smooth' });
+      if (pathname !== '/') {
+        // Not on home page - navigate to home page WITH hash
+        router.push('/' + href);
+      } else {
+        // Already on home page - scroll directly
+        const sectionId = href.substring(1);
+        const element = document.getElementById(sectionId);
+        
+        if (element) {
+          // Use requestAnimationFrame to ensure DOM is ready
+          requestAnimationFrame(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        } else {
+          // Fallback: try querySelector
+          const fallbackElement = document.querySelector(href);
+          if (fallbackElement) {
+            requestAnimationFrame(() => {
+              fallbackElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          }
+        }
+      }
     }
   };
   
@@ -64,7 +140,14 @@ export const Navbar = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <button 
-              onClick={() => handleNavClick('#')}
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                if (pathname === '/') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  router.push('/');
+                }
+              }}
               className="text-2xl md:text-3xl font-bold text-slate-900 hover:text-blue-600 transition-colors z-50"
             >
               <span className="inline-block hover:scale-110 transition-transform">
@@ -87,7 +170,8 @@ export const Navbar = () => {
             </div>
             
             {/* CTA Button - Desktop */}
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-4">
+              <LanguageSwitcher />
               <Button 
                 variant="primary" 
                 size="sm"
@@ -147,7 +231,8 @@ export const Navbar = () => {
           </div>
           
           {/* Mobile CTA Button */}
-          <div className="mt-auto">
+          <div className="mt-auto space-y-4">
+            <LanguageSwitcher />
             <Button 
               variant="primary" 
               size="md" 

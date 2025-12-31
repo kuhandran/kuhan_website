@@ -10,7 +10,15 @@
     "sync-json": "node scripts/sync-json.js",
     "setup": "npm run sync-json && npm install",
     "lint": "eslint",
-    "watch-public": "node watch-public.js"
+    "watch-public": "node watch-public.js",
+    "sync:status": "bash scripts/sync-public-folder.sh status",
+    "sync:website-to-api": "bash scripts/sync-public-folder.sh website->api",
+    "sync:api-to-website": "bash scripts/sync-public-folder.sh api->website",
+    "sync:bidirectional": "bash scripts/sync-public-folder.sh bidirectional",
+    "sync:website-to-api-push": "bash scripts/sync-public-folder.sh website->api --push",
+    "sync:api-to-website-push": "bash scripts/sync-public-folder.sh api->website --push",
+    "sync:bidirectional-push": "bash scripts/sync-public-folder.sh bidirectional --push",
+    "hooks:setup": "bash scripts/setup-git-hooks.sh"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

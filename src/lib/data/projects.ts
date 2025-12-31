@@ -16,17 +16,13 @@ const EMPTY_PROJECTS: ProjectCardProps[] = [];
 
 const fetchProjects = async () => {
   try {
-    console.log(`[Projects] Fetching from: ${DATA_URL}`);
     const response = await fetch(DATA_URL);
     if (!response.ok) {
-      console.warn(`[Projects] HTTP ${response.status}: ${DATA_URL}`);
       return EMPTY_PROJECTS;
     }
     const data = await response.json();
-    console.log(`[Projects] ✓ Successfully loaded ${data.length} projects`);
     return data;
   } catch (error) {
-    console.error(`[Projects] Error loading: ${error}`);
     return EMPTY_PROJECTS;
   }
 };

@@ -5,10 +5,28 @@ import { Badge } from '../elements/Badge';
 import { Trophy, Award, Sparkles, Zap } from 'lucide-react';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
 import { getErrorMessageSync } from '../../lib/config/appConfig';
+import { fetchAchievementsData } from '@/lib/data/achievements';
+
+interface AchievementsData {
+  awards: Array<{
+    name: string;
+    organization: string;
+    year: string;
+    icon: string;
+    description: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    provider: string;
+    year: string;
+    icon: string;
+    credentialUrl: string;
+  }>;
+}
 
 export const Achievements = () => {
   const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
-  const [achievementsData, setAchievementsData] = useState({ awards: [], certifications: [] });
+  const [achievementsData, setAchievementsData] = useState<AchievementsData>({ awards: [], certifications: [] });
 
   useEffect(() => {
     // Load content labels
@@ -17,18 +35,8 @@ export const Achievements = () => {
       setContentLabels(labels);
     }
 
-    // Fetch achievements data
-    const fetchAchievements = async () => {
-      try {
-        const response = await fetch('https://static.kuhandranchatbot.info/data/achievements.json');
-        const data = await response.json();
-        setAchievementsData(data);
-      } catch (error) {
-        console.error(getErrorMessageSync('data.achievements'), error);
-      }
-    };
-
-    fetchAchievements();
+    // Fetch achievements data from data loader (local first, then CDN)
+    fetchAchievementsData().then(setAchievementsData);
   }, []);
 
   return (

@@ -1,7 +1,32 @@
+'use client';
+
 import { Mail, Phone, MapPin, Linkedin, Github } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
 
 export const Footer = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+  
+  const handleQuickLinkClick = (id: string) => {
+    if (pathname !== '/') {
+      // Not on home page - navigate to home page with hash
+      router.push(`/#${id}`);
+    } else {
+      // Already on home page - scroll directly
+      requestAnimationFrame(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          const fallbackElement = document.querySelector(`#${id}`);
+          if (fallbackElement) {
+            fallbackElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    }
+  };
   
   return (
     <footer className="bg-slate-900 text-white py-12">
@@ -9,9 +34,18 @@ export const Footer = () => {
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           {/* Brand Section */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">
+            <button
+              onClick={() => {
+                if (pathname === '/') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  router.push('/');
+                }
+              }}
+              className="text-2xl font-bold mb-4 hover:opacity-80 transition-opacity"
+            >
               KS<span className="text-blue-400">.</span>
-            </h3>
+            </button>
             <p className="text-slate-400 mb-4">
               Technical Delivery Manager delivering enterprise software with strong full-stack capabilities, modern architecture, and cross-functional leadership.
             </p>
@@ -39,9 +73,12 @@ export const Footer = () => {
                 { label: 'Contact', id: 'contact' }
               ].map((link) => (
                 <li key={link.id}>
-                  <a href={`#${link.id}`} className="text-slate-400 hover:text-white transition-colors">
+                  <button
+                    onClick={() => handleQuickLinkClick(link.id)}
+                    className="text-slate-400 hover:text-white transition-colors text-left"
+                  >
                     {link.label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>

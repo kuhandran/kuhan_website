@@ -6,10 +6,12 @@ Smallest, reusable building blocks of the component system. Presentational compo
 
 | Component | Purpose | Key Props |
 |-----------|---------|-----------|
-| Badge.tsx | Semantic label | `variant`, `className` |
+| Badge.tsx | Semantic label | `variant`, `size` |
 | Button.tsx | Interactive button | `onClick`, `variant`, `disabled` |
 | Card.tsx | Container with styling | `className` |
+| HighlightItem.tsx | List item with icon | `variant`, `icon`, `children` |
 | ProjectCard.tsx | Project showcase | `title`, `description`, `technologies` |
+| SectionCard.tsx | Card with title | `title`, `variant`, `children` |
 | SectionHeader.tsx | Section title | `title`, `description` |
 | SkillBar.tsx | Proficiency indicator | `skill`, `proficiency` |
 | StatCard.tsx | Metric display | `label`, `value`, `icon` |
@@ -28,20 +30,60 @@ Each component:
 ## 📝 Component Reference
 
 ### Badge.tsx
-Semantic label/tag component.
+Semantic label/tag component with multiple variants and sizes.
 
 ```typescript
 interface BadgeProps {
   children: ReactNode
-  variant?: 'blue' | 'green' | 'red' | 'yellow' | 'purple'
-  className?: string
+  variant?: 'blue' | 'green' | 'amber' | 'gray' | 'gradient'
+  size?: 'sm' | 'md'
 }
 ```
 
 **Example:**
 ```tsx
 <Badge variant="blue">React</Badge>
-<Badge variant="green">Next.js</Badge>
+<Badge variant="green" size="sm">Active</Badge>
+<Badge variant="gradient">Featured</Badge>
+```
+
+### HighlightItem.tsx
+List item with icon and text, used in highlight lists.
+
+```typescript
+interface HighlightItemProps {
+  children: ReactNode
+  variant?: 'blue' | 'green' | 'emerald'
+  icon?: ReactNode
+}
+```
+
+**Example:**
+```tsx
+<HighlightItem variant="emerald">
+  Cross-border team management & Agile methodologies
+</HighlightItem>
+```
+
+### SectionCard.tsx
+Card container with title and flexible content. Matches Badge styling patterns.
+
+```typescript
+interface SectionCardProps {
+  title: string
+  children: ReactNode
+  variant?: 'white' | 'gradient'
+}
+```
+
+**Example:**
+```tsx
+<SectionCard title="Key Highlights">
+  <ul className="space-y-3">
+    <HighlightItem>Item 1</HighlightItem>
+    <HighlightItem>Item 2</HighlightItem>
+  </ul>
+</SectionCard>
 ```
 
 ### Button.tsx

@@ -1,17 +1,19 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
+import { ServiceWorkerManager } from '@/pwa';
+import { LanguageProvider } from '@/lib/hooks/useLanguageHook';
 import './critical.css';
 import './globals.css';
 
 // Lazy load Analytics - deferred until after initial render
 const AnalyticsWrapper = dynamic(
-  () => import('../components/AnalyticsWrapper'),
+  () => import('../components/analytics/AnalyticsWrapper'),
   { loading: () => null }
 );
 
 // Lazy load Analytics Consent Banner
 const AnalyticsConsentBanner = dynamic(
-  () => import('../components/AnalyticsConsentBanner').then(mod => ({ default: mod.AnalyticsConsentBanner })),
+  () => import('../components/analytics/AnalyticsConsentBanner').then(mod => ({ default: mod.AnalyticsConsentBanner })),
   { loading: () => null }
 );
 
@@ -29,7 +31,7 @@ export const metadata: Metadata = {
     locale: 'en_MY',
     images: [
       {
-        url: 'https://static.kuhandranchatbot.info/image/profile.webp',
+        url: '/image/profile.png',
         width: 400,
         height: 400,
         alt: 'Kuhandran SamudraPandiyan Profile',
@@ -41,7 +43,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Kuhandran SamudraPandiyan | Technical Delivery Manager',
     description: 'Full-Stack Engineer & Technical Leader | 8+ years in enterprise applications',
-    images: ['https://static.kuhandranchatbot.info/image/profile.webp'],
+    images: ['/image/profile.png'],
     creator: '@kuhan_samudra',
   },
   robots: {
@@ -87,11 +89,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <head>
         {/* DNS Prefetch and Preconnect for external services */}
-        <link rel="dns-prefetch" href="https://static.kuhandranchatbot.info" />
-        <link rel="preconnect" href="https://static.kuhandranchatbot.info" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://static-api-opal.vercel.app" />
+        <link rel="preconnect" href="https://static-api-opal.vercel.app" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="preconnect" href="https://resume-chatbot-services-v2-0.onrender.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api-gateway-715i.onrender.com" crossOrigin="anonymous" />
@@ -111,7 +113,7 @@ export default function RootLayout({
         <meta name="msapplication-config" content="/browserconfig.xml" />
         
         {/* Security and trust meta tags for Zscaler and SEO */}
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co; frame-src 'self' https://static.kuhandranchatbot.info https://www.google.com https://www.gstatic.com;" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static-api-opal.vercel.app https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <meta name="googlebot" content="index, follow, noimageindex:off, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -131,7 +133,7 @@ export default function RootLayout({
               "@type": "Person",
               "name": "Kuhandran SamudraPandiyan",
               "url": "https://www.kuhandranchatbot.info",
-              "image": "https://static.kuhandranchatbot.info/image/profile.webp",
+              "image": "/image/profile.png",
               "jobTitle": "Technical Delivery Manager",
               "worksFor": [
                 {
@@ -194,7 +196,10 @@ export default function RootLayout({
         <link rel="sitemap" href="https://www.kuhandranchatbot.info/sitemap.xml" />
       </head>
       <body>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
+        <ServiceWorkerManager />
         <AnalyticsWrapper />
         <AnalyticsConsentBanner />
       </body>

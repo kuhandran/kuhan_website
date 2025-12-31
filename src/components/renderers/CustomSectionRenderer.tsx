@@ -107,8 +107,9 @@ export const CustomSectionRenderer: React.FC<CustomSectionRendererProps> = ({
   const shouldDefer = deferredSections.includes(type.toLowerCase());
 
   // If section should be deferred and not yet visible, show placeholder
+  // IMPORTANT: Still include the section ID so hash navigation can find and scroll to it
   if (shouldDefer && !isVisible) {
-    return <div ref={containerRef} className="w-full h-32" />;
+    return <div ref={containerRef} id={config.id} className="w-full h-32" />;
   }
 
   // Get the component from registry
