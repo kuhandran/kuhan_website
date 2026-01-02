@@ -22,8 +22,24 @@ async function loadLocalFallback(language: string, fileType: string, fileName: s
       return localDataCache[cacheKey];
     }
 
-    // Try to load from local JSON files
-    const filePath = `/data/${language}/${fileName}.json`;
+    // Try to load from local file system (server-side)
+    if (typeof window === 'undefined') {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const filePath = path.join(process.cwd(), 'public', 'collections', language, fileType, `${fileName}.json`);
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        const data = JSON.parse(fileContent);
+        localDataCache[cacheKey] = data;
+        console.log(`✅ Loaded from local file: ${filePath}`);
+        return data;
+      } catch (fsError) {
+        console.warn(`⚠️ Local file not found: public/collections/${language}/${fileType}/${fileName}.json`);
+      }
+    }
+
+    // Try to load via HTTP (client-side or as fallback)
+    const filePath = `/collections/${language}/${fileType}/${fileName}.json`;
     const appUrl = DOMAINS.getAppUrl();
     const response = await fetch(`${appUrl}${filePath}`);
     

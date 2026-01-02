@@ -187,7 +187,7 @@ export function getErrorMessageSync(path: string, defaultMessage?: string): stri
 // ============================================================================
 
 /**
- * Fetch page layout configuration from static API
+ * Fetch page layout configuration from static API or local files
  */
 export async function fetchPageLayout() {
   if (cachedPageLayout) return cachedPageLayout;
@@ -195,6 +195,23 @@ export async function fetchPageLayout() {
 
   pageLayoutPromise = (async () => {
     try {
+      // Try local file first (server-side)
+      if (typeof window === 'undefined') {
+        try {
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          const filePath = path.join(process.cwd(), 'public', 'collections', DEFAULT_LANGUAGE, 'config', 'pageLayout.json');
+          const fileContent = await fs.readFile(filePath, 'utf-8');
+          cachedPageLayout = JSON.parse(fileContent);
+          console.log('[Loaders] pageLayout loaded from local file');
+          pageLayoutPromise = null;
+          return cachedPageLayout;
+        } catch (fileError) {
+          console.warn('[Loaders] Local pageLayout file not found, trying API');
+        }
+      }
+
+      // Fallback to API
       const url = getDataSourceUrl('pageLayout.json', DEFAULT_LANGUAGE, 'config');
       const response = await fetch(url);
       if (!response.ok) throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));

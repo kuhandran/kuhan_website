@@ -101,6 +101,23 @@ export async function fetchCollectionData<T = any>(
   if (cached) return cached;
 
   try {
+    // Try local file first (server-side)
+    if (typeof window === 'undefined') {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const filePath = path.join(process.cwd(), 'public', 'collections', language, 'data', `${dataType}.json`);
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        const data = JSON.parse(fileContent) as T;
+        setInCache(cacheKey, data);
+        console.log(`[API] Loaded ${dataType} from local file for ${language}`);
+        return data;
+      } catch (fileError) {
+        console.warn(`[API] Local file not found for ${language}/${dataType}, trying API`);
+      }
+    }
+
+    // Fallback to API
     const url = getCollectionUrl(language, 'data', dataType);
     console.log(`[API] Fetching collection: ${url}`);
     

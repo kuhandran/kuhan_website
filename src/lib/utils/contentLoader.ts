@@ -156,21 +156,38 @@ export async function getApiConfig(languageCode: string): Promise<any> {
   let content = null;
 
   try {
-    const url = getDataSourceUrl('apiConfig.json', languageCode, 'config');
-    console.log('[ContentLoader] Fetching apiConfig', { language: languageCode });
-    
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' }
-    });
+    // Try local file first (for server-side rendering)
+    if (typeof window === 'undefined') {
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'public', 'collections', languageCode, 'config', 'apiConfig.json');
+      try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        content = JSON.parse(fileContent);
+        console.log('[ContentLoader] apiConfig loaded from local file', { languageCode });
+      } catch (fileError) {
+        console.warn('[ContentLoader] Local file not found, trying external API', { languageCode });
+      }
+    }
 
-    if (response.ok) {
-      content = await response.json();
-      console.log('[ContentLoader] apiConfig loaded', { languageCode });
-    } else {
-      console.warn('[ContentLoader] apiConfig fetch failed', {
-        languageCode,
-        status: response.status
+    // Fallback to external API if local file fails or on client-side
+    if (!content) {
+      const url = getDataSourceUrl('apiConfig.json', languageCode, 'config');
+      console.log('[ContentLoader] Fetching apiConfig from API', { language: languageCode });
+      
+      const response = await fetch(url, {
+        headers: { 'Accept': 'application/json' }
       });
+
+      if (response.ok) {
+        content = await response.json();
+        console.log('[ContentLoader] apiConfig loaded from API', { languageCode });
+      } else {
+        console.warn('[ContentLoader] apiConfig fetch failed', {
+          languageCode,
+          status: response.status
+        });
+      }
     }
   } catch (error) {
     console.error('[ContentLoader] apiConfig error', {
@@ -204,13 +221,30 @@ export async function getPageLayout(languageCode: string): Promise<any> {
   let content = null;
 
   try {
-    const url = getDataSourceUrl('pageLayout.json', languageCode, 'config');
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' }
-    });
+    // Try local file first (for server-side rendering)
+    if (typeof window === 'undefined') {
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'public', 'collections', languageCode, 'config', 'pageLayout.json');
+      try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        content = JSON.parse(fileContent);
+        console.log('[ContentLoader] pageLayout loaded from local file', { languageCode });
+      } catch (fileError) {
+        console.warn('[ContentLoader] Local file not found, trying external API', { languageCode });
+      }
+    }
 
-    if (response.ok) {
-      content = await response.json();
+    // Fallback to external API if local file fails or on client-side
+    if (!content) {
+      const url = getDataSourceUrl('pageLayout.json', languageCode, 'config');
+      const response = await fetch(url, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        content = await response.json();
+      }
     }
   } catch (error) {
     console.error('[ContentLoader] pageLayout error', {
