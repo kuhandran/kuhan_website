@@ -97,7 +97,7 @@ export async function preloadImages(imagePaths: string[]): Promise<void> {
  */
 export function getResume(path: string): string {
   const cleanPath = extractPath(path);
-  const resumeUrl = `${STATIC_API_BASE}/resume/${cleanPath}`;
+  const resumeUrl = `${STATIC_API_BASE}/api/resume/${cleanPath}`;
   console.log(`[API] Resume URL: ${resumeUrl}`);
   return resumeUrl;
 }
