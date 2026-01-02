@@ -273,9 +273,9 @@ export function getApiConfigSync() {
  * 
  * Examples:
  * - getDataSourceUrl('contentLabels.json', 'en', 'data')
- *   → https://static-api-opal.vercel.app/api/collections/en/data/contentLabels.json
+ *   → https://static-api-opal.vercel.app/collections/en/data/contentLabels.json
  * - getDataSourceUrl('apiConfig.json', 'ta', 'config')
- *   → https://static-api-opal.vercel.app/api/collections/ta/config/apiConfig.json
+ *   → https://static-api-opal.vercel.app/collections/ta/config/apiConfig.json
  */
 export function getDataSourceUrl(
   filename: string,
@@ -297,9 +297,9 @@ export function getDataSourceUrl(
  * 
  * Examples:
  * - getMultilingualUrl('experience', 'en')
- *   → https://static-api-opal.vercel.app/api/collections/en/data/experience.json
+ *   → https://static-api-opal.vercel.app/collections/en/data/experience.json
  * - getMultilingualUrl('contentLabels', 'ar-AE')
- *   → https://static-api-opal.vercel.app/api/collections/ar-AE/data/contentLabels.json
+ *   → https://static-api-opal.vercel.app/collections/ar-AE/data/contentLabels.json
  */
 export function getMultilingualUrl(
   fileType: string,

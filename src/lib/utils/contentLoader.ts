@@ -142,7 +142,7 @@ export async function getAchievements(languageCode: string): Promise<any> {
  * 
  * Example:
  * const config = await getApiConfig('en');
- * // Access from: https://static-api-opal.vercel.app/api/collections/en/config/apiConfig.json
+ * // Access from: https://static-api-opal.vercel.app/collections/en/config/apiConfig.json
  */
 export async function getApiConfig(languageCode: string): Promise<any> {
   const cacheKey = `content-${languageCode}-apiConfig`;

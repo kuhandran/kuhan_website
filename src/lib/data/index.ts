@@ -4,7 +4,7 @@
  * - Each component loads its own data via useXXX() hooks
  * - Data is fetched on-demand when component renders
  * - Uses production API with language codes
- * API: https://static-api-opal.vercel.app/api/collections/{language}/data/{fileType}.json
+ * API: https://static-api-opal.vercel.app/collections/{language}/data/{fileType}.json
  */
 
 import { getApiBaseUrl } from '@/lib/config/loaders';

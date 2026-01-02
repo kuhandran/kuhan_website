@@ -40,7 +40,7 @@ export const DOMAINS = {
 export const API_ENDPOINTS = {
   // Production API paths
   collections: (language: string, type: 'data' | 'config', file: string) =>
-    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/${type}/${file}.json`,
+    `${DOMAINS.PRODUCTION_API}/collections/${language}/${type}/${file}.json`,
 
   // Internal API routes
   contentProxy: (type: string) => `/api/content/${type}`,
@@ -54,9 +54,9 @@ export const API_ENDPOINTS = {
 
   // CDN paths
   cdnData: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/data/${file}.json`,
+    `${DOMAINS.CDN}/collections/en/data/${file}.json`,
   cdnConfig: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/config/${file}.json`,
+    `${DOMAINS.CDN}/collections/en/config/${file}.json`,
   cdnImage: (imagePath: string) =>
     `${DOMAINS.CDN}/api/image/${imagePath}`,
 
@@ -144,7 +144,7 @@ export const IMAGE_ASSETS = {
 /**
  * Get full URL for production API collection data
  * @example getCollectionUrl('en', 'data', 'experience')
- *          → 'https://static-api-opal.vercel.app/api/collections/en/data/experience.json'
+ *          → 'https://static-api-opal.vercel.app/collections/en/data/experience.json'
  */
 export function getCollectionUrl(
   language: SupportedLanguage = DEFAULT_LANGUAGE,

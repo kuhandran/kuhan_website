@@ -1,9 +1,10 @@
 /**
  * Achievements Data
- * Loaded from: /data/achievements.json (dev) or https://static.kuhandranchatbot.info/data/achievements.json (prod)
+ * Loaded from: /data/achievements.json (dev) or https://static-api-opal.vercel.app/collections/{language}/data/achievements.json (prod)
  */
 
 import { getDataSourceUrl } from '@/lib/config/loaders';
+import { DEFAULT_LANGUAGE } from '@/lib/config/domains';
 
 interface Award {
   name: string;
@@ -26,27 +27,27 @@ interface AchievementsData {
   certifications: Certification[];
 }
 
-const DATA_URL = getDataSourceUrl('achievements.json');
-
 const EMPTY_ACHIEVEMENTS: AchievementsData = {
   awards: [],
   certifications: []
 };
 
-let cachedData: AchievementsData | null = null;
+const cachedData: Map<string, AchievementsData> = new Map();
 
-export async function fetchAchievementsData(): Promise<AchievementsData> {
-  if (cachedData) return cachedData;
+export async function fetchAchievementsData(language: string = DEFAULT_LANGUAGE): Promise<AchievementsData> {
+  // Check cache for this language
+  if (cachedData.has(language)) {
+    return cachedData.get(language)!;
+  }
   
   try {
+    const DATA_URL = getDataSourceUrl('achievements.json', language);
     const response = await fetch(DATA_URL);
     if (!response.ok) return EMPTY_ACHIEVEMENTS;
     const result = await response.json();
-    cachedData = result;
+    cachedData.set(language, result);
     return result;
   } catch (error) {
     return EMPTY_ACHIEVEMENTS;
   }
 }
-
-export const achievementsData: AchievementsData = EMPTY_ACHIEVEMENTS;
