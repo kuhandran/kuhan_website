@@ -3,7 +3,6 @@ import { projectsData } from '@/lib/data/projects';
 import { experienceData } from '@/lib/data/experience';
 import { skillsData } from '@/lib/data/skills';
 import { educationData } from '@/lib/data/education';
-import { achievementsData } from '@/lib/data/achievements';
 import { contentLabels } from '@/lib/data/contentLabels';
 import { fetchPageLayout, getPageLayoutSync } from '@/lib/config/loaders';
 
@@ -27,7 +26,6 @@ function resolveDataSources(config: any): PageLayoutConfig {
           experience: experienceData,
           skills: skillsData,
           education: educationData,
-          achievements: [...achievementsData.awards, ...achievementsData.certifications],
         };
         
         return {
