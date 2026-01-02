@@ -4,6 +4,7 @@
 
 import { Badge } from './Badge';
 import { Card } from './Card';
+import { getImage } from '@/lib/api/apiClient';
 import { CheckCircle2, Briefcase, MapPin, Calendar } from 'lucide-react';
 
 interface TimelineItemProps {
@@ -43,8 +44,8 @@ export const TimelineItem = ({
             {logo && (
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <picture>
-                  <source srcSet={logo.replace(/\.(png|jpg|jpeg)$/i, '.webp')} type="image/webp" />
-                  <img src={logo} alt={company} className="w-9 h-9 object-contain" />
+                  <source srcSet={getImage(logo).replace(/\.(png|jpg|jpeg)$/i, '.webp')} type="image/webp" />
+                  <img src={getImage(logo)} alt={company} className="w-9 h-9 object-contain" />
                 </picture>
               </div>
             )}

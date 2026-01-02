@@ -7,46 +7,40 @@
 
 import React from 'react';
 import { ProjectCardProps } from '@/lib/config/types';
-import { getDataSourceUrl } from '@/lib/config/dataConfig';
-
-const DATA_URL = getDataSourceUrl('projects.json');
+import { fetchProjects as fetchProjectsAPI } from '@/lib/api/apiClient';
+import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
 // Empty array as ultimate fallback
 const EMPTY_PROJECTS: ProjectCardProps[] = [];
 
-const fetchProjects = async () => {
-  try {
-    const response = await fetch(DATA_URL);
-    if (!response.ok) {
-      return EMPTY_PROJECTS;
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return EMPTY_PROJECTS;
-  }
-};
-
 export const projectsData: ProjectCardProps[] = [];
 
 export const useProjects = () => {
+  const { language } = useLanguage();
   const [projects, setProjects] = React.useState<ProjectCardProps[]>(EMPTY_PROJECTS);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    setLoading(true);
-    fetchProjects()
-      .then((data) => {
-        setProjects(data);
+    const loadProjects = async () => {
+      setLoading(true);
+      try {
+        console.log(`[Projects] Loading projects for language: ${language}`);
+        const data = await fetchProjectsAPI(language as SupportedLanguage);
+        setProjects(data || EMPTY_PROJECTS);
         setError(null);
-      })
-      .catch((err) => {
-        setError(err.message);
+      } catch (err) {
+        console.error(`[Projects] Failed to load projects for language ${language}:`, err);
+        setError(err instanceof Error ? err.message : 'Failed to load projects');
         setProjects(EMPTY_PROJECTS);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjects();
+  }, [language]); // Re-fetch when language changes
 
   return { projects, error, loading };
 };

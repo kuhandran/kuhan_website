@@ -7,7 +7,7 @@
  * API: https://static-api-opal.vercel.app/api/collections/{language}/data/{fileType}.json
  */
 
-import { getApiBaseUrl } from '@/lib/config/dataConfig';
+import { getApiBaseUrl } from '@/lib/config/loaders';
 
 // Individual data loaders are in their respective files:
 // - src/lib/data/projects.ts (useProjects hook)

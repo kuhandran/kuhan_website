@@ -4,22 +4,15 @@ import { SectionHeader } from '../elements/SectionHeader';
 import { Card } from '../elements/Card';
 import { SkillBar } from '../elements/SkillBar';
 import { useSkills } from '../../lib/data/skills';
-import { getStaticContentLabels } from '../../lib/data/contentLabels';
+import { useContentLabels } from '../../lib/data/contentLabels';
 
 type SkillsData = Record<string, { name: string; icon: string; skills: Array<{ name: string; level: number; color: string }> }>;
 
 export const Skills = () => {
   const { skills: skillsData, loading } = useSkills();
+  const { contentLabels } = useContentLabels();
   const [activeTab, setActiveTab] = useState('frontend');
-  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
   const typedSkillsData = skillsData as SkillsData;
-
-  useEffect(() => {
-    const labels = getStaticContentLabels();
-    if (labels && Object.keys(labels).length > 0) {
-      setContentLabels(labels);
-    }
-  }, []);
   
   const tabs = Object.entries(typedSkillsData);
 

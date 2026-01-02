@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
-import { ServiceWorkerManager } from '@/pwa';
 import { LanguageProvider } from '@/lib/hooks/useLanguageHook';
-import './critical.css';
-import './globals.css';
+import { getManifestUrl, DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import '@/styles/critical.css';
+import '@/styles/globals.css';
 
 // Lazy load Analytics - deferred until after initial render
 const AnalyticsWrapper = dynamic(
@@ -72,10 +72,10 @@ export const metadata: Metadata = {
     ],
     shortcut: '/favicon.ico',
     apple: [
-      { url: '/apple-touch-icon.svg', type: 'image/svg+xml' }
+      { url: '/files/apple-touch-icon.svg', type: 'image/svg+xml' }
     ],
   },
-  manifest: '/manifest.json',
+  manifest: getManifestUrl(DEFAULT_LANGUAGE),
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -102,8 +102,8 @@ export default function RootLayout({
         {/* Favicon and Web App Icons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" type="image/svg+xml" />
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/files/apple-touch-icon.svg" type="image/svg+xml" />
+        <link rel="manifest" href={getManifestUrl(DEFAULT_LANGUAGE)} />
         
         {/* Mobile Web App Meta Tags */}
         <meta name="mobile-web-app-capable" content="yes" />
@@ -113,7 +113,7 @@ export default function RootLayout({
         <meta name="msapplication-config" content="/browserconfig.xml" />
         
         {/* Security and trust meta tags for Zscaler and SEO */}
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static-api-opal.vercel.app https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co; frame-src 'self' https://www.google.com https://www.gstatic.com;" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://static-api-opal.vercel.app https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co; frame-src 'self' https://www.google.com https://www.gstatic.com https://static-api-opal.vercel.app;" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <meta name="googlebot" content="index, follow, noimageindex:off, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -199,7 +199,6 @@ export default function RootLayout({
         <LanguageProvider>
           {children}
         </LanguageProvider>
-        <ServiceWorkerManager />
         <AnalyticsWrapper />
         <AnalyticsConsentBanner />
       </body>

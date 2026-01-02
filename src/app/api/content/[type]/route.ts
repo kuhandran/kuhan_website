@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { DOMAINS, DEFAULT_LANGUAGE, getCollectionUrl } from '@/lib/config/domains';
 
 /**
  * API Proxy Route for fetching multilingual content
@@ -6,10 +7,9 @@ import { NextRequest, NextResponse } from 'next/server';
  * 
  * Usage: /api/content/[type]?language=en&file=experience
  * Example: /api/content/data?language=ta&file=experience
+ * 
+ * ⚠️ Domains are now centralized in src/config/domains.ts
  */
-
-const API_BASE = 'https://static-api-opal.vercel.app/api';
-const DEFAULT_LANGUAGE = 'en';
 
 // Local fallback cache
 const localDataCache: Record<string, Record<string, any>> = {};
@@ -24,7 +24,8 @@ async function loadLocalFallback(language: string, fileType: string, fileName: s
 
     // Try to load from local JSON files
     const filePath = `/data/${language}/${fileName}.json`;
-    const response = await fetch(`${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}${filePath}`);
+    const appUrl = DOMAINS.getAppUrl();
+    const response = await fetch(`${appUrl}${filePath}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -58,7 +59,7 @@ export async function GET(
 
     // Try external API first
     try {
-      const apiUrl = `${API_BASE}/collections/${language}/${type}/${fileName}.json`;
+      const apiUrl = getCollectionUrl(language as any, type as any, fileName);
       console.log(`📡 Fetching from API: ${apiUrl}`);
 
       const response = await fetch(apiUrl, {

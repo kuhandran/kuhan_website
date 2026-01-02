@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { getImage } from '@/lib/api/apiClient';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ImageCarouselProps {
@@ -29,7 +30,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
       {/* Main Image */}
       <div className="relative w-full rounded-lg shadow-lg overflow-hidden bg-slate-100">
         <img
-          src={images[currentImageIndex]}
+          src={getImage(images[currentImageIndex])}
           alt={`${title} - Image ${currentImageIndex + 1}`}
           className="w-full h-auto"
         />
@@ -74,7 +75,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
               }`}
             >
               <img
-                src={images[index]}
+                src={getImage(images[index])}
                 alt={`Thumbnail ${index + 1}`}
                 className="w-full h-full object-cover rounded-sm"
               />

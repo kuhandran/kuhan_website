@@ -4,7 +4,9 @@
  */
 
 import React from 'react';
-import { getDataSourceUrl } from '@/lib/config/dataConfig';
+import { fetchEducation as fetchEducationAPI } from '@/lib/api/apiClient';
+import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
 interface EducationItem {
   degree: string;
@@ -14,39 +16,36 @@ interface EducationItem {
   focus: string;
 }
 
-const DATA_URL = getDataSourceUrl('education.json');
-
 const EMPTY_EDUCATION: EducationItem[] = [];
-
-const fetchEducation = async () => {
-  try {
-    const response = await fetch(DATA_URL);
-    if (!response.ok) return EMPTY_EDUCATION;
-    return await response.json();
-  } catch (error) {
-    return EMPTY_EDUCATION;
-  }
-};
 
 export let educationData: EducationItem[] = EMPTY_EDUCATION;
 
 export const useEducation = () => {
-  const [education, setEducation] = React.useState(educationData);
+  const { language } = useLanguage();
+  const [education, setEducation] = React.useState<EducationItem[]>(educationData);
   const [error, setError] = React.useState<Error | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    setLoading(true);
-    fetchEducation()
-      .then((data) => {
-        setEducation(data);
-        educationData = data;
-      })
-      .catch((err) => {
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    const loadEducation = async () => {
+      setLoading(true);
+      try {
+        console.log(`[Education] Loading education for language: ${language}`);
+        const data = await fetchEducationAPI(language as SupportedLanguage);
+        setEducation(data || EMPTY_EDUCATION);
+        educationData = data || EMPTY_EDUCATION;
+        setError(null);
+      } catch (err) {
+        console.error(`[Education] Failed to load education for language ${language}:`, err);
+        setError(err instanceof Error ? err : new Error('Failed to load education'));
+        setEducation(EMPTY_EDUCATION);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEducation();
+  }, [language]);
 
   return { education, error, loading };
 };

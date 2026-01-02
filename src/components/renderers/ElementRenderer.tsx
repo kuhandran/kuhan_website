@@ -2,7 +2,7 @@
 
 import React, { Suspense, lazy } from 'react';
 import { ElementConfig, ComponentType } from '@/lib/config/types';
-import { getErrorMessageSync } from '@/lib/config/appConfig';
+import { getErrorMessageSync } from '@/lib/config/loaders';
 
 // Import all reusable elements
 import { ProjectCard } from '@/components/elements/ProjectCard';

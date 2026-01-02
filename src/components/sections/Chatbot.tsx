@@ -9,7 +9,7 @@ import type { ChatbotStep } from './ChatbotState';
 import { resetToOtp } from './chatbotHelpers';
 import { MessageCircle, Bot, X } from 'lucide-react';
 import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
-import { fetchApiConfig } from '@/lib/config/configLoader';
+import { fetchApiConfig } from '@/lib/config/loaders';
 
 // Safe defaults in case contentLabels is undefined
 const defaultContentLabels = {

@@ -5,41 +5,40 @@
 
 import React from 'react';
 import { TimelineItemProps } from '@/lib/config/types';
-import { getDataSourceUrl } from '@/lib/config/dataConfig';
-
-const DATA_URL = getDataSourceUrl('experience.json');
+import { fetchExperience as fetchExperienceAPI } from '@/lib/api/apiClient';
+import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
 const EMPTY_EXPERIENCE: TimelineItemProps[] = [];
-
-const fetchExperience = async () => {
-  try {
-    const response = await fetch(DATA_URL);
-    if (!response.ok) return EMPTY_EXPERIENCE;
-    return await response.json();
-  } catch (error) {
-    return EMPTY_EXPERIENCE;
-  }
-};
 
 export let experienceData: TimelineItemProps[] = EMPTY_EXPERIENCE;
 
 export const useExperience = () => {
-  const [experience, setExperience] = React.useState(experienceData);
+  const { language } = useLanguage();
+  const [experience, setExperience] = React.useState<TimelineItemProps[]>(experienceData);
   const [error, setError] = React.useState<Error | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    setLoading(true);
-    fetchExperience()
-      .then((data) => {
-        setExperience(data);
-        experienceData = data;
-      })
-      .catch((err) => {
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    const loadExperience = async () => {
+      setLoading(true);
+      try {
+        console.log(`[Experience] Loading experience for language: ${language}`);
+        const data = await fetchExperienceAPI(language as SupportedLanguage);
+        setExperience(data || EMPTY_EXPERIENCE);
+        experienceData = data || EMPTY_EXPERIENCE;
+        setError(null);
+      } catch (err) {
+        console.error(`[Experience] Failed to load experience for language ${language}:`, err);
+        setError(err instanceof Error ? err : new Error('Failed to load experience'));
+        setExperience(EMPTY_EXPERIENCE);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExperience();
+  }, [language]); // Re-fetch when language changes
 
   return { experience, error, loading };
 };

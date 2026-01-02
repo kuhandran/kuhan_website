@@ -59,6 +59,9 @@ export {
   CaseStudyDetailSections 
 } from './renderers/case-studies';
 
+// Examples - Demo/Test Components
+export { LogoShowcase } from './examples/LogoShowcase';
+
 // Layout - Layout Components
 export { Navbar } from './layout/Navbar';
 export { Footer } from './layout/Footer';

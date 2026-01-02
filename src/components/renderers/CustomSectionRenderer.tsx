@@ -3,7 +3,7 @@
 import React, { Suspense } from 'react';
 import { SectionConfig } from '@/lib/config/types';
 import { sectionRegistry } from '@/lib/config/componentRegistry';
-import { getErrorMessageSync } from '@/lib/config/appConfig';
+import { getErrorMessageSync } from '@/lib/config/loaders';
 
 /**
  * Loading fallback component

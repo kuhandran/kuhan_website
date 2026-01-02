@@ -6,7 +6,9 @@ import { ResumePDFViewer } from '../elements/ResumePDFViewer';
 import { HighlightItem } from '../elements/HighlightItem';
 import { SectionCard } from '../elements/SectionCard';
 import { Users, Briefcase, TrendingUp } from 'lucide-react';
-import { getStaticContentLabels, initializeContentLabels } from '../../lib/data/contentLabels';
+import { useContentLabels } from '../../lib/data/contentLabels';
+import { API_ENDPOINTS, IMAGE_ASSETS } from '@/lib/config/domains';
+import { getImage, getResume } from '@/lib/api/apiClient';
 
 // Default fallback for About section - matches CDN data exactly
 const DEFAULT_ABOUT_LABELS = {
@@ -47,29 +49,17 @@ const DEFAULT_ABOUT_LABELS = {
 };
 
 export const About = () => {
-  const [contentLabels, setContentLabels] = useState(() => {
-    const labels = getStaticContentLabels();
-    return labels && Object.keys(labels).length > 0 ? labels : DEFAULT_ABOUT_LABELS;
-  });
+  const { contentLabels } = useContentLabels();
   const [isResumePDFOpen, setIsResumePDFOpen] = useState(false);
-
-  useEffect(() => {
-    const loadContentLabels = async () => {
-      await initializeContentLabels();
-      const updatedLabels = getStaticContentLabels();
-      if (updatedLabels && Object.keys(updatedLabels).length > 0) {
-        setContentLabels(updatedLabels);
-      }
-    };
-    loadContentLabels();
-  }, []);
+  const labels = contentLabels || DEFAULT_ABOUT_LABELS;
+  
   return (
     <section id="about" className="py-20 bg-slate-50">
       <div className="container mx-auto px-4">
         <SectionHeader
-          subtitle={contentLabels?.about?.subtitle || 'Learn More'}
-          title={contentLabels?.about?.title || 'About Me'}
-          description={contentLabels?.about?.description || ''}
+          subtitle={labels?.about?.subtitle || 'Learn More'}
+          title={labels?.about?.title || 'About Me'}
+          description={labels?.about?.description || ''}
         />
         
         <div className="grid md:grid-cols-2 gap-12 items-start max-w-6xl mx-auto">
@@ -79,16 +69,16 @@ export const About = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl transform rotate-3"></div>
               
               {(() => {
-                // Images are loaded from external static web service
-                const imageSrc = 'https://static.kuhandranchatbot.info/image/profile.webp';
-                const webpSrc = 'https://static.kuhandranchatbot.info/image/profile.webp';
+                // Images are loaded from external static web service using utility function
+                const imageSrc = getImage(IMAGE_ASSETS.profile.webp);
+                const webpSrc = getImage(IMAGE_ASSETS.profile.webp);
 
                 return (
                   <picture>
                     <source srcSet={webpSrc} type="image/webp" />
                     <img
                       src={imageSrc}
-                      alt={contentLabels?.about?.image?.alt || 'About'}
+                      alt={labels?.about?.image?.alt || 'About'}
                       className="relative rounded-2xl shadow-xl w-full"
                     />
                   </picture>
@@ -98,7 +88,7 @@ export const About = () => {
             
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-4 mt-8">
-              {(contentLabels?.about?.stats || [])?.map((stat: { icon?: string; value?: string; label?: string }, index: number) => {
+              {(labels?.about?.stats || [])?.map((stat: { icon?: string; value?: string; label?: string }, index: number) => {
                 const IconComponent = { Users, Briefcase, TrendingUp }[stat?.icon as string] || Users;
                 return (
                   <StatCard
@@ -116,22 +106,22 @@ export const About = () => {
           <div className="space-y-6">
             <div className="space-y-4">
               <p className="text-slate-600 leading-relaxed">
-                {contentLabels?.about?.paragraphs?.current_role || ''}
+                {labels?.about?.paragraphs?.current_role || ''}
               </p>
               
               <p className="text-slate-600 leading-relaxed">
-                {contentLabels?.about?.paragraphs?.previous_experience || ''}
+                {labels?.about?.paragraphs?.previous_experience || ''}
               </p>
               
               <p className="text-slate-600 leading-relaxed">
-                {contentLabels?.about?.paragraphs?.education || ''}
+                {labels?.about?.paragraphs?.education || ''}
               </p>
             </div>
             
             {/* Key Highlights */}
-            <SectionCard title={contentLabels?.about?.highlights?.heading || 'Key Highlights'}>
+            <SectionCard title={labels?.about?.highlights?.heading || 'Key Highlights'}>
               <ul className="space-y-3">
-                {(contentLabels?.about?.highlights?.items || [])?.map((highlight: string, index: number) => (
+                {(labels?.about?.highlights?.items || [])?.map((highlight: string, index: number) => (
                   <HighlightItem key={index} variant="emerald">
                     {highlight}
                   </HighlightItem>
@@ -142,10 +132,10 @@ export const About = () => {
             {/* CTA */}
             <div className="flex gap-4">
               <Button variant="primary" onClick={() => setIsResumePDFOpen(true)}>
-                {contentLabels?.about?.cta?.resume || 'Download Resume'}
+                {labels?.about?.cta?.resume || 'Download Resume'}
               </Button>
               <a href="https://www.linkedin.com/in/kuhandran-samudrapandiyan/" target="_blank" rel="noopener noreferrer">
-                <Button variant="secondary">{contentLabels?.about?.cta?.linkedin || 'Connect on LinkedIn'}</Button>
+                <Button variant="secondary">{labels?.about?.cta?.linkedin || 'Connect on LinkedIn'}</Button>
               </a>
             </div>
           </div>
@@ -156,7 +146,7 @@ export const About = () => {
       <ResumePDFViewer
         isOpen={isResumePDFOpen}
         onClose={() => setIsResumePDFOpen(false)}
-        resumeUrl="https://static.kuhandranchatbot.info/resume/resume.pdf"
+        resumeUrl={getResume('resume.pdf')}
       />
     </section>
   );

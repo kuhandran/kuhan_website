@@ -31,7 +31,7 @@ export function useCaseStudiesTranslation() {
           return;
         }
 
-        const { getDataSourceUrl } = await import('@/lib/config/dataConfig');
+        const { getDataSourceUrl } = await import('@/lib/config/loaders');
         const dataUrl = getDataSourceUrl('caseStudiesTranslations.json');
 
         const response = await fetch(dataUrl);

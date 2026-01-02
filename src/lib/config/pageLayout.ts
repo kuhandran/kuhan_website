@@ -5,7 +5,7 @@ import { skillsData } from '@/lib/data/skills';
 import { educationData } from '@/lib/data/education';
 import { achievementsData } from '@/lib/data/achievements';
 import { contentLabels } from '@/lib/data/contentLabels';
-import { fetchPageLayout, getPageLayoutSync } from '@/lib/config/configLoader';
+import { fetchPageLayout, getPageLayoutSync } from '@/lib/config/loaders';
 
 /**
  * Main Page Layout Configuration

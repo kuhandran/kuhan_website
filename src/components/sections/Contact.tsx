@@ -8,9 +8,9 @@ import { SectionHeader } from '../elements/SectionHeader';
 import { Button } from '../elements/Button';
 import { Card } from '../elements/Card';
 import { Mail, Phone, MapPin, Linkedin, Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
-import { getStaticContentLabels } from '../../lib/data/contentLabels';
-import { fetchApiConfig } from '@/lib/config/configLoader';
-import { getErrorMessageSync } from '@/lib/config/appConfig';
+import { useContentLabels } from '../../lib/data/contentLabels';
+import { fetchApiConfig } from '@/lib/config/loaders';
+import { getErrorMessageSync } from '@/lib/config/loaders';
 
 interface FormData {
   name: string;
@@ -20,7 +20,7 @@ interface FormData {
 }
 
 export const Contact = () => {
-  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
+  const { contentLabels } = useContentLabels();
   const [apiConfig, setApiConfig] = useState<any>({});
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -30,11 +30,7 @@ export const Contact = () => {
   });
   
   useEffect(() => {
-    // Fetch content labels and API config from CDN
-    const labels = getStaticContentLabels();
-    if (labels && Object.keys(labels).length > 0) {
-      setContentLabels(labels);
-    }
+    // Fetch API config from CDN
     fetchApiConfig().then(config => setApiConfig(config));
   }, []);
   

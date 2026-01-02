@@ -4,7 +4,7 @@
  * Supports environment-aware data sources (local JSON or CDN)
  */
 
-import { getDataSourceUrl } from '../config/dataConfig';
+import { getDataSourceUrl } from '../config/loaders';
 
 /**
  * Case Study Type Definition

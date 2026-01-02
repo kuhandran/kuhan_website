@@ -13,7 +13,7 @@ interface ResumePDFViewerProps {
 export const ResumePDFViewer = ({
   isOpen,
   onClose,
-  resumeUrl = 'https://static.kuhandranchatbot.info/resume/resume.pdf'
+  resumeUrl
 }: ResumePDFViewerProps) => {
   const [hasAnalyticsConsent, setHasAnalyticsConsent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +60,11 @@ export const ResumePDFViewer = ({
     setIsDownloading(true);
 
     try {
+      // Validate resumeUrl is available
+      if (!resumeUrl) {
+        throw new Error('Resume URL is not available');
+      }
+
       // Use fetch to download the file
       const response = await fetch(resumeUrl);
       

@@ -6,15 +6,8 @@
  * Flow: Component → /api/content/[type] → External API or Local Fallback
  */
 
-import { getConfigUrl } from '@/lib/config/dataConfig';
-
-interface ContentCache {
-  [languageCode: string]: {
-    [fileType: string]: any;
-  };
-}
-
-let contentCache: ContentCache = {};
+import { getDataSourceUrl } from '@/lib/config/loaders';
+import { cacheManager } from '@/lib/api/cache';
 
 /**
  * Fetch multilingual content through Next.js API proxy
@@ -35,9 +28,14 @@ export async function getMultilingualContent(
   fileType: string,
   preferCache: boolean = true
 ): Promise<any> {
+  const cacheKey = `content-${languageCode}-${fileType}`;
+
   // Check cache first if preferred
-  if (preferCache && contentCache[languageCode]?.[fileType]) {
-    return contentCache[languageCode][fileType];
+  if (preferCache) {
+    const cached = cacheManager.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
   }
 
   let content = null;
@@ -46,7 +44,7 @@ export async function getMultilingualContent(
     // Use Next.js API proxy instead of direct external API call
     // This avoids CORS issues and provides automatic fallback to local data
     const proxyUrl = `/api/content/data?language=${languageCode}&file=${fileType}`;
-    console.log(`📡 Fetching via proxy: ${proxyUrl}`);
+    console.log('[ContentLoader] Fetching via proxy', { language: languageCode, file: fileType });
     
     const response = await fetch(proxyUrl, {
       headers: { 'Accept': 'application/json' }
@@ -55,24 +53,26 @@ export async function getMultilingualContent(
     if (response.ok) {
       content = await response.json();
       const dataSource = response.headers.get('X-Data-Source') || 'api';
-      console.log(`✅ Loaded ${fileType} for ${languageCode} (${dataSource})`);
+      console.log('[ContentLoader] Loaded successfully', { fileType, languageCode, dataSource });
     } else {
-      console.warn(
-        `⚠️ Failed to fetch ${fileType} for ${languageCode} (HTTP ${response.status})`
-      );
+      console.warn('[ContentLoader] HTTP error', {
+        fileType,
+        languageCode,
+        status: response.status
+      });
     }
   } catch (error) {
-    console.error(
-      `❌ Error fetching ${fileType} for ${languageCode}:`,
-      error instanceof Error ? error.message : error
-    );
+    console.error('[ContentLoader] Fetch error', {
+      fileType,
+      languageCode,
+      error: error instanceof Error ? error.message : String(error)
+    });
   }
 
-  // Cache the result (even if null)
-  if (!contentCache[languageCode]) {
-    contentCache[languageCode] = {};
+  // Cache the result (5 minute TTL)
+  if (content) {
+    cacheManager.set(cacheKey, content, 5 * 60 * 1000);
   }
-  contentCache[languageCode][fileType] = content;
 
   return content;
 }
@@ -145,16 +145,19 @@ export async function getAchievements(languageCode: string): Promise<any> {
  * // Access from: https://static-api-opal.vercel.app/api/collections/en/config/apiConfig.json
  */
 export async function getApiConfig(languageCode: string): Promise<any> {
+  const cacheKey = `content-${languageCode}-apiConfig`;
+
   // Check cache first
-  if (contentCache[languageCode]?.['apiConfig']) {
-    return contentCache[languageCode]['apiConfig'];
+  const cached = cacheManager.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
   let content = null;
 
   try {
-    const url = getConfigUrl('apiConfig', languageCode);
-    console.log(`📡 Fetching config: ${url}`);
+    const url = getDataSourceUrl('apiConfig.json', languageCode, 'config');
+    console.log('[ContentLoader] Fetching apiConfig', { language: languageCode });
     
     const response = await fetch(url, {
       headers: { 'Accept': 'application/json' }
@@ -162,24 +165,24 @@ export async function getApiConfig(languageCode: string): Promise<any> {
 
     if (response.ok) {
       content = await response.json();
-      console.log(`✅ Loaded apiConfig for ${languageCode}`);
+      console.log('[ContentLoader] apiConfig loaded', { languageCode });
     } else {
-      console.warn(
-        `⚠️ Failed to fetch apiConfig for ${languageCode} (HTTP ${response.status})`
-      );
+      console.warn('[ContentLoader] apiConfig fetch failed', {
+        languageCode,
+        status: response.status
+      });
     }
   } catch (error) {
-    console.error(
-      `❌ Error fetching apiConfig for ${languageCode}:`,
-      error instanceof Error ? error.message : error
-    );
+    console.error('[ContentLoader] apiConfig error', {
+      languageCode,
+      error: error instanceof Error ? error.message : String(error)
+    });
   }
 
-  // Cache the result
-  if (!contentCache[languageCode]) {
-    contentCache[languageCode] = {};
+  // Cache the result (5 minute TTL)
+  if (content) {
+    cacheManager.set(cacheKey, content, 5 * 60 * 1000);
   }
-  contentCache[languageCode]['apiConfig'] = content;
 
   return content;
 }
@@ -190,10 +193,18 @@ export async function getApiConfig(languageCode: string): Promise<any> {
  * @returns Page layout configuration
  */
 export async function getPageLayout(languageCode: string): Promise<any> {
+  const cacheKey = `content-${languageCode}-pageLayout`;
+
+  // Check cache first
+  const cached = cacheManager.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   let content = null;
 
   try {
-    const url = getConfigUrl('pageLayout', languageCode);
+    const url = getDataSourceUrl('pageLayout.json', languageCode, 'config');
     const response = await fetch(url, {
       headers: { 'Accept': 'application/json' }
     });
@@ -202,7 +213,15 @@ export async function getPageLayout(languageCode: string): Promise<any> {
       content = await response.json();
     }
   } catch (error) {
-    console.error(`Error fetching pageLayout for ${languageCode}:`, error);
+    console.error('[ContentLoader] pageLayout error', {
+      languageCode,
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+
+  // Cache the result (5 minute TTL)
+  if (content) {
+    cacheManager.set(cacheKey, content, 5 * 60 * 1000);
   }
 
   return content;
@@ -212,8 +231,8 @@ export async function getPageLayout(languageCode: string): Promise<any> {
  * Clear the content cache (useful for forcing refresh)
  */
 export function clearContentCache(): void {
-  contentCache = {};
-  console.log('✨ Content cache cleared');
+  cacheManager.clear(/^content-/);
+  console.log('[ContentLoader] Cache cleared');
 }
 
 /**

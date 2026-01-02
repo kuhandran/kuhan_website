@@ -178,8 +178,9 @@ export async function updateServiceWorker(): Promise<boolean> {
 
 /**
  * Pre-cache default API files on first load
+ * Note: Config paths use dynamic routes based on language (e.g., /api/config/en/pageLayout)
  */
-export async function initializeDefaultCache(): Promise<void> {
+export async function initializeDefaultCache(language: string = 'en'): Promise<void> {
   const defaultApis = [
     '/data/projects.json',
     '/data/experience.json',
@@ -188,7 +189,8 @@ export async function initializeDefaultCache(): Promise<void> {
     '/data/achievements.json',
     '/data/caseStudies.json',
     '/data/contentLabels.json',
-    '/config/pageLayout.json',
+    // Use dynamic config route with language support
+    `/api/config/${language}/pageLayout`,
   ];
 
   await precacheApis(defaultApis);

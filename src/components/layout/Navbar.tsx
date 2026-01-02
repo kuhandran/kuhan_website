@@ -9,13 +9,19 @@ import { Button } from '../elements/Button';
 import { ResumePDFViewer } from '../elements/ResumePDFViewer';
 import { LanguageSwitcher } from '../language/LanguageSwitcher';
 import { Menu, X, Download } from 'lucide-react';
+import { getResume } from '@/lib/api/apiClient';
+import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
 export const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { language } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResumePDFOpen, setIsResumePDFOpen] = useState(false);
+  
+  // Use original logo with proper sizing
+  const logoUrl = '/logo.svg';
   
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -133,11 +139,11 @@ export const Navbar = () => {
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white/95 backdrop-blur-lg shadow-lg py-3' 
-          : 'bg-white/80 backdrop-blur-md py-4'
+          ? 'bg-slate-900/95 backdrop-blur-xl shadow-xl border-b border-blue-500/20 py-2.5' 
+          : 'bg-slate-900/90 backdrop-blur-lg py-3.5'
       }`}>
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
+          <div className="flex items-center justify-between gap-2">
             {/* Logo */}
             <button 
               onClick={() => {
@@ -148,60 +154,76 @@ export const Navbar = () => {
                   router.push('/');
                 }
               }}
-              className="text-2xl md:text-3xl font-bold text-slate-900 hover:text-blue-600 transition-colors z-50"
+              className="relative z-50 group flex items-center"
+              title="Go to home"
             >
-              <span className="inline-block hover:scale-110 transition-transform">
-                KS<span className="text-blue-500">.</span>
-              </span>
+              {/* Logo Container with Gradient Background */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md opacity-0 group-hover:opacity-100 blur transition-opacity duration-300"></div>
+                <div className="relative bg-white backdrop-blur-sm p-1.5 rounded-md border border-white/20 group-hover:border-blue-400/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/50">
+                  <img 
+                    src={logoUrl}
+                    alt="Kuhandran Logo"
+                    className="h-8 w-8 object-contain transition-transform duration-300 group-hover:scale-105"
+                    loading="eager"
+                    style={{ display: 'block' }}
+                  />
+                </div>
+              </div>
+              {/* Brand Text (Optional - uncomment if needed) */}
+              {/* <span className="hidden lg:block text-white font-bold text-lg">Kuhandran</span> */}
             </button>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <button
                   key={link.name}
                   onClick={() => handleNavClick(link.href)}
-                  className="relative text-slate-600 hover:text-blue-600 font-medium transition-colors group"
+                  className="relative px-3 py-2 text-sm text-slate-300 hover:text-white font-medium transition-all duration-200 group rounded-md hover:bg-white/5"
                 >
                   {link.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full" />
+                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-300 group-hover:w-3/4 rounded-full" />
                 </button>
               ))}
             </div>
             
-            {/* CTA Button - Desktop */}
-            <div className="hidden md:flex items-center gap-4">
+            {/* CTA Section - Desktop */}
+            <div className="hidden lg:flex items-center gap-2">
               <LanguageSwitcher />
               <Button 
                 variant="primary" 
                 size="sm"
                 onClick={handleDownloadResume}
-                className="group"
+                className="group bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 border-0 whitespace-nowrap"
               >
-                <Download size={16} className="mr-2 group-hover:animate-bounce" />
-                Download Resume
+                <Download size={16} className="mr-1.5 group-hover:animate-bounce" />
+                Resume
               </Button>
             </div>
             
             {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-slate-900 z-50 p-2 hover:bg-slate-100 rounded-lg transition-colors"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X size={28} className="text-slate-900" />
-              ) : (
-                <Menu size={28} />
-              )}
-            </button>
+            <div className="flex lg:hidden items-center gap-2">
+              <LanguageSwitcher />
+              <button
+                className="relative z-50 p-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 hover:border-blue-400/50 transition-all duration-200"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X size={24} className="text-white" />
+                ) : (
+                  <Menu size={24} className="text-white" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </nav>
       
       {/* Mobile Menu Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${
           isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setIsMobileMenuOpen(false)}
@@ -209,34 +231,46 @@ export const Navbar = () => {
       
       {/* Mobile Menu */}
       <div 
-        className={`fixed top-0 right-0 h-full w-[280px] bg-white shadow-2xl z-40 md:hidden transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-[320px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 shadow-2xl z-40 lg:hidden transition-transform duration-300 ease-in-out border-l border-blue-500/20 ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col h-full pt-24 pb-8 px-6">
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 opacity-10 overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500 rounded-full filter blur-3xl"></div>
+        </div>
+        
+        <div className="relative flex flex-col h-full pt-20 pb-8 px-6">
+          {/* Mobile Header */}
+          <div className="mb-8 pb-6 border-b border-white/10">
+            <h3 className="text-white font-bold text-xl mb-1">Navigation</h3>
+            <p className="text-slate-400 text-sm">Explore my portfolio</p>
+          </div>
+          
           {/* Mobile Navigation Links */}
-          <div className="flex flex-col gap-2 mb-8">
+          <div className="flex flex-col gap-1 mb-auto">
             {navLinks.map((link, index) => (
               <button
                 key={link.name}
                 onClick={() => handleNavClick(link.href)}
-                className="text-left text-slate-700 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all transform hover:translate-x-2"
+                className="group relative text-left text-slate-300 hover:text-white font-medium py-3.5 px-4 rounded-lg transition-all hover:bg-white/10 border border-transparent hover:border-blue-500/30"
                 style={{ 
-                  animation: isMobileMenuOpen ? `slideInRight 0.3s ease-out ${index * 0.1}s both` : 'none'
+                  animation: isMobileMenuOpen ? `slideInRight 0.3s ease-out ${index * 0.05}s both` : 'none'
                 }}
               >
-                {link.name}
+                <span className="relative z-10">{link.name}</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/10 group-hover:to-purple-500/10 rounded-lg transition-all duration-300"></div>
               </button>
             ))}
           </div>
           
-          {/* Mobile CTA Button */}
-          <div className="mt-auto space-y-4">
-            <LanguageSwitcher />
+          {/* Mobile CTA Section */}
+          <div className="mt-6 space-y-4 pt-6 border-t border-white/10">
             <Button 
               variant="primary" 
               size="md" 
-              className="w-full group"
+              className="w-full group bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white shadow-lg shadow-blue-500/30 border-0"
               onClick={handleDownloadResume}
             >
               <Download size={18} className="mr-2 group-hover:animate-bounce" />
@@ -244,19 +278,25 @@ export const Navbar = () => {
             </Button>
             
             {/* Contact Info */}
-            <div className="mt-6 pt-6 border-t border-slate-200">
-              <p className="text-sm text-slate-500 mb-2">Get in touch</p>
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <p className="text-xs uppercase tracking-wider text-slate-500 mb-3 font-semibold">Get in Touch</p>
               <a 
                 href="mailto:skuhandran@yahoo.com"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium block mb-2"
+                className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 font-medium mb-3 group"
               >
-                skuhandran@yahoo.com
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span className="group-hover:underline">skuhandran@yahoo.com</span>
               </a>
               <a 
                 href="tel:+60149337280"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium block"
+                className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 font-medium group"
               >
-                +60 14 933 7280
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span className="group-hover:underline">+60 14 933 7280</span>
               </a>
             </div>
           </div>
@@ -281,7 +321,7 @@ export const Navbar = () => {
       <ResumePDFViewer
         isOpen={isResumePDFOpen}
         onClose={() => setIsResumePDFOpen(false)}
-        resumeUrl="https://static.kuhandranchatbot.info/resume/resume.pdf"
+        resumeUrl={getResume('resume.pdf')}
       />
     </>
   );

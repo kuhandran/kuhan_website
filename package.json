@@ -7,20 +7,11 @@
     "build": "next build",
     "start": "NODE_ENV=production next start -p 3000",
     "prod": "npm run build && npm run start",
-    "sync-json": "node scripts/sync-json.js",
-    "setup": "npm run sync-json && npm install",
     "lint": "eslint",
-    "watch-public": "node watch-public.js",
-    "sync:status": "bash scripts/sync-public-folder.sh status",
-    "sync:website-to-api": "bash scripts/sync-public-folder.sh website->api",
-    "sync:api-to-website": "bash scripts/sync-public-folder.sh api->website",
-    "sync:bidirectional": "bash scripts/sync-public-folder.sh bidirectional",
-    "sync:website-to-api-push": "bash scripts/sync-public-folder.sh website->api --push",
-    "sync:api-to-website-push": "bash scripts/sync-public-folder.sh api->website --push",
-    "sync:bidirectional-push": "bash scripts/sync-public-folder.sh bidirectional --push",
-    "hooks:setup": "bash scripts/setup-git-hooks.sh"
+    "watch-public": "node watch-public.js"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.11.2",
     "@vercel/analytics": "^1.6.1",
     "framer-motion": "^12.23.25",
     "lucide-react": "^0.555.0",
@@ -29,7 +20,8 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-google-recaptcha": "^3.1.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

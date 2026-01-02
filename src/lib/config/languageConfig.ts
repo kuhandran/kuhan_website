@@ -45,13 +45,11 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
   languagesConfigPromise = (async () => {
     try {
       // Try to fetch from production API first
-      const response = await fetch(
-        'https://static-api-opal.vercel.app/api/config-file/languages.json',
-        { next: { revalidate: 3600 } } // Cache for 1 hour
-      );
-
-      if (response.ok) {
-        cachedLanguagesConfig = await response.json();
+      const { getInfoFromAPI } = await import('@/lib/api');
+      const result = await getInfoFromAPI('GET', 'api/config-file/languages.json', undefined, true);
+      
+      if (result) {
+        cachedLanguagesConfig = result;
         return cachedLanguagesConfig;
       }
 
@@ -196,19 +194,21 @@ export async function fetchLocaleData(
   fileType: string
 ): Promise<any> {
   try {
-    const response = await fetch(
-      `https://static-api-opal.vercel.app/api/collections/${languageCode}/data/${fileType}.json`,
-      { next: { revalidate: 3600 } } // Cache for 1 hour
+    const { getCollection } = await import('@/lib/api');
+    const result = await getCollection(
+      `${fileType}.json`,
+      'data',
+      languageCode as any
     );
-
-    if (!response.ok) {
+    
+    if (!result) {
       console.warn(
         `Failed to fetch ${fileType} for language ${languageCode}`
       );
       return null;
     }
 
-    return await response.json();
+    return result;
   } catch (error) {
     console.error(
       `Error fetching locale data for ${languageCode}/${fileType}:`,

@@ -4,7 +4,7 @@ import { Card } from '../elements/Card';
 import { Badge } from '../elements/Badge';
 import { Trophy, Award, Sparkles, Zap } from 'lucide-react';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
-import { getErrorMessageSync } from '../../lib/config/appConfig';
+import { getErrorMessageSync } from '@/lib/config/loaders';
 import { fetchAchievementsData } from '@/lib/data/achievements';
 
 interface AchievementsData {

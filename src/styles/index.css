@@ -1,0 +1,5 @@
+/* Centralized stylesheet entry point */
+/* Imports critical, globals, and all other stylesheets */
+
+@import "./critical.css";
+@import "./globals.css";

@@ -4,18 +4,20 @@
  */
 
 import React from 'react';
-import { getDataSourceUrl } from '@/lib/config/dataConfig';
+import { fetchSkills as fetchSkillsAPI } from '@/lib/api/apiClient';
+import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
-const DATA_URL = getDataSourceUrl('skills.json');
+interface SkillItem {
+  name: string;
+  level: number;
+  color: string;
+}
 
 interface SkillCategory {
   name: string;
   icon: string;
-  skills: Array<{
-    name: string;
-    level: number;
-    color: string;
-  }>;
+  skills: SkillItem[];
 }
 
 type SkillsData = Record<string, SkillCategory>;
@@ -27,35 +29,34 @@ const EMPTY_SKILLS: SkillsData = {
   cloud: { name: '', icon: '', skills: [] }
 };
 
-const fetchSkills = async () => {
-  try {
-    const response = await fetch(DATA_URL);
-    if (!response.ok) return EMPTY_SKILLS;
-    return await response.json();
-  } catch (error) {
-    return EMPTY_SKILLS;
-  }
-};
-
 export let skillsData: SkillsData = EMPTY_SKILLS;
 
 export const useSkills = () => {
-  const [skills, setSkills] = React.useState(skillsData);
+  const { language } = useLanguage();
+  const [skills, setSkills] = React.useState<SkillsData>(skillsData);
   const [error, setError] = React.useState<Error | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    setLoading(true);
-    fetchSkills()
-      .then((data) => {
-        setSkills(data);
-        skillsData = data;
-      })
-      .catch((err) => {
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    const loadSkills = async () => {
+      setLoading(true);
+      try {
+        console.log(`[Skills] Loading skills for language: ${language}`);
+        const data = await fetchSkillsAPI(language as SupportedLanguage);
+        setSkills(data || EMPTY_SKILLS);
+        skillsData = data || EMPTY_SKILLS;
+        setError(null);
+      } catch (err) {
+        console.error(`[Skills] Failed to load skills for language ${language}:`, err);
+        setError(err instanceof Error ? err : new Error('Failed to load skills'));
+        setSkills(EMPTY_SKILLS);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSkills();
+  }, [language]); // Re-fetch when language changes
 
   return { skills, error, loading };
 };

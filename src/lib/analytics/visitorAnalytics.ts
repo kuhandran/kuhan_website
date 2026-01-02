@@ -2,7 +2,12 @@
  * Visitor Analytics Utility
  * Collects: Location, Language, Browser, Organization
  * Requires user consent for analytics
+ * 
+ * ⚠️ Domains are now centralized in src/config/domains.ts
  */
+
+import { API_ENDPOINTS } from '@/lib/config/domains';
+import { getInfoFromAPI } from '@/lib/api/apiClient';
 
 export interface VisitorData {
   location: {
@@ -76,21 +81,16 @@ function getLanguage(): string {
 async function getLocationData(): Promise<any> {
   try {
     // Using ipapi.co (free, no auth required, privacy-friendly)
-    const response = await fetch('https://ipapi.co/json/', {
-      headers: {
-        'User-Agent': 'Kuhandran-Portfolio-Analytics',
-      },
-    });
+    const locationData = await getInfoFromAPI<any>('GET', '/json/', undefined, false);
 
-    if (!response.ok) throw new Error('Failed to fetch location');
+    if (!locationData) throw new Error('Failed to fetch location');
 
-    const data = await response.json();
     return {
-      city: data.city || 'Unknown',
-      country: data.country_name || 'Unknown',
-      countryCode: data.country_code || 'Unknown',
-      latitude: data.latitude || 0,
-      longitude: data.longitude || 0,
+      city: locationData.city || 'Unknown',
+      country: locationData.country_name || 'Unknown',
+      countryCode: locationData.country_code || 'Unknown',
+      latitude: locationData.latitude || 0,
+      longitude: locationData.longitude || 0,
     };
   } catch (error) {
     console.error('Error fetching location:', error);
@@ -142,7 +142,8 @@ export async function collectVisitorAnalytics(): Promise<VisitorData> {
 // Send analytics to your backend
 export async function sendVisitorAnalytics(visitorData: VisitorData): Promise<void> {
   try {
-    const response = await fetch('/api/analytics/visitor', {
+    const analyticsUrl = API_ENDPOINTS.analyticsVisitor();
+    const response = await fetch(analyticsUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

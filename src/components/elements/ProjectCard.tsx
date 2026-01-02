@@ -1,6 +1,7 @@
 
 import Link from 'next/link';
 import { Badge } from './Badge';
+import { getImage } from '@/lib/api/apiClient';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 
 interface ProjectCardProps {
@@ -33,10 +34,10 @@ export const ProjectCard = ({
       <div className="relative w-full h-56 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 flex-shrink-0">
         <picture>
           {/* WebP fallback */}
-          <source srcSet={image.replace(/\.(png|jpg|jpeg)$/i, '.webp')} type="image/webp" />
+          <source srcSet={getImage(image).replace(/\.(png|jpg|jpeg)$/i, '.webp')} type="image/webp" />
           {/* Original format fallback */}
           <img 
-            src={image} 
+            src={getImage(image)} 
             alt={title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
             loading="lazy"

@@ -3,7 +3,7 @@
  * Loaded from: /data/achievements.json (dev) or https://static.kuhandranchatbot.info/data/achievements.json (prod)
  */
 
-import { getDataSourceUrl } from '@/lib/config/dataConfig';
+import { getDataSourceUrl } from '@/lib/config/loaders';
 
 interface Award {
   name: string;

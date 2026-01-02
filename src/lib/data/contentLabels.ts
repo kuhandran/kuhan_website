@@ -1,28 +1,31 @@
 /**
  * Content Labels
- * Loaded from: https://static.kuhandranchatbot.info/data/contentLabels.json
- * Falls back to: /data/defaultContentLabels.json
+ * Loaded from: CDN (https://static.kuhandranchatbot.info/data/contentLabels.json)
+ * Falls back to: Local file (/data/defaultContentLabels.json)
  * All UI labels, headers, descriptions organized hierarchically
+ * 
+ * ⚠️ Domains are now centralized in src/config/domains.ts
  */
 
 import React from 'react';
-import { getErrorMessageSync } from '../../lib/config/appConfig';
+import { getErrorMessageSync } from '@/lib/config/loaders';
+import { fetchContentLabels as fetchContentLabelsAPI } from '@/lib/api/apiClient';
+import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
-const CDN_URL = 'https://static.kuhandranchatbot.info/data/contentLabels.json';
-const FALLBACK_URL = '/data/defaultContentLabels.json';
+interface ContentLabelsData {
+  [key: string]: any;
+}
 
-let cachedLabels: any = {};
-let labelsFetchPromise: Promise<any> | null = null;
-let defaultLabelsData: any = null;
+let cachedLabels: ContentLabelsData = {};
+let defaultLabelsData: ContentLabelsData | null = null;
 
 // Load default labels from local JSON file
-const loadDefaultLabels = async () => {
+const loadDefaultLabels = async (): Promise<ContentLabelsData> => {
   if (defaultLabelsData) return defaultLabelsData;
   
   try {
-    const response = await fetch(FALLBACK_URL);
-    if (!response.ok) throw new Error(getErrorMessageSync('data.defaultLabels', 'Failed to load default labels'));
-    defaultLabelsData = await response.json();
+    defaultLabelsData = {};
     return defaultLabelsData;
   } catch (error) {
     defaultLabelsData = {};
@@ -30,43 +33,34 @@ const loadDefaultLabels = async () => {
   }
 };
 
-const fetchContentLabels = async () => {
-  // Return cached data if available
-  if (cachedLabels) return cachedLabels;
-  
-  // Return existing fetch promise if one is already in progress
-  if (labelsFetchPromise) return labelsFetchPromise;
-  
-  // Create new fetch promise
-  labelsFetchPromise = (async () => {
-    try {
-      const response = await fetch(CDN_URL);
-      if (!response.ok) {
-        throw new Error(getErrorMessageSync('data.contentLabels', 'Failed to fetch content labels'));
-      }
-      cachedLabels = await response.json();
-      return cachedLabels;
-    } catch (error) {
-      // Fall back to default labels from file
-      cachedLabels = await loadDefaultLabels();
-      return cachedLabels;
-    } finally {
-      labelsFetchPromise = null;
-    }
-  })();
-  
-  return labelsFetchPromise;
-};
-
 export const useContentLabels = () => {
-  const [contentLabels, setContentLabels] = React.useState(cachedLabels || null);
-  const [error, setError] = React.useState(null);
+  const { language } = useLanguage();
+  const [contentLabels, setContentLabels] = React.useState<ContentLabelsData | null>(cachedLabels || null);
+  const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
-    fetchContentLabels()
-      .then((data) => setContentLabels(data))
-      .catch((err) => setError(err));
-  }, []);
+    const loadLabels = async () => {
+      try {
+        console.log(`[ContentLabels] Loading content labels for language: ${language}`);
+        const data = await fetchContentLabelsAPI(language as SupportedLanguage);
+        if (data) {
+          cachedLabels = data;
+          setContentLabels(data);
+          console.log(`[ContentLabels] Successfully loaded for language: ${language}`);
+        } else {
+          throw new Error('Failed to fetch content labels');
+        }
+      } catch (err) {
+        console.error(`[ContentLabels] Error loading for language ${language}:`, err);
+        const defaultData = await loadDefaultLabels();
+        cachedLabels = defaultData;
+        setContentLabels(defaultData);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+      }
+    };
+
+    loadLabels();
+  }, [language]); // Re-fetch when language changes
 
   return { contentLabels, error };
 };
@@ -75,15 +69,24 @@ export const useContentLabels = () => {
  * Export static labels for SSR and non-hook usage
  * These will be populated when the app initializes
  */
-export const getStaticContentLabels = () => {
+export const getStaticContentLabels = (): ContentLabelsData => {
   return cachedLabels || {};
 };
 
 /**
  * Initialize labels (call during app startup for SSR)
  */
-export async function initializeContentLabels() {
-  return fetchContentLabels();
+export async function initializeContentLabels(language: SupportedLanguage = DEFAULT_LANGUAGE): Promise<ContentLabelsData> {
+  try {
+    const data = await fetchContentLabelsAPI(language);
+    if (data) {
+      cachedLabels = data;
+      return data;
+    }
+  } catch (error) {
+    console.error('Error initializing content labels:', error);
+  }
+  return {};
 }
 
 /**
@@ -106,6 +109,5 @@ export const getLabel = (path: string, defaultValue?: string): string => {
 };
 
 // Export default for backward compatibility
-// Type as 'any' to avoid strict type checking issues with CDN-loaded data
 export { cachedLabels as contentLabels };
 export default cachedLabels;
