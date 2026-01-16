@@ -169,7 +169,7 @@ Complete documentation for the Kuhan Website project. All information organized 
 
 - **README.md** - Project overview (in root)
 - **Live Demo** - https://kuhan.vercel.app
-- **Static API** - https://static-api-opal.vercel.app
+- **Static API** - https://static.kuhandranchatbot.info
 
 ---
 

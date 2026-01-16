@@ -11,10 +11,10 @@
 /** Production API - Main data source for all multilingual content */
 export const DOMAINS = {
   // Production API
-  PRODUCTION_API: 'https://static-api-opal.vercel.app',
+  PRODUCTION_API: 'https://static.kuhandranchatbot.info',
 
   // CDN - Static content and images
-  CDN: 'https://static-api-opal.vercel.app',
+  CDN: 'https://static.kuhandranchatbot.info',
 
   // Third-party services
   IP_API: 'https://ipapi.co',
@@ -40,7 +40,7 @@ export const DOMAINS = {
 export const API_ENDPOINTS = {
   // Production API paths
   collections: (language: string, type: 'data' | 'config', file: string) =>
-    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/${type}/${file}.json`,
+    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/${type}/${file}`,
 
   // Internal API routes
   contentProxy: (type: string) => `/api/content/${type}`,
@@ -54,9 +54,9 @@ export const API_ENDPOINTS = {
 
   // CDN paths
   cdnData: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/data/${file}.json`,
+    `${DOMAINS.CDN}/api/collections/en/data/${file}`,
   cdnConfig: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/config/${file}.json`,
+    `${DOMAINS.CDN}/api/collections/en/config/${file}`,
   cdnImage: (imagePath: string) =>
     `${DOMAINS.CDN}/api/image/${imagePath}`,
 

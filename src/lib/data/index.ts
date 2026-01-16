@@ -4,7 +4,7 @@
  * - Each component loads its own data via useXXX() hooks
  * - Data is fetched on-demand when component renders
  * - Uses production API with language codes
- * API: https://static-api-opal.vercel.app/collections/{language}/data/{fileType}.json
+ * API: https://static.kuhandranchatbot.info/api/collections/{language}/data/{fileType}
  */
 
 import { getApiBaseUrl } from '@/lib/config/loaders';
@@ -28,16 +28,16 @@ export async function preloadData(filenames: string[], languageCode: string = 'e
     await Promise.allSettled(
       filenames.map(async (filename) => {
         try {
-          const url = `${API_BASE_URL}/collections/${languageCode}/data/${filename}`;
+          const url = `${API_BASE_URL}/api/collections/${languageCode}/data/${filename}`;
           const response = await fetch(url);
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           await response.json();
-        } catch (error) {
+        } catch {
           // Silent failure - data will be loaded on-demand
         }
       })
     );
-  } catch (error) {
+  } catch {
     // Silent failure - data will be loaded on-demand
   }
 }

@@ -111,7 +111,7 @@ getImage(url) → Extracts path, handles domain, returns full URL
 2. **Data Loader**: Loaded via `useProjects()` hook
 3. **Component**: Passed to `<ProjectCard image="/images/project.jpg" />`
 4. **Rendering**: Inside ProjectCard, `getImage("/images/project.jpg")` 
-5. **Output**: `https://static-api-opal.vercel.app/images/project.jpg`
+5. **Output**: `https://static.kuhandranchatbot.info/images/project.jpg`
 
 ---
 
@@ -144,7 +144,7 @@ getImage(url) → Extracts path, handles domain, returns full URL
 ### Image URL Formats
 - [ ] Test relative path: `getImage('/images/profile.webp')`
 - [ ] Test path without slash: `getImage('images/profile.webp')`
-- [ ] Test full URL: `getImage('https://static-api-opal.vercel.app/images/profile.webp')`
+- [ ] Test full URL: `getImage('https://static.kuhandranchatbot.info/images/profile.webp')`
 - [ ] Test non-existent image: Verify graceful handling
 
 ### Components
@@ -560,7 +560,7 @@ Experience JSON includes:
 ### Phase 3: Path Extraction Testing
 - [ ] Test with relative paths: `/image/profile.png`
 - [ ] Test with absolute paths: `image/profile.png`
-- [ ] Test with full URLs: `https://static-api-opal.vercel.app/images/profile.png`
+- [ ] Test with full URLs: `https://static.kuhandranchatbot.info/images/profile.png`
 - [ ] Verify domain extraction works in all cases
 
 ---

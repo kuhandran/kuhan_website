@@ -1,6 +1,6 @@
 /**
  * Achievements Data
- * Loaded from: /data/achievements.json (dev) or https://static-api-opal.vercel.app/collections/{language}/data/achievements.json (prod)
+ * Loaded from: /data/achievements.json (dev) or https://static.kuhandranchatbot.info/api/collections/{language}/data/achievements (prod)
  */
 
 import { getDataSourceUrl } from '@/lib/config/loaders';
@@ -47,7 +47,7 @@ export async function fetchAchievementsData(language: string = DEFAULT_LANGUAGE)
     const result = await response.json();
     cachedData.set(language, result);
     return result;
-  } catch (error) {
+  } catch {
     return EMPTY_ACHIEVEMENTS;
   }
 }

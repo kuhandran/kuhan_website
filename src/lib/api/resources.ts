@@ -11,7 +11,7 @@ import { getFromCache, setInCache } from './cache-legacy';
 // CONSTANTS
 // ============================================================================
 
-const STATIC_API_BASE = 'https://static-api-opal.vercel.app';
+const STATIC_API_BASE = 'https://static.kuhandranchatbot.info';
 const BACKEND_API_BASE = 'https://api-gateway-9unh.onrender.com';
 const STORAGE_FILES_URL = `${STATIC_API_BASE}/api/storage-files`;
 
@@ -33,7 +33,7 @@ function extractPath(urlOrPath: string): string {
     }
     // If it's already a path, remove leading slash if present
     return urlOrPath.startsWith('/') ? urlOrPath.slice(1) : urlOrPath;
-  } catch (error) {
+  } catch {
     console.warn(`[API] Could not parse URL: ${urlOrPath}, using as-is`);
     return urlOrPath.startsWith('/') ? urlOrPath.slice(1) : urlOrPath;
   }
@@ -113,7 +113,7 @@ export function getResume(path: string): string {
  */
 export function getConfig(path: string): string {
   const cleanPath = extractPath(path);
-  const configUrl = `${STATIC_API_BASE}/config/${cleanPath}`;
+  const configUrl = `${STATIC_API_BASE}/api/config/${cleanPath}`;
   console.log(`[API] Config URL: ${configUrl}`);
   return configUrl;
 }
@@ -127,7 +127,7 @@ export function getConfig(path: string): string {
  * @param fileName - File name to fetch (e.g., 'logo-svg', 'manifest.json')
  * @returns File data
  */
-export async function getStorageFile<T = any>(fileName: string): Promise<T | null> {
+export async function getStorageFile<T extends Record<string, unknown>>(fileName: string): Promise<T | null> {
   const cacheKey = `storage:${fileName}`;
   
   // Check cache first
@@ -153,7 +153,7 @@ export async function getStorageFile<T = any>(fileName: string): Promise<T | nul
     setInCache(cacheKey, data);
     return data as T;
   } catch (error) {
-    console.error(`[API Error] Failed to fetch storage file ${fileName}:`, error);
+    console.error(`[API Error] Failed to fetch storage file ${fileName}:`, { error });
     return null;
   }
 }
@@ -186,7 +186,7 @@ export async function getManifestFromStorage() {
  * @param language - Language code (from Redux state)
  * @returns Collection data
  */
-export async function getCollection<T = any>(
+export async function getCollection<T extends Record<string, unknown>>(
   url: string,
   type: 'config' | 'data',
   language: SupportedLanguage = DEFAULT_LANGUAGE
@@ -201,7 +201,7 @@ export async function getCollection<T = any>(
   if (cached) return cached;
 
   try {
-    const fullUrl = `${STATIC_API_BASE}/${type}/${language}/${cleanUrl}`;
+    const fullUrl = `${STATIC_API_BASE}/api/collections/${language}/${type}/${cleanUrl}`;
     console.log(`[API] Fetching collection: ${fullUrl}`);
     
     const response = await fetch(fullUrl, {
@@ -219,7 +219,7 @@ export async function getCollection<T = any>(
     setInCache(cacheKey, data);
     return data as T;
   } catch (error) {
-    console.error(`[API Error] Failed to fetch collection from ${url}:`, error);
+    console.error(`[API Error] Failed to fetch collection from ${url}:`, { error });
     return null;
   }
 }
@@ -236,10 +236,10 @@ export async function getCollection<T = any>(
  * @param useStatic - Whether to use static API (default: false, uses backend API)
  * @returns Response data
  */
-export async function getInfoFromAPI<T = any>(
+export async function getInfoFromAPI<T extends Record<string, unknown>>(
   type: 'GET' | 'POST',
   path: string,
-  data?: Record<string, any>,
+  data?: Record<string, unknown>,
   useStatic: boolean = false
 ): Promise<T | null> {
   const cleanPath = extractPath(path);
@@ -286,7 +286,7 @@ export async function getInfoFromAPI<T = any>(
 
     return responseData as T;
   } catch (error) {
-    console.error(`[API Error] ${type} request failed to ${fullUrl}:`, error);
+    console.error(`[API Error] ${type} request failed to ${fullUrl}:`, { error });
     return null;
   }
 }

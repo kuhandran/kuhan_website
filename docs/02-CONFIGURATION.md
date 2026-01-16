@@ -152,7 +152,7 @@ curl http://localhost:3000/api/config/ta/urlConfig
 
 The application previously used:
 ```
-https://static-api-opal.vercel.app/api/collections/{language}/config/{configType}.json
+https://static.kuhandranchatbot.info/api/collections/{language}/config/{configType}
 ```
 
 Now served locally via:
@@ -221,7 +221,7 @@ import { DOMAINS, API_ENDPOINTS, IMAGE_ASSETS } from '@/config/domains';
 ```typescript
 // Get production API base URL
 const apiBase = DOMAINS.PRODUCTION_API;
-// → 'https://static-api-opal.vercel.app'
+// → 'https://static.kuhandranchatbot.info'
 
 // Get CDN base URL
 const cdnBase = DOMAINS.CDN;
@@ -237,11 +237,11 @@ const appUrl = DOMAINS.getAppUrl();
 ```typescript
 // Production API collection
 const url = API_ENDPOINTS.collections('en', 'data', 'experience');
-// → 'https://static-api-opal.vercel.app/api/collections/en/data/experience.json'
+// → 'https://static.kuhandranchatbot.info/api/collections/en/data/experience'
 
 // CDN data
 const url = API_ENDPOINTS.cdnData('skills');
-// → 'https://static.kuhandranchatbot.info/data/skills.json'
+// → 'https://static.kuhandranchatbot.info/api/collections/en/data/skills'
 
 // CDN images
 const url = API_ENDPOINTS.cdnImage('profile.webp');
@@ -303,7 +303,7 @@ const logo = IMAGE_ASSETS.logo;                 // 'logo.svg'
 ```typescript
 const imageSrc = 'https://static.kuhandranchatbot.info/image/profile.webp';
 const response = await fetch('https://ipapi.co/json/');
-const apiUrl = 'https://static-api-opal.vercel.app/api/collections/en/data/experience.json';
+const apiUrl = 'https://static.kuhandranchatbot.info/api/collections/en/data/experience';
 ```
 
 ### After (Using Centralized Config)
@@ -402,12 +402,12 @@ export const SUPPORTED_LANGUAGES = [
 
 ### Production API
 ```
-Base: https://static-api-opal.vercel.app/api
+Base: https://static.kuhandranchatbot.info/api
 
 Data Collections:
-GET /collections/{language}/data/{file}.json
-  - experience.json
-  - projects.json
+GET /collections/{language}/data/{file}
+  - experience
+  - projects
   - skills.json
   - education.json
   - achievements.json

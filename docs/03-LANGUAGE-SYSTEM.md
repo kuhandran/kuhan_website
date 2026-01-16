@@ -8,7 +8,7 @@ The website now features a fully automated language dropdown system that fetches
 ### Components & Files
 
 #### 1. **Language Configuration** (`src/lib/config/languageConfig.ts`)
-- Fetches language list from API: `https://static-api-opal.vercel.app/api/config-file/languages.json`
+- Fetches language list from API: `https://static.kuhandranchatbot.info/api/config-file/languages`
 - Caches language configuration for 1 hour
 - Provides fallback to local default languages if API is unavailable
 - Supports 10 languages: English, Arabic, Spanish, French, Hindi, Indonesian, Burmese, Sinhala, Tamil, Thai
@@ -123,7 +123,7 @@ export function MyComponent() {
 
 ### Languages Configuration
 ```
-GET https://static-api-opal.vercel.app/api/config-file/languages.json
+GET https://static.kuhandranchatbot.info/api/config-file/languages
 ```
 
 **Response:**
@@ -157,13 +157,13 @@ GET https://static-api-opal.vercel.app/api/config-file/languages.json
 
 ### Locale Data
 ```
-GET https://static-api-opal.vercel.app/api/collections/{code}/data/{fileType}.json
+GET https://static.kuhandranchatbot.info/api/collections/{code}/data/{fileType}
 ```
 
 **Example:**
 ```
-https://static-api-opal.vercel.app/api/collections/ta/data/contentLabels.json
-https://static-api-opal.vercel.app/api/collections/ar-AE/data/projects.json
+https://static.kuhandranchatbot.info/api/collections/ta/data/contentLabels
+https://static.kuhandranchatbot.info/api/collections/ar-AE/data/projects
 ```
 
 ## Supported Languages
@@ -333,7 +333,7 @@ Test the language switcher:
 2. Open browser DevTools > Application > Local Storage
 3. Change language - observe `preferredLanguage` key updates
 4. Refresh page - verify language preference persists
-5. Check Network tab - see API calls to `static-api-opal.vercel.app`
+5. Check Network tab - see API calls to `static.kuhandranchatbot.info`
 
 ## Environment Variables
 
@@ -2299,7 +2299,7 @@ export function LanguageButtons() {
 
 /*
 FETCH LANGUAGES:
-GET https://static-api-opal.vercel.app/api/config-file/languages.json
+GET https://static.kuhandranchatbot.info/api/config-file/languages
 
 Response Structure:
 {
@@ -2330,12 +2330,12 @@ Response Structure:
 }
 
 FETCH CONTENT FOR A LANGUAGE:
-GET https://static-api-opal.vercel.app/api/collections/{code}/data/{fileType}.json
+GET https://static.kuhandranchatbot.info/api/collections/{code}/data/{fileType}
 
 Examples:
-https://static-api-opal.vercel.app/api/collections/ta/data/contentLabels.json
-https://static-api-opal.vercel.app/api/collections/ar-AE/data/projects.json
-https://static-api-opal.vercel.app/api/collections/en/data/experience.json
+https://static.kuhandranchatbot.info/api/collections/ta/data/contentLabels
+https://static.kuhandranchatbot.info/api/collections/ar-AE/data/projects
+https://static.kuhandranchatbot.info/api/collections/en/data/experience
 */
 
 // ============================================================================

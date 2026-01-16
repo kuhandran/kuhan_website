@@ -366,5 +366,5 @@ export async function initializeAppConfig(): Promise<void> {
  * @returns Base URL for production API
  */
 export function getApiBaseUrl(): string {
-  return 'https://static-api-opal.vercel.app';
+  return 'https://static.kuhandranchatbot.info';
 }
