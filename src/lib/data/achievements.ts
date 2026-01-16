@@ -41,7 +41,7 @@ export async function fetchAchievementsData(language: string = DEFAULT_LANGUAGE)
   }
   
   try {
-    const DATA_URL = getDataSourceUrl('achievements.json', language);
+    const DATA_URL = getDataSourceUrl('achievements', language);
     const response = await fetch(DATA_URL);
     if (!response.ok) return EMPTY_ACHIEVEMENTS;
     const result = await response.json();

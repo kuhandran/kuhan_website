@@ -9,6 +9,15 @@
 import { API_ENDPOINTS } from '@/lib/config/domains';
 import { getInfoFromAPI } from '@/lib/api/apiClient';
 
+export interface LocationResponse {
+  city: string;
+  country_name: string;
+  country_code: string;
+  latitude: number;
+  longitude: number;
+  [key: string]: string | number | undefined;
+}
+
 export interface VisitorData {
   location: {
     city: string;
@@ -78,10 +87,10 @@ function getLanguage(): string {
 }
 
 // Fetch IP-based location data
-async function getLocationData(): Promise<any> {
+async function getLocationData(): Promise<{city: string; country: string; countryCode: string; latitude: number; longitude: number;}> {
   try {
     // Using ipapi.co (free, no auth required, privacy-friendly)
-    const locationData = await getInfoFromAPI<any>('GET', '/json/', undefined, false);
+    const locationData = await getInfoFromAPI<LocationResponse>('GET', '/json/', undefined, false);
 
     if (!locationData) throw new Error('Failed to fetch location');
 
@@ -93,7 +102,7 @@ async function getLocationData(): Promise<any> {
       longitude: locationData.longitude || 0,
     };
   } catch (error) {
-    console.error('Error fetching location:', error);
+    console.error('Error fetching location:', { error });
     return {
       city: 'Unknown',
       country: 'Unknown',
@@ -105,7 +114,7 @@ async function getLocationData(): Promise<any> {
 }
 
 // Detect organization from domain (if visitor uses corporate email)
-async function detectOrganization(ipAddress?: string): Promise<any> {
+async function detectOrganization(): Promise<null> {
   try {
     // Using ipqualityscore API or similar for company detection
     // This requires API key - alternative: use clearbit.com
@@ -115,7 +124,7 @@ async function detectOrganization(ipAddress?: string): Promise<any> {
     
     return null;
   } catch (error) {
-    console.error('Error detecting organization:', error);
+    console.error('Error detecting organization:', { error });
     return null;
   }
 }

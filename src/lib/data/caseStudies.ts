@@ -110,7 +110,7 @@ let cachedCaseStudies: CaseStudy[] | null = null;
  */
 async function fetchCaseStudiesFromJSON(): Promise<CaseStudy[]> {
   try {
-    const url = getDataSourceUrl('caseStudies.json');
+    const url = getDataSourceUrl('caseStudies');
 
     const response = await fetch(url, {
       cache: 'force-cache',
@@ -131,7 +131,7 @@ async function fetchCaseStudiesFromJSON(): Promise<CaseStudy[]> {
     }
 
     return caseStudies;
-  } catch (error) {
+  } catch {
     // Fallback to hardcoded case studies on any error
     return DEFAULT_CASE_STUDIES;
   }

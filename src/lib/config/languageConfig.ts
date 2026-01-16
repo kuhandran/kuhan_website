@@ -46,7 +46,7 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
     try {
       // Try to fetch from production API first
       const { getInfoFromAPI } = await import('@/lib/api');
-      const result = await getInfoFromAPI('GET', 'api/config-file/languages.json', undefined, true);
+      const result = await getInfoFromAPI<LanguagesConfig>('GET', 'api/config-file/languages', undefined, true);
       
       if (result) {
         cachedLanguagesConfig = result;
@@ -152,12 +152,12 @@ export function getDefaultLanguagesConfig(): LanguagesConfig {
     supportedLocales: 8,
     completedLocales: 8,
     fileTypes: [
-      'contentLabels.json',
-      'projects.json',
-      'experience.json',
-      'skills.json',
-      'education.json',
-      'achievements.json',
+      'contentLabels',
+      'projects',
+      'experience',
+      'skills',
+      'education',
+      'achievements',
     ],
     apiEndpoints: {
       listLanguages: 'GET /api/config/languages',
@@ -192,13 +192,13 @@ export async function getLanguageByCode(
 export async function fetchLocaleData(
   languageCode: string,
   fileType: string
-): Promise<any> {
+): Promise<Record<string, unknown> | null> {
   try {
     const { getCollection } = await import('@/lib/api');
-    const result = await getCollection(
-      `${fileType}.json`,
+    const result = await getCollection<Record<string, unknown>>(
+      `${fileType}`,
       'data',
-      languageCode as any
+      languageCode as 'en' | 'es' | 'fr' | 'de' | 'hi' | 'ta' | 'ar-AE' | 'id' | 'my' | 'si' | 'th'
     );
     
     if (!result) {

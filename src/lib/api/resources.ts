@@ -127,7 +127,7 @@ export function getConfig(path: string): string {
  * @param fileName - File name to fetch (e.g., 'logo-svg', 'manifest.json')
  * @returns File data
  */
-export async function getStorageFile<T extends Record<string, unknown>>(fileName: string): Promise<T | null> {
+export async function getStorageFile<T = unknown>(fileName: string): Promise<T | null> {
   const cacheKey = `storage:${fileName}`;
   
   // Check cache first
@@ -186,7 +186,7 @@ export async function getManifestFromStorage() {
  * @param language - Language code (from Redux state)
  * @returns Collection data
  */
-export async function getCollection<T extends Record<string, unknown>>(
+export async function getCollection<T = unknown>(
   url: string,
   type: 'config' | 'data',
   language: SupportedLanguage = DEFAULT_LANGUAGE
@@ -236,7 +236,7 @@ export async function getCollection<T extends Record<string, unknown>>(
  * @param useStatic - Whether to use static API (default: false, uses backend API)
  * @returns Response data
  */
-export async function getInfoFromAPI<T extends Record<string, unknown>>(
+export async function getInfoFromAPI<T = unknown>(
   type: 'GET' | 'POST',
   path: string,
   data?: Record<string, unknown>,
