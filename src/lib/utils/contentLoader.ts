@@ -27,7 +27,7 @@ export async function getMultilingualContent(
   languageCode: string,
   fileType: string,
   preferCache: boolean = true
-): Promise<any> {
+): Promise<unknown> {
   const cacheKey = `content-${languageCode}-${fileType}`;
 
   // Check cache first if preferred
@@ -86,7 +86,7 @@ export async function getMultilingualContent(
  * const labels = await getContentLabels('en');
  * // Access: labels.navigation.about, labels.hero.greeting
  */
-export async function getContentLabels(languageCode: string): Promise<any> {
+export async function getContentLabels(languageCode: string): Promise<unknown> {
   return getMultilingualContent(languageCode, 'contentLabels');
 }
 
@@ -95,7 +95,7 @@ export async function getContentLabels(languageCode: string): Promise<any> {
  * @param languageCode - Language code
  * @returns Projects array
  */
-export async function getProjects(languageCode: string): Promise<any> {
+export async function getProjects(languageCode: string): Promise<unknown> {
   return getMultilingualContent(languageCode, 'projects');
 }
 
@@ -104,7 +104,7 @@ export async function getProjects(languageCode: string): Promise<any> {
  * @param languageCode - Language code
  * @returns Experience array
  */
-export async function getExperience(languageCode: string): Promise<any> {
+export async function getExperience(languageCode: string): Promise<unknown> {
   return getMultilingualContent(languageCode, 'experience');
 }
 
@@ -113,7 +113,7 @@ export async function getExperience(languageCode: string): Promise<any> {
  * @param languageCode - Language code
  * @returns Skills array/object
  */
-export async function getSkills(languageCode: string): Promise<any> {
+export async function getSkills(languageCode: string): Promise<unknown> {
   return getMultilingualContent(languageCode, 'skills');
 }
 
@@ -122,7 +122,7 @@ export async function getSkills(languageCode: string): Promise<any> {
  * @param languageCode - Language code
  * @returns Education array
  */
-export async function getEducation(languageCode: string): Promise<any> {
+export async function getEducation(languageCode: string): Promise<unknown> {
   return getMultilingualContent(languageCode, 'education');
 }
 
@@ -131,7 +131,7 @@ export async function getEducation(languageCode: string): Promise<any> {
  * @param languageCode - Language code
  * @returns Achievements array
  */
-export async function getAchievements(languageCode: string): Promise<any> {
+export async function getAchievements(languageCode: string): Promise<unknown> {
   return getMultilingualContent(languageCode, 'achievements');
 }
 
@@ -144,7 +144,7 @@ export async function getAchievements(languageCode: string): Promise<any> {
  * const config = await getApiConfig('en');
  * // Access from: https://static-api-opal.vercel.app/collections/en/config/apiConfig.json
  */
-export async function getApiConfig(languageCode: string): Promise<any> {
+export async function getApiConfig(languageCode: string): Promise<unknown> {
   const cacheKey = `content-${languageCode}-apiConfig`;
 
   // Check cache first
@@ -156,38 +156,24 @@ export async function getApiConfig(languageCode: string): Promise<any> {
   let content = null;
 
   try {
-    // Try local file first (for server-side rendering)
-    if (typeof window === 'undefined') {
-      const fs = await import('fs/promises');
-      const path = await import('path');
-      const filePath = path.join(process.cwd(), 'public', 'collections', languageCode, 'config', 'apiConfig.json');
-      try {
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        content = JSON.parse(fileContent);
-        console.log('[ContentLoader] apiConfig loaded from local file', { languageCode });
-      } catch (fileError) {
-        console.warn('[ContentLoader] Local file not found, trying external API', { languageCode });
-      }
-    }
+    // Fetch from external API (no local file fallback)
+    const url = getDataSourceUrl('apiConfig.json', languageCode, 'config');
+    console.log('[ContentLoader] Fetching apiConfig from API', { language: languageCode });
+    
+    const response = await fetch(url, {
+      headers: { 'Accept': 'application/json' }
+    });
 
-    // Fallback to external API if local file fails or on client-side
-    if (!content) {
-      const url = getDataSourceUrl('apiConfig.json', languageCode, 'config');
-      console.log('[ContentLoader] Fetching apiConfig from API', { language: languageCode });
-      
-      const response = await fetch(url, {
-        headers: { 'Accept': 'application/json' }
+    if (response.ok) {
+      const data = await response.json();
+      // Extract 'data' field if present (API response wrapper)
+      content = data.data || data;
+      console.log('[ContentLoader] apiConfig loaded from API', { languageCode });
+    } else {
+      console.warn('[ContentLoader] apiConfig fetch failed', {
+        languageCode,
+        status: response.status
       });
-
-      if (response.ok) {
-        content = await response.json();
-        console.log('[ContentLoader] apiConfig loaded from API', { languageCode });
-      } else {
-        console.warn('[ContentLoader] apiConfig fetch failed', {
-          languageCode,
-          status: response.status
-        });
-      }
     }
   } catch (error) {
     console.error('[ContentLoader] apiConfig error', {
@@ -209,7 +195,7 @@ export async function getApiConfig(languageCode: string): Promise<any> {
  * @param languageCode - Language code
  * @returns Page layout configuration
  */
-export async function getPageLayout(languageCode: string): Promise<any> {
+export async function getPageLayout(languageCode: string): Promise<unknown> {
   const cacheKey = `content-${languageCode}-pageLayout`;
 
   // Check cache first
@@ -221,30 +207,24 @@ export async function getPageLayout(languageCode: string): Promise<any> {
   let content = null;
 
   try {
-    // Try local file first (for server-side rendering)
-    if (typeof window === 'undefined') {
-      const fs = await import('fs/promises');
-      const path = await import('path');
-      const filePath = path.join(process.cwd(), 'public', 'collections', languageCode, 'config', 'pageLayout.json');
-      try {
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        content = JSON.parse(fileContent);
-        console.log('[ContentLoader] pageLayout loaded from local file', { languageCode });
-      } catch (fileError) {
-        console.warn('[ContentLoader] Local file not found, trying external API', { languageCode });
-      }
-    }
+    // Fetch from external API (no local file fallback)
+    const url = getDataSourceUrl('pageLayout.json', languageCode, 'config');
+    console.log('[ContentLoader] Fetching pageLayout from API', { language: languageCode });
+    
+    const response = await fetch(url, {
+      headers: { 'Accept': 'application/json' }
+    });
 
-    // Fallback to external API if local file fails or on client-side
-    if (!content) {
-      const url = getDataSourceUrl('pageLayout.json', languageCode, 'config');
-      const response = await fetch(url, {
-        headers: { 'Accept': 'application/json' }
+    if (response.ok) {
+      const data = await response.json();
+      // Extract 'data' field if present (API response wrapper)
+      content = data.data || data;
+      console.log('[ContentLoader] pageLayout loaded from API', { languageCode });
+    } else {
+      console.warn('[ContentLoader] pageLayout fetch failed', {
+        languageCode,
+        status: response.status
       });
-
-      if (response.ok) {
-        content = await response.json();
-      }
     }
   } catch (error) {
     console.error('[ContentLoader] pageLayout error', {
@@ -290,7 +270,7 @@ export async function prefetchLanguageContent(
   ]
 ): Promise<void> {
   console.log(`⚙️ Prefetching ${languageCodes.length} languages × ${fileTypes.length} types...`);
-  const promises: Promise<any>[] = [];
+  const promises: Promise<unknown>[] = [];
 
   for (const langCode of languageCodes) {
     for (const fileType of fileTypes) {

@@ -1,33 +1,17 @@
 /**
  * Language Content Loader
- * Dynamically loads language-specific content from public/collections/{languageCode}
+ * Loads language-specific content from the production API
  * Falls back to English (en) if requested language or file is not available
  * 
- * Directory structure:
- * public/collections/
- *   ├── en/
- *   ├── es/
- *   ├── fr/
- *   ├── de/
- *   ├── hi/
- *   ├── ta/
- *   ├── ar-AE/
- *   └── {languageCode}/
- *       ├── config/
- *       │   ├── urlConfig.json
- *       │   ├── apiConfig.json
- *       │   └── pageLayout.json
- *       └── data/
- *           ├── contentLabels.json
- *           ├── projects.json
- *           ├── experience.json
- *           ├── skills.json
- *           ├── education.json
- *           └── achievements.json
+ * API Endpoints:
+ * - Config: https://static.kuhandranchatbot.info/api/collections/{language}/config/{type}
+ * - Data: https://static.kuhandranchatbot.info/api/collections/{language}/data/{type}
  */
 
+import { getCollectionUrl } from '@/lib/config/domains';
+
 const DEFAULT_LANGUAGE = 'en';
-const LANGUAGE_CACHE: { [key: string]: { [key: string]: any } } = {};
+const LANGUAGE_CACHE: Record<string, Record<string, unknown>> = {};
 
 interface LanguageLoaderOptions {
   languageCode?: string;
@@ -36,25 +20,7 @@ interface LanguageLoaderOptions {
 }
 
 /**
- * Validates if a language code is available in the collections
- */
-async function validateLanguageExists(
-  languageCode: string
-): Promise<boolean> {
-  try {
-    // Try to fetch a config file to validate language exists
-    const response = await fetch(
-      `/public/collections/${languageCode}/config/pageLayout.json`,
-      { next: { revalidate: 3600 } }
-    );
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Load configuration files from a specific language folder
+ * Load configuration files from the API for a specific language
  * @param languageCode - Language code (e.g., 'en', 'ta', 'ar-AE')
  * @param configType - Config file type ('urlConfig', 'apiConfig', 'pageLayout')
  * @param options - Optional settings for caching and fallback
@@ -68,7 +34,7 @@ export async function loadLanguageConfig(
   languageCode: string = DEFAULT_LANGUAGE,
   configType: 'urlConfig' | 'apiConfig' | 'pageLayout',
   options: LanguageLoaderOptions = {}
-): Promise<any> {
+): Promise<unknown> {
   const {
     preferCache = true,
     fallbackLanguage = DEFAULT_LANGUAGE,
@@ -84,28 +50,26 @@ export async function loadLanguageConfig(
       return LANGUAGE_CACHE[languageCode][configType];
     }
 
-    // Normalize language code for file path
-    const normalizedLanguage = languageCode.toLowerCase();
-    const configFileName = `${configType}.json`;
-    const configPath = `/public/collections/${normalizedLanguage}/config/${configFileName}`;
+    console.log(`📖 Loading config: ${languageCode}/${configType}`);
 
-    console.log(`📖 Loading config: ${configPath}`);
-
-    const response = await fetch(configPath, {
+    const url = getCollectionUrl(languageCode as 'en' | 'es' | 'fr' | 'de' | 'hi' | 'ta' | 'ar-AE' | 'id' | 'my' | 'si' | 'th', 'config', configType);
+    const response = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (response.ok) {
       const data = await response.json();
+      // Extract 'data' field if present (API response wrapper)
+      const content = data.data || data;
       
       // Cache the result
       if (!LANGUAGE_CACHE[languageCode]) {
         LANGUAGE_CACHE[languageCode] = {};
       }
-      LANGUAGE_CACHE[languageCode][configType] = data;
+      LANGUAGE_CACHE[languageCode][configType] = content;
 
       console.log(`✓ Loaded: ${languageCode}/${configType}`);
-      return data;
+      return content;
     }
 
     // If the requested language fails and it's not the fallback, try fallback
@@ -140,7 +104,7 @@ export async function loadLanguageConfig(
 }
 
 /**
- * Load data files from a specific language folder
+ * Load data files from the API for a specific language
  * @param languageCode - Language code (e.g., 'en', 'ta', 'ar-AE')
  * @param dataType - Data file type ('contentLabels', 'projects', 'experience', etc.)
  * @param options - Optional settings for caching and fallback
@@ -154,7 +118,7 @@ export async function loadLanguageData(
   languageCode: string = DEFAULT_LANGUAGE,
   dataType: string,
   options: LanguageLoaderOptions = {}
-): Promise<any> {
+): Promise<unknown> {
   const {
     preferCache = true,
     fallbackLanguage = DEFAULT_LANGUAGE,
@@ -170,29 +134,26 @@ export async function loadLanguageData(
       return LANGUAGE_CACHE[languageCode][dataType];
     }
 
-    // Normalize language code and data type for file path
-    const normalizedLanguage = languageCode.toLowerCase();
-    const normalizedDataType = dataType.toLowerCase();
-    const dataFileName = `${normalizedDataType}.json`;
-    const dataPath = `/public/collections/${normalizedLanguage}/data/${dataFileName}`;
+    console.log(`📊 Loading data: ${languageCode}/${dataType}`);
 
-    console.log(`📊 Loading data: ${dataPath}`);
-
-    const response = await fetch(dataPath, {
+    const url = getCollectionUrl(languageCode as 'en' | 'es' | 'fr' | 'de' | 'hi' | 'ta' | 'ar-AE' | 'id' | 'my' | 'si' | 'th', 'data', dataType);
+    const response = await fetch(url, {
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (response.ok) {
       const data = await response.json();
+      // Extract 'data' field if present (API response wrapper)
+      const content = data.data || data;
 
       // Cache the result
       if (!LANGUAGE_CACHE[languageCode]) {
         LANGUAGE_CACHE[languageCode] = {};
       }
-      LANGUAGE_CACHE[languageCode][dataType] = data;
+      LANGUAGE_CACHE[languageCode][dataType] = content;
 
       console.log(`✓ Loaded: ${languageCode}/${dataType}`);
-      return data;
+      return content;
     }
 
     // If the requested language fails and it's not the fallback, try fallback

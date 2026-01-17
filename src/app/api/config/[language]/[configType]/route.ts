@@ -17,7 +17,7 @@ import { getDataSourceUrl } from '@/lib/config/loaders';
  * - urlConfig
  */
 
-async function loadConfigFile(language: string, configType: string): Promise<any> {
+async function loadConfigFile(language: string, configType: string): Promise<unknown> {
   try {
     // Validate language
     const validLanguages = SUPPORTED_LANGUAGES as readonly string[];
@@ -38,7 +38,9 @@ async function loadConfigFile(language: string, configType: string): Promise<any
             console.error(`[Config] loadConfigFile: Failed to fetch ${configType} (status ${response.status})`);
             return null;
           }
-          return await response.json();
+          const data = await response.json();
+          // Extract 'data' field if present (API response wrapper)
+          return data.data || data;
         } catch (fetchError) {
           console.error(`[Config] loadConfigFile: Network error fetching ${configType}`, fetchError);
           return null;
@@ -89,13 +91,13 @@ export async function GET(
     }
 
     // Valid config types
-    const validConfigTypes = [
+    const validConfigTypes: readonly string[] = [
       DATA_FILES.apiConfig,
       DATA_FILES.pageLayout,
       DATA_FILES.urlConfig,
     ];
 
-    if (!validConfigTypes.includes(configType as any)) {
+    if (!validConfigTypes.includes(configType)) {
       console.warn('[Config] GET: Invalid configType', { configType, validConfigTypes });
       return NextResponse.json(
         {

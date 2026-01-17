@@ -3,7 +3,6 @@ import { Footer } from '../components/layout/Footer';
 import { PageRenderer } from '../components/renderers/PageRenderer';
 import { getPageLayoutConfig } from '@/lib/config/pageLayout';
 import { initializeContentLabels } from '@/lib/data/contentLabels';
-import { PageLayoutConfig } from '@/lib/config/types';
 
 /**
  * Home Page - Server-Side Rendered
@@ -18,53 +17,45 @@ import { PageLayoutConfig } from '@/lib/config/types';
  * - Progressive enhancement (works without JS)
  */
 export default async function Home() {
+  let pageLayoutConfig;
+  let errorOccurred = false;
+
   try {
     // Initialize content labels and fetch page layout in parallel on server
     // This happens before HTML is sent to client
-    const [_, pageLayoutConfig] = await Promise.all([
+    const results = await Promise.all([
       initializeContentLabels(),
       getPageLayoutConfig(),
     ]);
-
-    // If no config, show error state
-    if (!pageLayoutConfig || !pageLayoutConfig.sections || pageLayoutConfig.sections.length === 0) {
-      return (
-        <main>
-          <Navbar />
-          <div className="min-h-screen flex items-center justify-center bg-slate-50">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-slate-900 mb-4">Page Configuration Not Found</h1>
-              <p className="text-slate-600">The page layout could not be loaded from the API.</p>
-            </div>
-          </div>
-          <Footer />
-        </main>
-      );
-    }
-
-    // Render complete page on server
-    return (
-      <main>
-        <Navbar />
-        <PageRenderer config={pageLayoutConfig} />
-        <Footer />
-      </main>
-    );
+    
+    pageLayoutConfig = results[1];
   } catch (error) {
     console.error('[Page] Error rendering home page:', error);
-    
-    // Error fallback
+    errorOccurred = true;
+  }
+
+  // If no config, show error state
+  if (errorOccurred || !pageLayoutConfig || !pageLayoutConfig.sections || pageLayoutConfig.sections.length === 0) {
     return (
       <main>
         <Navbar />
         <div className="min-h-screen flex items-center justify-center bg-slate-50">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Error Loading Page</h1>
-            <p className="text-slate-600">Please try refreshing the page.</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-4">Page Configuration Not Found</h1>
+            <p className="text-slate-600">The page layout could not be loaded from the API.</p>
           </div>
         </div>
         <Footer />
       </main>
     );
   }
+
+  // Render complete page on server
+  return (
+    <main>
+      <Navbar />
+      <PageRenderer config={pageLayoutConfig} />
+      <Footer />
+    </main>
+  );
 }

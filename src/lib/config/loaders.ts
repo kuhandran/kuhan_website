@@ -195,27 +195,15 @@ export async function fetchPageLayout() {
 
   pageLayoutPromise = (async () => {
     try {
-      // Try local file first (server-side)
-      if (typeof window === 'undefined') {
-        try {
-          const fs = await import('fs/promises');
-          const path = await import('path');
-          const filePath = path.join(process.cwd(), 'public', 'collections', DEFAULT_LANGUAGE, 'config', 'pageLayout.json');
-          const fileContent = await fs.readFile(filePath, 'utf-8');
-          cachedPageLayout = JSON.parse(fileContent);
-          console.log('[Loaders] pageLayout loaded from local file');
-          pageLayoutPromise = null;
-          return cachedPageLayout;
-        } catch (fileError) {
-          console.warn('[Loaders] Local pageLayout file not found, trying API');
-        }
-      }
-
-      // Fallback to API
+      // Fetch from external API
       const url = getDataSourceUrl('pageLayout.json', DEFAULT_LANGUAGE, 'config');
       const response = await fetch(url);
       if (!response.ok) throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));
-      cachedPageLayout = await response.json();
+      
+      const data = await response.json();
+      // Extract 'data' field if present (API response wrapper)
+      cachedPageLayout = data.data || data;
+      console.log('[Loaders] pageLayout loaded from API');
       pageLayoutPromise = null;
       return cachedPageLayout;
     } catch (error) {
@@ -248,10 +236,15 @@ export async function fetchApiConfig() {
 
   apiConfigPromise = (async () => {
     try {
+      // Fetch from external API
       const url = getDataSourceUrl('apiConfig.json', DEFAULT_LANGUAGE, 'config');
       const response = await fetch(url);
       if (!response.ok) throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));
-      cachedApiConfig = await response.json();
+      
+      const data = await response.json();
+      // Extract 'data' field if present (API response wrapper)
+      cachedApiConfig = data.data || data;
+      console.log('[Loaders] apiConfig loaded from API');
       apiConfigPromise = null;
       return cachedApiConfig;
     } catch (error) {
