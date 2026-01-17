@@ -54,9 +54,11 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
       );
       
       // Extract data from API response wrapper
-      const result = (response && 'data' in response ? response.data : response) as LanguagesConfig | undefined;
+      const result = response && typeof response === 'object' && 'data' in response 
+        ? response.data 
+        : response as LanguagesConfig | undefined;
       
-      if (result && result.languages) {
+      if (result && result.languages && Array.isArray(result.languages) && result.languages.length > 0) {
         cachedLanguagesConfig = result;
         return cachedLanguagesConfig;
       }
