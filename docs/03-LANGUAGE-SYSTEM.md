@@ -8,7 +8,7 @@ The website now features a fully automated language dropdown system that fetches
 ### Components & Files
 
 #### 1. **Language Configuration** (`src/lib/config/languageConfig.ts`)
-- Fetches language list from API: `https://static.kuhandranchatbot.info/api/config-file/languages`
+- Fetches language list from API: `https://static.kuhandranchatbot.info/api/config/languages`
 - Caches language configuration for 1 hour
 - Provides fallback to local default languages if API is unavailable
 - Supports 10 languages: English, Arabic, Spanish, French, Hindi, Indonesian, Burmese, Sinhala, Tamil, Thai
@@ -2299,7 +2299,7 @@ export function LanguageButtons() {
 
 /*
 FETCH LANGUAGES:
-GET https://static.kuhandranchatbot.info/api/config-file/languages
+GET https://static.kuhandranchatbot.info/api/config/languages
 
 Response Structure:
 {

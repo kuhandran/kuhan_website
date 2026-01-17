@@ -161,7 +161,7 @@ export function Section() {
 
 ### Get Languages Configuration
 ```
-GET https://static-api-opal.vercel.app/api/config-file/languages.json
+GET https://static-api-opal.vercel.app/api/config/languages.json
 ```
 
 ### Get Multilingual Content
@@ -1804,7 +1804,7 @@ Before deploying to production:
 **Dependencies Added:** None (zero additional packages)
 
 **API Endpoints:**
-- Languages: https://static-api-opal.vercel.app/api/config-file/languages.json
+- Languages: https://static-api-opal.vercel.app/api/config/languages.json
 - Content: https://static-api-opal.vercel.app/api/collections/{code}/data/{fileType}.json
 
 **Caching Strategy:**
