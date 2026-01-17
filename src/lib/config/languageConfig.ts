@@ -46,9 +46,17 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
     try {
       // Try to fetch from production API first
       const { getInfoFromAPI } = await import('@/lib/api');
-      const result = await getInfoFromAPI<LanguagesConfig>('GET', 'api/config/languages', undefined, true);
+      const response = await getInfoFromAPI<{ data?: LanguagesConfig } | LanguagesConfig>(
+        'GET',
+        'api/config/languages',
+        undefined,
+        true
+      );
       
-      if (result) {
+      // Extract data from API response wrapper
+      const result = (response && 'data' in response ? response.data : response) as LanguagesConfig | undefined;
+      
+      if (result && result.languages) {
         cachedLanguagesConfig = result;
         return cachedLanguagesConfig;
       }
