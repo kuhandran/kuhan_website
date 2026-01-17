@@ -15,13 +15,29 @@ import { fetchPageLayout, getPageLayoutSync } from '@/lib/config/loaders';
  */
 
 // Helper function to resolve dataSource references to actual data
-function resolveDataSources(config: any): PageLayoutConfig {
+function resolveDataSources(config: unknown): PageLayoutConfig {
+  // Safely handle null/undefined config or sections
+  if (!config || typeof config !== 'object' || !('sections' in config)) {
+    return { sections: [] };
+  }
+  
+  const configObj = config as Record<string, unknown>;
+  if (!Array.isArray(configObj.sections)) {
+    return { sections: [] };
+  }
+  
   return {
-    ...config,
-    sections: config.sections.map((section: any) => {
+    ...configObj,
+    sections: configObj.sections.map((section: unknown) => {
+      if (!section || typeof section !== 'object') {
+        return section;
+      }
+      
+      const sectionObj = section as Record<string, unknown>;
+      
       // Resolve data source references
-      if (section.dataSource) {
-        const dataSources: Record<string, any> = {
+      if (sectionObj.dataSource) {
+        const dataSources: Record<string, unknown> = {
           projects: projectsData,
           experience: experienceData,
           skills: skillsData,
@@ -29,29 +45,33 @@ function resolveDataSources(config: any): PageLayoutConfig {
         };
         
         return {
-          ...section,
-          data: dataSources[section.dataSource] || section.data,
+          ...sectionObj,
+          data: dataSources[sectionObj.dataSource as string] || sectionObj.data,
         };
       }
       
       // Resolve header labels from contentLabels if needed
-      if (section.header && !section.header.subtitle && section.id) {
-        const sectionLabels = (contentLabels as any)[section.id];
-        if (sectionLabels) {
-          return {
-            ...section,
-            header: {
-              subtitle: sectionLabels.subtitle || section.header.subtitle,
-              title: sectionLabels.title || section.header.title,
-              description: sectionLabels.description || section.header.description,
-            },
-          };
+      if (sectionObj.header && sectionObj.id) {
+        const headerObj = sectionObj.header as Record<string, unknown>;
+        if (!headerObj.subtitle && sectionObj.id) {
+          const sectionLabels = (contentLabels as Record<string, unknown>)[sectionObj.id as string];
+          if (sectionLabels && typeof sectionLabels === 'object') {
+            const labelsObj = sectionLabels as Record<string, unknown>;
+            return {
+              ...sectionObj,
+              header: {
+                subtitle: labelsObj.subtitle || headerObj.subtitle,
+                title: labelsObj.title || headerObj.title,
+                description: labelsObj.description || headerObj.description,
+              },
+            };
+          }
         }
       }
       
-      return section;
+      return sectionObj;
     }),
-  };
+  } as PageLayoutConfig;
 }
 
 export async function getPageLayoutConfig(): Promise<PageLayoutConfig> {
