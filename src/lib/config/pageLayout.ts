@@ -34,9 +34,10 @@ function resolveDataSources(config: unknown): PageLayoutConfig {
       }
       
       const sectionObj = section as Record<string, unknown>;
+      let processedSection = { ...sectionObj };
       
       // Resolve data source references
-      if (sectionObj.dataSource) {
+      if (processedSection.dataSource) {
         const dataSources: Record<string, unknown> = {
           projects: projectsData,
           experience: experienceData,
@@ -44,32 +45,37 @@ function resolveDataSources(config: unknown): PageLayoutConfig {
           education: educationData,
         };
         
-        return {
-          ...sectionObj,
-          data: dataSources[sectionObj.dataSource as string] || sectionObj.data,
-        };
+        const sourceKey = processedSection.dataSource as string;
+        const sourceData = dataSources[sourceKey];
+        
+        // Ensure data is always an array or empty array
+        processedSection.data = Array.isArray(sourceData) ? sourceData : Array.isArray(processedSection.data) ? processedSection.data : [];
       }
       
       // Resolve header labels from contentLabels if needed
-      if (sectionObj.header && sectionObj.id) {
-        const headerObj = sectionObj.header as Record<string, unknown>;
-        if (!headerObj.subtitle && sectionObj.id) {
-          const sectionLabels = (contentLabels as Record<string, unknown>)[sectionObj.id as string];
+      if (processedSection.header && processedSection.id) {
+        const headerObj = processedSection.header as Record<string, unknown>;
+        if (!headerObj.subtitle && processedSection.id) {
+          const sectionLabels = (contentLabels as Record<string, unknown>)[processedSection.id as string];
           if (sectionLabels && typeof sectionLabels === 'object') {
             const labelsObj = sectionLabels as Record<string, unknown>;
-            return {
-              ...sectionObj,
-              header: {
-                subtitle: labelsObj.subtitle || headerObj.subtitle,
-                title: labelsObj.title || headerObj.title,
-                description: labelsObj.description || headerObj.description,
-              },
+            processedSection.header = {
+              subtitle: labelsObj.subtitle || headerObj.subtitle,
+              title: labelsObj.title || headerObj.title,
+              description: labelsObj.description || headerObj.description,
             };
           }
         }
       }
       
-      return sectionObj;
+      // Final safety: ensure data is always an array if it exists
+      if ('data' in processedSection && processedSection.data !== null && processedSection.data !== undefined) {
+        if (!Array.isArray(processedSection.data)) {
+          processedSection.data = [];
+        }
+      }
+      
+      return processedSection;
     }),
   } as PageLayoutConfig;
 }

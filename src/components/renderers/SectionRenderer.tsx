@@ -114,18 +114,23 @@ export const SectionRenderer: React.FC<SectionRendererProps> = ({
     layout = 'grid',
     gridCols = 'md:grid-cols-2 lg:grid-cols-3',
     elements = [],
-    data = [],
+    data,
     elementRenderer,
     custom = {},
   } = config;
 
   /**
+   * Safely ensure data is an array
+   */
+  const safeData = Array.isArray(data) ? data : [];
+
+  /**
    * Convert data array to element configs
    */
   const renderedElements = elementRenderer
-    ? data.map((item, index) => elementRenderer(item, index))
-    : data.length > 0
-      ? getElementsFromData(type, data)
+    ? safeData.map((item, index) => elementRenderer(item, index))
+    : safeData.length > 0
+      ? getElementsFromData(type, safeData)
       : elements;
 
   /**
