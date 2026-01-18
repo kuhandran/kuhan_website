@@ -34,7 +34,7 @@ function resolveDataSources(config: unknown): PageLayoutConfig {
       }
       
       const sectionObj = section as Record<string, unknown>;
-      let processedSection = { ...sectionObj };
+      const processedSection = { ...sectionObj };
       
       // Resolve data source references
       if (processedSection.dataSource) {
