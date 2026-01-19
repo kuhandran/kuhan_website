@@ -57,8 +57,22 @@ export function getImageUrl(imagePath: string): string {
  */
 export function getImage(path: string): string {
   const cleanPath = extractPath(path);
-  // Remove 'image/' prefix if it already exists to avoid duplication
-  const finalPath = cleanPath.startsWith('image/') ? cleanPath.substring(6) : cleanPath;
+  
+  // Remove duplicate API path prefixes to avoid duplication
+  let finalPath = cleanPath;
+  
+  // Remove '/api/image/' prefix if it already exists
+  if (finalPath.startsWith('api/image/')) {
+    finalPath = finalPath.substring(10); // Remove 'api/image/'
+  } else if (finalPath.startsWith('/api/image/')) {
+    finalPath = finalPath.substring(11); // Remove '/api/image/'
+  }
+  
+  // Remove 'image/' prefix if it exists
+  if (finalPath.startsWith('image/')) {
+    finalPath = finalPath.substring(6); // Remove 'image/'
+  }
+  
   const imageUrl = `${STATIC_API_BASE}/api/image/${finalPath}`;
   console.log(`[API] Image URL: ${imageUrl}`);
   return imageUrl;
