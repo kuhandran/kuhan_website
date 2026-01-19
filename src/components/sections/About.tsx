@@ -66,7 +66,7 @@ export const About = () => {
           {/* Left Column - Image & Stats */}
           <div>
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl transform rotate-3"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-500 rounded-2xl transform rotate-3"></div>
               
               {(() => {
                 // Images are loaded from external static web service using utility function

@@ -31,7 +31,7 @@ export const ProjectCard = ({
   return (
     <div className="w-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group flex flex-col">
       {/* Image Container */}
-      <div className="relative w-full h-56 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 flex-shrink-0">
+      <div className="relative w-full h-56 overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 shrink-0">
         <picture>
           {/* WebP fallback */}
           <source srcSet={getImage(image).replace(/\.(png|jpg|jpeg)$/i, '.webp')} type="image/webp" />
@@ -43,7 +43,7 @@ export const ProjectCard = ({
             loading="lazy"
           />
         </picture>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         {/* Metrics Badge - Overlay */}
         {metrics && (
@@ -54,7 +54,7 @@ export const ProjectCard = ({
       </div>
       
       {/* Content - Flex grow to push footer down */}
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="p-6 flex flex-col grow">
         <h3 className="text-lg font-bold text-slate-900 mb-3 line-clamp-2">{title}</h3>
         <p className="text-sm text-slate-600 mb-4 line-clamp-3">{description}</p>
         
@@ -67,7 +67,7 @@ export const ProjectCard = ({
                   key={index} 
                   className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full whitespace-nowrap"
                 >
-                  <ArrowRight size={12} className="flex-shrink-0" />
+                  <ArrowRight size={12} className="shrink-0" />
                   <span className="line-clamp-1">{highlight}</span>
                 </span>
               ))}
@@ -87,7 +87,7 @@ export const ProjectCard = ({
             {(techStack || []).map((tech, index) => (
               <span 
                 key={index} 
-                className="px-2.5 py-1 bg-gradient-to-r from-slate-100 to-slate-50 text-slate-700 text-xs font-medium rounded-lg border border-slate-200 hover:border-slate-300 transition-all hover:shadow-sm whitespace-nowrap"
+                className="px-2.5 py-1 bg-linear-to-r from-slate-100 to-slate-50 text-slate-700 text-xs font-medium rounded-lg border border-slate-200 hover:border-slate-300 transition-all hover:shadow-sm whitespace-nowrap"
               >
                 {tech}
               </span>
@@ -105,7 +105,7 @@ export const ProjectCard = ({
               href={`/case-studies/${caseStudySlug}`}
               className="inline-flex items-center gap-1.5 text-purple-600 hover:text-purple-700 font-medium text-sm transition-colors group/link"
             >
-              <ArrowRight size={16} className="group-hover/link:translate-x-0.5 transition-transform flex-shrink-0" />
+              <ArrowRight size={16} className="group-hover/link:translate-x-0.5 transition-transform shrink-0" />
               View Case Study
             </Link>
           )}
@@ -116,7 +116,7 @@ export const ProjectCard = ({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors group/link"
             >
-              <ExternalLink size={16} className="group-hover/link:translate-x-0.5 transition-transform flex-shrink-0" />
+              <ExternalLink size={16} className="group-hover/link:translate-x-0.5 transition-transform shrink-0" />
               View Live
             </a>
           )}
@@ -127,7 +127,7 @@ export const ProjectCard = ({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-medium text-sm transition-colors group/link"
             >
-              <Github size={16} className="group-hover/link:translate-x-0.5 transition-transform flex-shrink-0" />
+              <Github size={16} className="group-hover/link:translate-x-0.5 transition-transform shrink-0" />
               GitHub
             </a>
           )}
