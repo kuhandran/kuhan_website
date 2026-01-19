@@ -15,9 +15,7 @@ const CACHE_NAMES = {
 // Assets to cache on install
 const PRECACHE_URLS = [
   '/',
-  '/index.html',
   '/manifest.json',
-  '/offline.html', // optional fallback page
 ];
 
 // Max ages for different cache types (in milliseconds)
@@ -38,9 +36,20 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       try {
-        // Cache static assets
+        // Cache static assets individually to prevent one failure from blocking all
         const staticCache = await caches.open(CACHE_NAMES.STATIC);
-        await staticCache.addAll(PRECACHE_URLS.filter(url => url !== '/offline.html'));
+        
+        for (const url of PRECACHE_URLS) {
+          try {
+            const response = await fetch(url);
+            if (response && response.status === 200) {
+              await staticCache.put(url, response);
+              console.log('[SW] Cached:', url);
+            }
+          } catch (error) {
+            console.warn('[SW] Failed to cache URL:', url, error);
+          }
+        }
 
         console.log('[SW] Static cache created');
 
@@ -48,6 +57,8 @@ self.addEventListener('install', (event) => {
         self.skipWaiting();
       } catch (error) {
         console.error('[SW] Install failed:', error);
+        // Don't fail installation due to cache errors
+        self.skipWaiting();
       }
     })()
   );
