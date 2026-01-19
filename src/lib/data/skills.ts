@@ -29,7 +29,54 @@ const EMPTY_SKILLS: SkillsData = {
   cloud: { name: '', icon: '', skills: [] }
 };
 
-export let skillsData: SkillsData = EMPTY_SKILLS;
+const DEFAULT_SKILLS: SkillsData = {
+  frontend: {
+    name: 'Frontend Development',
+    icon: '🎨',
+    skills: [
+      { name: 'React / Next.js', level: 95, color: '#61DAFB' },
+      { name: 'TypeScript', level: 90, color: '#3178C6' },
+      { name: 'Tailwind CSS', level: 88, color: '#06B6D4' },
+      { name: 'HTML / CSS', level: 92, color: '#E34C26' },
+      { name: 'JavaScript', level: 93, color: '#F7DF1E' }
+    ]
+  },
+  backend: {
+    name: 'Backend Development',
+    icon: '⚙️',
+    skills: [
+      { name: 'Node.js / Express', level: 87, color: '#339933' },
+      { name: 'Python', level: 85, color: '#3776AB' },
+      { name: 'Java', level: 80, color: '#007396' },
+      { name: 'SQL / Databases', level: 88, color: '#336791' },
+      { name: 'REST APIs', level: 92, color: '#009688' }
+    ]
+  },
+  data: {
+    name: 'Data & Analytics',
+    icon: '📊',
+    skills: [
+      { name: 'Data Analysis', level: 85, color: '#FF6B6B' },
+      { name: 'Visualization', level: 82, color: '#4ECDC4' },
+      { name: 'SQL', level: 88, color: '#336791' },
+      { name: 'Python (Data)', level: 85, color: '#3776AB' },
+      { name: 'Power BI', level: 80, color: '#F2CC8F' }
+    ]
+  },
+  cloud: {
+    name: 'Cloud & DevOps',
+    icon: '☁️',
+    skills: [
+      { name: 'AWS', level: 88, color: '#FF9900' },
+      { name: 'Docker', level: 85, color: '#2496ED' },
+      { name: 'Kubernetes', level: 80, color: '#326CE5' },
+      { name: 'CI/CD Pipelines', level: 87, color: '#0052CC' },
+      { name: 'Google Cloud', level: 82, color: '#4285F4' }
+    ]
+  }
+};
+
+export let skillsData: SkillsData = DEFAULT_SKILLS;
 
 export const useSkills = () => {
   const { language } = useLanguage();
@@ -43,13 +90,13 @@ export const useSkills = () => {
       try {
         console.log(`[Skills] Loading skills for language: ${language}`);
         const data = await fetchSkillsAPI(language as SupportedLanguage);
-        setSkills((data && typeof data === 'object' && !Array.isArray(data)) ? data : EMPTY_SKILLS);
-        skillsData = (data && typeof data === 'object' && !Array.isArray(data)) ? data : EMPTY_SKILLS;
+        setSkills((data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) ? data : DEFAULT_SKILLS);
+        skillsData = (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) ? data : DEFAULT_SKILLS;
         setError(null);
       } catch (err) {
         console.error(`[Skills] Failed to load skills for language ${language}:`, err);
         setError(err instanceof Error ? err : new Error('Failed to load skills'));
-        setSkills(EMPTY_SKILLS);
+        setSkills(DEFAULT_SKILLS);
       } finally {
         setLoading(false);
       }
