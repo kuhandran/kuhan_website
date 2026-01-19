@@ -28,7 +28,8 @@ export const useProjects = () => {
       try {
         console.log(`[Projects] Loading projects for language: ${language}`);
         const data = await fetchProjectsAPI(language as SupportedLanguage);
-        setProjects(Array.isArray(data) ? data : EMPTY_PROJECTS);
+        const projectItems = Array.isArray(data) ? (data as ProjectCardProps[]) : EMPTY_PROJECTS;
+        setProjects(projectItems);
         setError(null);
       } catch (err) {
         console.error(`[Projects] Failed to load projects for language ${language}:`, err);

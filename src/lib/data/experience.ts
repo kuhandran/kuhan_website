@@ -25,8 +25,9 @@ export const useExperience = () => {
       try {
         console.log(`[Experience] Loading experience for language: ${language}`);
         const data = await fetchExperienceAPI(language as SupportedLanguage);
-        setExperience(Array.isArray(data) ? data : EMPTY_EXPERIENCE);
-        experienceData = Array.isArray(data) ? data : EMPTY_EXPERIENCE;
+        const experienceItems = Array.isArray(data) ? (data as TimelineItemProps[]) : EMPTY_EXPERIENCE;
+        setExperience(experienceItems);
+        experienceData = experienceItems;
         setError(null);
       } catch (err) {
         console.error(`[Experience] Failed to load experience for language ${language}:`, err);

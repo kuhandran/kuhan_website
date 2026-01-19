@@ -26,7 +26,7 @@ import {
  * @param language - Language code (defaults to DEFAULT_LANGUAGE)
  * @returns Configuration object
  */
-export async function fetchConfig<T = any>(
+export async function fetchConfig<T extends Record<string, unknown> = Record<string, unknown>>(
   configType: 'apiConfig' | 'pageLayout' | 'urlConfig',
   language: SupportedLanguage = DEFAULT_LANGUAGE
 ): Promise<T> {
@@ -57,7 +57,7 @@ export async function fetchConfig<T = any>(
     return data as T;
   } catch (error) {
     console.error(`[API Error] Failed to fetch config (${language}/${configType}):`, error);
-    return {} as T;
+    return {} as unknown as T;
   }
 }
 
@@ -92,7 +92,7 @@ export async function fetchUrlConfig(language: SupportedLanguage = DEFAULT_LANGU
  * @param language - Language code (defaults to DEFAULT_LANGUAGE)
  * @returns Collection data
  */
-export async function fetchCollectionData<T = any>(
+export async function fetchCollectionData<T extends Record<string, unknown> | unknown[] = unknown[]>(
   dataType: string,
   language: SupportedLanguage = DEFAULT_LANGUAGE
 ): Promise<T> {
@@ -135,10 +135,16 @@ export async function fetchCollectionData<T = any>(
 
     const responseData = await response.json();
     // Extract data from various response formats:
+    // - { status, data: { data: {...} } } (API wrapper with nested data)
     // - { content: {...} } (pageLayout wrapper)
     // - { data: {...} } (standard wrapper)
     // - {...} (direct data)
-    let data = responseData.content || responseData.data || responseData;
+    let data = responseData.data || responseData.content || responseData;
+    
+    // Handle nested data structure from API (data.data)
+    if (data && typeof data === 'object' && 'data' in data && !Array.isArray(data.data)) {
+      data = data.data;
+    }
     
     // If data is still wrapped in metadata object but has a 'data' or 'content' property, unwrap again
     if (data && typeof data === 'object' && !Array.isArray(data)) {
@@ -154,7 +160,7 @@ export async function fetchCollectionData<T = any>(
   } catch (error) {
     console.error(`[API Error] Failed to fetch collection (${language}/${dataType}):`, error);
     // Return empty array for data collections that expect array responses
-    return [] as T;
+    return [] as unknown as T;
   }
 }
 
@@ -214,11 +220,11 @@ export async function fetchContentLabels(language: SupportedLanguage = DEFAULT_L
 /**
  * Fetch PWA manifest
  */
-export async function fetchManifest(language: SupportedLanguage = DEFAULT_LANGUAGE) {
+export async function fetchManifest(language: SupportedLanguage = DEFAULT_LANGUAGE): Promise<Record<string, unknown> | null> {
   const cacheKey = `manifest:${language}`;
   
-  const cached = getFromCache(cacheKey);
-  if (cached) return cached;
+  const cached = getFromCache<Record<string, unknown>>(cacheKey);
+  if (cached) return cached as Record<string, unknown>;
 
   try {
     const url = getManifestUrl(language);
@@ -234,9 +240,9 @@ export async function fetchManifest(language: SupportedLanguage = DEFAULT_LANGUA
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const responseData = await response.json();
+    const responseData = await response.json() as Record<string, unknown>;
     // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
-    const data = responseData.data || responseData;
+    const data = (responseData.data as Record<string, unknown>) || responseData;
     setInCache(cacheKey, data);
     return data;
   } catch (error) {
