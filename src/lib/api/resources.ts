@@ -149,7 +149,9 @@ export async function getStorageFile<T = unknown>(fileName: string): Promise<T |
       return null;
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
+    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+    const data = responseData.data || responseData;
     setInCache(cacheKey, data);
     return data as T;
   } catch (error) {
@@ -215,7 +217,9 @@ export async function getCollection<T = unknown>(
       return null;
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
+    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+    const data = responseData.data || responseData;
     setInCache(cacheKey, data);
     return data as T;
   } catch (error) {

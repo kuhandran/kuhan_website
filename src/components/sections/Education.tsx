@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Card } from '../elements/Card';
 import { Badge } from '../elements/Badge';
@@ -8,14 +8,7 @@ import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 export const Education = () => {
   const { education: educationData, loading } = useEducation();
-  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
-
-  useEffect(() => {
-    const labels = getStaticContentLabels();
-    if (labels && Object.keys(labels).length > 0) {
-      setContentLabels(labels);
-    }
-  }, []);
+  const [contentLabels] = useState(getStaticContentLabels());
 
   if (loading) {
     return (
@@ -42,7 +35,7 @@ export const Education = () => {
         />
         
         <div className="max-w-4xl mx-auto space-y-6">
-          {educationData.map((edu, index) => (
+          {Array.isArray(educationData) && educationData.map((edu, index) => (
             <Card key={index} className="p-6">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">

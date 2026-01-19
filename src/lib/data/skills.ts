@@ -43,8 +43,8 @@ export const useSkills = () => {
       try {
         console.log(`[Skills] Loading skills for language: ${language}`);
         const data = await fetchSkillsAPI(language as SupportedLanguage);
-        setSkills(data || EMPTY_SKILLS);
-        skillsData = data || EMPTY_SKILLS;
+        setSkills((data && typeof data === 'object' && !Array.isArray(data)) ? data : EMPTY_SKILLS);
+        skillsData = (data && typeof data === 'object' && !Array.isArray(data)) ? data : EMPTY_SKILLS;
         setError(null);
       } catch (err) {
         console.error(`[Skills] Failed to load skills for language ${language}:`, err);

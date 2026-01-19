@@ -25,8 +25,8 @@ export const useExperience = () => {
       try {
         console.log(`[Experience] Loading experience for language: ${language}`);
         const data = await fetchExperienceAPI(language as SupportedLanguage);
-        setExperience(data || EMPTY_EXPERIENCE);
-        experienceData = data || EMPTY_EXPERIENCE;
+        setExperience(Array.isArray(data) ? data : EMPTY_EXPERIENCE);
+        experienceData = Array.isArray(data) ? data : EMPTY_EXPERIENCE;
         setError(null);
       } catch (err) {
         console.error(`[Experience] Failed to load experience for language ${language}:`, err);

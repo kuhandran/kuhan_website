@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { ProjectCard } from '../elements/ProjectCard';
 import { useProjects } from '../../lib/data/projects';
@@ -6,14 +6,7 @@ import { getStaticContentLabels } from '../../lib/data/contentLabels';
 
 export const Projects = () => {
   const { projects: projectsData, loading } = useProjects();
-  const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
-
-  useEffect(() => {
-    const labels = getStaticContentLabels();
-    if (labels && Object.keys(labels).length > 0) {
-      setContentLabels(labels);
-    }
-  }, []);
+  const [contentLabels] = useState(getStaticContentLabels());
 
   if (loading) {
     return (
@@ -40,7 +33,7 @@ export const Projects = () => {
         />
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginTop: '48px' }}>
-          {projectsData.map((project, index) => (
+          {Array.isArray(projectsData) && projectsData.map((project, index) => (
             <ProjectCard key={index} {...project} />
           ))}
         </div>

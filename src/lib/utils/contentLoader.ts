@@ -51,7 +51,9 @@ export async function getMultilingualContent(
     });
 
     if (response.ok) {
-      content = await response.json();
+      const responseData = await response.json();
+      // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+      content = responseData.data || responseData;
       const dataSource = response.headers.get('X-Data-Source') || 'api';
       console.log('[ContentLoader] Loaded successfully', { fileType, languageCode, dataSource });
     } else {

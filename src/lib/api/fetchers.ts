@@ -50,7 +50,9 @@ export async function fetchConfig<T = any>(
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
+    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+    const data = responseData.data || responseData;
     setInCache(cacheKey, data);
     return data as T;
   } catch (error) {
@@ -131,12 +133,15 @@ export async function fetchCollectionData<T = any>(
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
+    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+    const data = responseData.data || responseData;
     setInCache(cacheKey, data);
     return data as T;
   } catch (error) {
     console.error(`[API Error] Failed to fetch collection (${language}/${dataType}):`, error);
-    return {} as T;
+    // Return empty array for data collections that expect array responses
+    return [] as T;
   }
 }
 
@@ -216,7 +221,9 @@ export async function fetchManifest(language: SupportedLanguage = DEFAULT_LANGUA
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const responseData = await response.json();
+    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+    const data = responseData.data || responseData;
     setInCache(cacheKey, data);
     return data;
   } catch (error) {

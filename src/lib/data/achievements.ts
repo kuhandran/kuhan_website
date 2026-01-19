@@ -44,7 +44,9 @@ export async function fetchAchievementsData(language: string = DEFAULT_LANGUAGE)
     const DATA_URL = getDataSourceUrl('achievements', language);
     const response = await fetch(DATA_URL);
     if (!response.ok) return EMPTY_ACHIEVEMENTS;
-    const result = await response.json();
+    const responseData = await response.json();
+    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+    const result = responseData.data || responseData;
     cachedData.set(language, result);
     return result;
   } catch {

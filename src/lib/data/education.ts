@@ -32,8 +32,8 @@ export const useEducation = () => {
       try {
         console.log(`[Education] Loading education for language: ${language}`);
         const data = await fetchEducationAPI(language as SupportedLanguage);
-        setEducation(data || EMPTY_EDUCATION);
-        educationData = data || EMPTY_EDUCATION;
+        setEducation(Array.isArray(data) ? data : EMPTY_EDUCATION);
+        educationData = Array.isArray(data) ? data : EMPTY_EDUCATION;
         setError(null);
       } catch (err) {
         console.error(`[Education] Failed to load education for language ${language}:`, err);

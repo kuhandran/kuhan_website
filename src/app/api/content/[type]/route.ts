@@ -12,7 +12,7 @@ import { DOMAINS, DEFAULT_LANGUAGE, getCollectionUrl } from '@/lib/config/domain
  */
 
 // Local fallback cache
-const localDataCache: Record<string, Record<string, any>> = {};
+const localDataCache: Record<string, Record<string, unknown>> = {};
 
 async function loadLocalFallback(language: string, fileType: string, fileName: string) {
   try {
@@ -29,11 +29,13 @@ async function loadLocalFallback(language: string, fileType: string, fileName: s
         const path = await import('path');
         const filePath = path.join(process.cwd(), 'public', 'collections', language, fileType, `${fileName}.json`);
         const fileContent = await fs.readFile(filePath, 'utf-8');
-        const data = JSON.parse(fileContent);
+        const fileData = JSON.parse(fileContent);
+        // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+        const data = fileData.data || fileData;
         localDataCache[cacheKey] = data;
         console.log(`✅ Loaded from local file: ${filePath}`);
         return data;
-      } catch (fsError) {
+      } catch {
         console.warn(`⚠️ Local file not found: public/collections/${language}/${fileType}/${fileName}.json`);
       }
     }
@@ -44,7 +46,9 @@ async function loadLocalFallback(language: string, fileType: string, fileName: s
     const response = await fetch(`${appUrl}${filePath}`);
     
     if (response.ok) {
-      const data = await response.json();
+      const responseData = await response.json();
+      // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+      const data = responseData.data || responseData;
       localDataCache[cacheKey] = data;
       return data;
     }
@@ -75,7 +79,7 @@ export async function GET(
 
     // Try external API first
     try {
-      const apiUrl = getCollectionUrl(language as any, type as any, fileName);
+      const apiUrl = getCollectionUrl(language as unknown as Parameters<typeof getCollectionUrl>[0], type as 'data' | 'config', fileName);
       console.log(`📡 Fetching from API: ${apiUrl}`);
 
       const response = await fetch(apiUrl, {
@@ -88,7 +92,9 @@ export async function GET(
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const responseData = await response.json();
+        // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
+        const data = responseData.data || responseData;
         console.log(`✅ Successfully fetched ${fileName} for ${language}`);
         
         return NextResponse.json(data, {
