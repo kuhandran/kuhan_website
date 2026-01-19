@@ -134,8 +134,21 @@ export async function fetchCollectionData<T = any>(
     }
 
     const responseData = await response.json();
-    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
-    const data = responseData.data || responseData;
+    // Extract data from various response formats:
+    // - { content: {...} } (pageLayout wrapper)
+    // - { data: {...} } (standard wrapper)
+    // - {...} (direct data)
+    let data = responseData.content || responseData.data || responseData;
+    
+    // If data is still wrapped in metadata object but has a 'data' or 'content' property, unwrap again
+    if (data && typeof data === 'object' && !Array.isArray(data)) {
+      if ('data' in data && !('items' in data && typeof data.data === 'object')) {
+        data = data.data;
+      } else if ('content' in data && !('items' in data && typeof data.content === 'object')) {
+        data = data.content;
+      }
+    }
+    
     setInCache(cacheKey, data);
     return data as T;
   } catch (error) {

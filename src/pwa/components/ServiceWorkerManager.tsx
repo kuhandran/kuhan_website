@@ -72,29 +72,42 @@ export function ServiceWorkerManager() {
  */
 async function precacheEssentialData() {
   if (!('serviceWorker' in navigator)) {
+    console.warn('[SW] Service Worker not supported');
     return;
   }
 
-  const controller = navigator.serviceWorker.controller;
-  if (!controller) {
-    return;
+  // Wait for the service worker to become the active controller
+  // Use a ready promise which resolves when the service worker takes control
+  try {
+    const registration = await navigator.serviceWorker.ready;
+
+    if (!registration.active) {
+      console.warn('[SW] No active service worker');
+      return;
+    }
+
+    const essentialUrls = [
+      'https://static.kuhandranchatbot.info/api/collections/en/data/contentLabels',
+      'https://static.kuhandranchatbot.info/api/collections/en/data/projects',
+      'https://static.kuhandranchatbot.info/api/collections/en/data/experience',
+      'https://static.kuhandranchatbot.info/api/collections/en/data/skills',
+    ];
+
+    // Send message to active service worker
+    const activeWorker = registration.active;
+    if (activeWorker) {
+      essentialUrls.forEach((url) => {
+        activeWorker.postMessage({
+          type: 'CACHE_API',
+          data: { url },
+        });
+      });
+
+      console.log('[SW] Sent pre-cache request for essential data');
+    }
+  } catch (error) {
+    console.warn('[SW] Failed to precache essential data:', error);
   }
-
-  const essentialUrls = [
-    'https://static.kuhandranchatbot.info/api/collections/en/data/contentLabels',
-    'https://static.kuhandranchatbot.info/api/collections/en/data/projects',
-    'https://static.kuhandranchatbot.info/api/collections/en/data/experience',
-    'https://static.kuhandranchatbot.info/api/collections/en/data/skills',
-  ];
-
-  essentialUrls.forEach((url) => {
-    controller.postMessage({
-      type: 'CACHE_API',
-      data: { url },
-    });
-  });
-
-  console.log('[SW] Sent pre-cache request for essential data');
 }
 
 /**

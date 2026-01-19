@@ -45,11 +45,41 @@ export async function fetchAchievementsData(language: string = DEFAULT_LANGUAGE)
     const response = await fetch(DATA_URL);
     if (!response.ok) return EMPTY_ACHIEVEMENTS;
     const responseData = await response.json();
-    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
-    const result = responseData.data || responseData;
-    cachedData.set(language, result);
-    return result;
-  } catch {
+    
+    // Extract data from various response formats:
+    // - { content: { awards: [], certifications: [] } } (API wrapper)
+    // - { data: { awards: [], certifications: [] } } (alternative wrapper)
+    // - { awards: [], certifications: [] } (direct data)
+    let result = responseData.content || responseData.data || responseData;
+    
+    // Ensure we have the right structure
+    if (result && typeof result === 'object' && !Array.isArray(result)) {
+      // If result is wrapped with metadata, try to extract the actual data
+      if ('awards' in result || 'certifications' in result) {
+        // Already has the right structure
+      } else if ('data' in result) {
+        result = result.data;
+      } else if ('content' in result) {
+        result = result.content;
+      }
+    }
+    
+    // Validate structure
+    if (!result || typeof result !== 'object' || Array.isArray(result)) {
+      console.warn('[Achievements] Invalid response structure:', result);
+      return EMPTY_ACHIEVEMENTS;
+    }
+    
+    const resultObj = result as Record<string, unknown>;
+    const validatedResult: AchievementsData = {
+      awards: Array.isArray(resultObj.awards) ? (resultObj.awards as Award[]) : [],
+      certifications: Array.isArray(resultObj.certifications) ? (resultObj.certifications as Certification[]) : []
+    };
+    
+    cachedData.set(language, validatedResult);
+    return validatedResult;
+  } catch (error) {
+    console.error('[Achievements] Failed to fetch:', error);
     return EMPTY_ACHIEVEMENTS;
   }
 }

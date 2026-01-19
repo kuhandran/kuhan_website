@@ -52,6 +52,38 @@ export async function clearAllCaches(): Promise<void> {
 }
 
 /**
+ * Clear all caches via service worker message
+ * Preferred method as it ensures service worker is aware of cache clearing
+ */
+export async function clearAllCachesViaServiceWorker(): Promise<void> {
+  if (!('serviceWorker' in navigator)) {
+    console.warn('[CacheUtils] Service Worker not supported, falling back to direct cache clear');
+    await clearAllCaches();
+    return;
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    
+    if (!registration.active) {
+      console.warn('[CacheUtils] No active service worker, falling back to direct cache clear');
+      await clearAllCaches();
+      return;
+    }
+
+    registration.active.postMessage({ type: 'CLEAR_CACHE' });
+    
+    // Also clear browser caches directly to ensure complete clearing
+    await clearAllCaches();
+    
+    console.log('[CacheUtils] All caches cleared via service worker');
+  } catch (error) {
+    console.warn('[CacheUtils] Service worker cache clear failed, falling back:', error);
+    await clearAllCaches();
+  }
+}
+
+/**
  * Clear specific cache
  */
 export async function clearCache(cacheName: string): Promise<void> {

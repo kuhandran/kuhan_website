@@ -197,17 +197,50 @@ export async function fetchPageLayout() {
     try {
       // Fetch from external API
       const url = getDataSourceUrl('pageLayout.json', DEFAULT_LANGUAGE, 'config');
+      console.log('[Loaders] Fetching pageLayout from:', url);
+      
       const response = await fetch(url);
-      if (!response.ok) throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[Loaders] pageLayout HTTP error:', response.status, response.statusText, errorText);
+        throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));
+      }
       
       const data = await response.json();
-      // Extract 'data' field if present (API response wrapper)
-      cachedPageLayout = data.data || data;
-      console.log('[Loaders] pageLayout loaded from API');
+      
+      if (!data) {
+        console.error('[Loaders] pageLayout response is empty');
+        pageLayoutPromise = null;
+        return { sections: [] };
+      }
+      
+      // Extract 'content' field if present (API response wrapper structure)
+      // The API returns: { id, language, type, filename, content: { theme, sections }, ... }
+      let layoutData = data.content || data.data || data;
+      
+      // If we got the full API response, make sure to get content from it
+      if (layoutData && typeof layoutData === 'object' && !Array.isArray(layoutData)) {
+        // Check if this looks like the API wrapper with content/data fields
+        if ('content' in layoutData && 'sections' in layoutData.content) {
+          layoutData = layoutData.content;
+        } else if ('data' in layoutData && typeof layoutData.data === 'object' && 'sections' in layoutData.data) {
+          layoutData = layoutData.data;
+        }
+      }
+      
+      if (!layoutData || !layoutData.sections) {
+        console.error('[Loaders] pageLayout missing sections:', layoutData);
+        pageLayoutPromise = null;
+        return { sections: [] };
+      }
+      
+      cachedPageLayout = layoutData;
+      console.log('[Loaders] pageLayout loaded successfully from API with', cachedPageLayout.sections.length, 'sections');
       pageLayoutPromise = null;
       return cachedPageLayout;
     } catch (error) {
-      console.error('Failed to fetch pageLayout:', error);
+      console.error('[Loaders] Failed to fetch pageLayout:', error);
       pageLayoutPromise = null;
       return { sections: [] };
     }

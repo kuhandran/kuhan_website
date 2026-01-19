@@ -366,11 +366,17 @@ function createOfflineImage() {
 // ============================================================================
 
 self.addEventListener('message', (event) => {
+  console.log('[SW] Message received:', event.data);
+  
   const { type, data } = event.data;
 
   switch (type) {
     case 'CACHE_API':
-      cacheApiUrl(data.url);
+      if (data && data.url) {
+        cacheApiUrl(data.url);
+      } else {
+        console.warn('[SW] CACHE_API message missing URL');
+      }
       break;
 
     case 'CLEAR_CACHE':
@@ -382,7 +388,11 @@ self.addEventListener('message', (event) => {
       break;
 
     case 'PRECACHE_URLS':
-      precacheUrls(data.urls);
+      if (data && data.urls) {
+        precacheUrls(data.urls);
+      } else {
+        console.warn('[SW] PRECACHE_URLS message missing URLs');
+      }
       break;
 
     default:
@@ -395,14 +405,29 @@ self.addEventListener('message', (event) => {
  */
 async function cacheApiUrl(url) {
   try {
+    console.log('[SW] Starting to cache API URL:', url);
+    
     const response = await fetch(url);
-    if (response && response.status === 200) {
-      const cache = await caches.open(CACHE_NAMES.API);
-      cache.put(url, response);
-      console.log('[SW] Cached API URL:', url);
+    
+    if (!response) {
+      console.warn('[SW] No response received for:', url);
+      return;
     }
+    
+    if (response.status !== 200) {
+      console.warn('[SW] Non-200 response status:', response.status, 'for URL:', url);
+      return;
+    }
+    
+    const cache = await caches.open(CACHE_NAMES.API);
+    
+    // Clone response before putting into cache
+    const responseToCache = response.clone();
+    await cache.put(url, responseToCache);
+    
+    console.log('[SW] Successfully cached API URL:', url);
   } catch (error) {
-    console.warn('[SW] Failed to cache URL:', url, error);
+    console.error('[SW] Failed to cache URL:', url, error);
   }
 }
 
