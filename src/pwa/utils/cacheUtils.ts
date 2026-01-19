@@ -27,9 +27,11 @@ export async function precacheApis(urls: string[]): Promise<void> {
   urls.forEach((url) => {
     controller.postMessage({
       type: 'CACHE_API',
-      url,
+      data: { url },
     });
   });
+
+  console.log('[CacheUtils] Pre-cache request sent for:', urls);
 }
 
 /**
@@ -182,17 +184,65 @@ export async function updateServiceWorker(): Promise<boolean> {
  */
 export async function initializeDefaultCache(language: string = 'en'): Promise<void> {
   const defaultApis = [
-    '/data/projects.json',
-    '/data/experience.json',
-    '/data/education.json',
-    '/data/skills.json',
-    '/data/achievements.json',
-    '/data/caseStudies.json',
-    '/data/contentLabels.json',
-    // Use dynamic config route with language support
-    `/api/config/${language}/pageLayout`,
+    'https://static.kuhandranchatbot.info/api/collections/en/data/projects.json',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/experience.json',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/education.json',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/skills.json',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/achievements.json',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/caseStudies.json',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/contentLabels.json',
   ];
 
   await precacheApis(defaultApis);
   console.log('[CacheUtils] Default cache initialized');
+}
+
+/**
+ * Pre-cache images from a list
+ */
+export async function precacheImages(imageUrls: string[]): Promise<void> {
+  if (!('caches' in window)) {
+    console.warn('[CacheUtils] Cache API not supported');
+    return;
+  }
+
+  const cache = await caches.open('v1.0.0-images');
+  const promises = imageUrls.map(async (url) => {
+    try {
+      const response = await fetch(url);
+      if (response && response.status === 200) {
+        await cache.put(url, response);
+        console.log('[CacheUtils] Cached image:', url);
+      }
+    } catch (error) {
+      console.warn('[CacheUtils] Failed to cache image:', url, error);
+    }
+  });
+
+  await Promise.all(promises);
+}
+
+/**
+ * Pre-cache CDN content
+ */
+export async function precacheCdnContent(cdnUrls: string[]): Promise<void> {
+  if (!('caches' in window)) {
+    console.warn('[CacheUtils] Cache API not supported');
+    return;
+  }
+
+  const cache = await caches.open('v1.0.0-cdn');
+  const promises = cdnUrls.map(async (url) => {
+    try {
+      const response = await fetch(url);
+      if (response && response.status === 200) {
+        await cache.put(url, response);
+        console.log('[CacheUtils] Cached CDN content:', url);
+      }
+    } catch (error) {
+      console.warn('[CacheUtils] Failed to cache CDN content:', url, error);
+    }
+  });
+
+  await Promise.all(promises);
 }

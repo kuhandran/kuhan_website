@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { LanguageProvider } from '@/lib/hooks/useLanguageHook';
 import { getManifestUrl, DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import { ServiceWorkerManager } from '@/pwa';
 import '@/styles/critical.css';
 import '@/styles/globals.css';
 
@@ -199,6 +200,7 @@ export default function RootLayout({
         <LanguageProvider>
           {children}
         </LanguageProvider>
+        <ServiceWorkerManager />
         <AnalyticsWrapper />
         <AnalyticsConsentBanner />
       </body>
