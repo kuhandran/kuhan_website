@@ -81,10 +81,10 @@ async function precacheEssentialData() {
   }
 
   const essentialUrls = [
-    'https://static.kuhandranchatbot.info/api/collections/en/data/contentLabels.json',
-    'https://static.kuhandranchatbot.info/api/collections/en/data/projects.json',
-    'https://static.kuhandranchatbot.info/api/collections/en/data/experience.json',
-    'https://static.kuhandranchatbot.info/api/collections/en/data/skills.json',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/contentLabels',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/projects',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/experience',
+    'https://static.kuhandranchatbot.info/api/collections/en/data/skills',
   ];
 
   essentialUrls.forEach((url) => {
