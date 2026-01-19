@@ -20,18 +20,6 @@ const PRECACHE_URLS = [
   '/offline.html', // optional fallback page
 ];
 
-// API endpoints to cache
-const API_CACHE_URLS = [
-  'https://static.kuhandranchatbot.info/api/collections',
-  'https://api-gateway-9unh.onrender.com/api',
-];
-
-// Image domains to cache
-const IMAGE_DOMAINS = [
-  'static.kuhandranchatbot.info',
-  'localhost:3000',
-];
-
 // Max ages for different cache types (in milliseconds)
 const CACHE_MAX_AGE = {
   IMAGES: 30 * 24 * 60 * 60 * 1000, // 30 days
@@ -147,7 +135,7 @@ async function cacheImageStrategy(request) {
     }
 
     return response;
-  } catch (error) {
+  } catch {
     // Return cached version if available, even if expired
     const cached = await caches.match(request);
     if (cached) {
@@ -186,7 +174,7 @@ async function cacheApiStrategy(request) {
     }
 
     return response;
-  } catch (error) {
+  } catch {
     // Return cached version if available
     const cached = await caches.match(request);
     if (cached) {
@@ -218,7 +206,7 @@ async function cacheStaticStrategy(request) {
     }
 
     return response;
-  } catch (error) {
+  } catch {
     const cached = await caches.match(request);
     if (cached) {
       return cached;
@@ -242,7 +230,7 @@ async function networkFirstStrategy(request) {
     }
 
     return response;
-  } catch (error) {
+  } catch {
     const cached = await caches.match(request);
     if (cached) {
       return cached;
@@ -284,7 +272,6 @@ function isStaticAsset(url) {
  * Check if cached response is expired
  */
 function isExpired(response) {
-  const cacheControl = response.headers.get('cache-control');
   const dateHeader = response.headers.get('date');
 
   if (!dateHeader) {

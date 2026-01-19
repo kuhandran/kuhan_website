@@ -7,12 +7,11 @@ import { useEffect, useState } from 'react';
  * Registers service worker, caches API data, and manages offline support
  */
 export function ServiceWorkerManager() {
-  const [isCacheReady, setIsCacheReady] = useState(false);
-  const [swRegistered, setSwRegistered] = useState(false);
-
   useEffect(() => {
     // Only initialize in browser environment
     if (typeof window === 'undefined') return;
+
+    let updateCheckInterval: NodeJS.Timeout | null = null;
 
     const initializeServiceWorker = async () => {
       try {
@@ -24,10 +23,9 @@ export function ServiceWorkerManager() {
           });
 
           console.log('[SW] Service worker registered:', registration.scope);
-          setSwRegistered(true);
 
           // Check for updates periodically
-          const updateCheckInterval = setInterval(async () => {
+          updateCheckInterval = setInterval(async () => {
             try {
               await registration.update();
             } catch (error) {
@@ -43,13 +41,10 @@ export function ServiceWorkerManager() {
             console.log('[SW] New service worker activated, reloading...');
             window.location.reload();
           });
-
-          return () => clearInterval(updateCheckInterval);
         }
 
         // Check if Cache API is available
         if ('caches' in window) {
-          setIsCacheReady(true);
           console.log('[SW] Browser Cache API available');
         }
 
@@ -60,9 +55,12 @@ export function ServiceWorkerManager() {
       }
     };
 
-    const cleanup = initializeServiceWorker();
+    initializeServiceWorker();
+
     return () => {
-      if (cleanup) cleanup();
+      if (updateCheckInterval) {
+        clearInterval(updateCheckInterval);
+      }
     };
   }, []);
 
@@ -73,7 +71,12 @@ export function ServiceWorkerManager() {
  * Pre-cache essential API endpoints and data
  */
 async function precacheEssentialData() {
-  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  const controller = navigator.serviceWorker.controller;
+  if (!controller) {
     return;
   }
 
@@ -85,7 +88,7 @@ async function precacheEssentialData() {
   ];
 
   essentialUrls.forEach((url) => {
-    navigator.serviceWorker.controller.postMessage({
+    controller.postMessage({
       type: 'CACHE_API',
       data: { url },
     });
@@ -98,7 +101,7 @@ async function precacheEssentialData() {
  * Hook to check if app is online
  */
 export function useOnlineStatus() {
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -113,9 +116,6 @@ export function useOnlineStatus() {
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
-    // Check initial status
-    setIsOnline(navigator.onLine);
 
     return () => {
       window.removeEventListener('online', handleOnline);

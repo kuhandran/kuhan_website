@@ -180,9 +180,8 @@ export async function updateServiceWorker(): Promise<boolean> {
 
 /**
  * Pre-cache default API files on first load
- * Note: Config paths use dynamic routes based on language (e.g., /api/config/en/pageLayout)
  */
-export async function initializeDefaultCache(language: string = 'en'): Promise<void> {
+export async function initializeDefaultCache(): Promise<void> {
   const defaultApis = [
     'https://static.kuhandranchatbot.info/api/collections/en/data/projects.json',
     'https://static.kuhandranchatbot.info/api/collections/en/data/experience.json',
