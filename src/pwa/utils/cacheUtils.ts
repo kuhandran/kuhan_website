@@ -215,13 +215,13 @@ export async function updateServiceWorker(): Promise<boolean> {
  */
 export async function initializeDefaultCache(): Promise<void> {
   const defaultApis = [
-    'https://static.kuhandranchatbot.info/public/collections/en/data/projects',
-    'https://static.kuhandranchatbot.info/public/collections/en/data/experience',
-    'https://static.kuhandranchatbot.info/public/collections/en/data/education',
-    'https://static.kuhandranchatbot.info/public/collections/en/data/skills',
-    'https://static.kuhandranchatbot.info/public/collections/en/data/achievements',
-    'https://static.kuhandranchatbot.info/public/collections/en/data/caseStudies',
-    'https://static.kuhandranchatbot.info/public/collections/en/data/contentLabels',
+    'https://static.kuhandranchatbot.info/public/collections/en/data/projects.json',
+    'https://static.kuhandranchatbot.info/public/collections/en/data/experience.json',
+    'https://static.kuhandranchatbot.info/public/collections/en/data/education.json',
+    'https://static.kuhandranchatbot.info/public/collections/en/data/skills.json',
+    'https://static.kuhandranchatbot.info/public/collections/en/data/achievements.json',
+    'https://static.kuhandranchatbot.info/public/collections/en/data/caseStudies.json',
+    'https://static.kuhandranchatbot.info/public/collections/en/data/contentLabels.json',
   ];
 
   await precacheApis(defaultApis);
