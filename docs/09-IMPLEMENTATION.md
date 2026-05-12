@@ -8,7 +8,7 @@
 ## What Was Accomplished
 
 ### 1. ✅ API Integration
-- Integrated with production API: `https://static-api-opal.vercel.app/public`
+- Integrated with production API: `https://static-api-opal.vercel.app/api`
 - Fetches dynamic language list with flags and native names
 - Automatic fallback to local defaults if API unavailable
 - 1-hour caching for optimal performance
@@ -161,16 +161,16 @@ export function Section() {
 
 ### Get Languages Configuration
 ```
-GET https://static-api-opal.vercel.app/public/config/languages.json
+GET https://static-api-opal.vercel.app/api/config/languages.json
 ```
 
 ### Get Multilingual Content
 ```
-GET https://static-api-opal.vercel.app/public/collections/{code}/data/{fileType}.json
+GET https://static-api-opal.vercel.app/api/collections/{code}/data/{fileType}.json
 
 Examples:
-- https://static-api-opal.vercel.app/public/collections/ta/data/contentLabels.json
-- https://static-api-opal.vercel.app/public/collections/ar-AE/data/projects.json
+- https://static-api-opal.vercel.app/api/collections/ta/data/contentLabels.json
+- https://static-api-opal.vercel.app/api/collections/ar-AE/data/projects.json
 ```
 
 ---
@@ -347,15 +347,15 @@ For issues or questions:
 ```
 ❌ BEFORE:
 GET /config/pageLayout.json → 404 in 117ms
-GET /config/publicConfig.json  → 404 in 254ms
+GET /config/apiConfig.json  → 404 in 254ms
 GET /manifest.json          → 404 in 93ms
 GET /sw.js                  → 404 in 90ms
 
 ✅ AFTER:
-GET /public/config/en/pageLayout   → 200 JSON (language-specific)
-GET /public/config/en/publicConfig    → 200 JSON (language-specific)
-GET /public/manifest/en            → 200 manifest (language-specific)
-GET /public/sw                     → 200 JavaScript (dynamic)
+GET /api/config/en/pageLayout   → 200 JSON (language-specific)
+GET /api/config/en/apiConfig    → 200 JSON (language-specific)
+GET /api/manifest/en            → 200 manifest (language-specific)
+GET /api/sw                     → 200 JavaScript (dynamic)
 ```
 
 ---
@@ -365,7 +365,7 @@ GET /public/sw                     → 200 JavaScript (dynamic)
 ### New Route Handlers Created
 
 ```
-src/app/public/
+src/app/api/
 ├── config/[language]/[configType]/
 │   └── route.ts                    ← Load language-specific config
 │
@@ -405,9 +405,9 @@ src/config/domains.ts
 
 | File | Purpose |
 |------|---------|
-| `src/app/public/config/[language]/[configType]/route.ts` | Serves language-specific config files |
-| `src/app/public/manifest/[language]/route.ts` | Generates language-specific PWA manifest |
-| `src/app/public/sw/route.ts` | Generates dynamic service worker |
+| `src/app/api/config/[language]/[configType]/route.ts` | Serves language-specific config files |
+| `src/app/api/manifest/[language]/route.ts` | Generates language-specific PWA manifest |
+| `src/app/api/sw/route.ts` | Generates dynamic service worker |
 | `DYNAMIC_ROUTES_SETUP.md` | Complete guide for new routes |
 | `CLEANUP_STATIC_FILES.md` | Instructions for removing static files |
 
@@ -428,7 +428,7 @@ Check /public/manifest.json
 ```
 Browser Request
     ↓
-Route Handler: /public/manifest/[language]
+Route Handler: /api/manifest/[language]
     ↓
 Load language-specific content
     ↓
@@ -445,17 +445,17 @@ All new routes support dynamic language selection:
 
 ```typescript
 // English
-GET /public/config/en/publicConfig
-GET /public/manifest/en
-GET /public/sw                      ← language-agnostic
+GET /api/config/en/apiConfig
+GET /api/manifest/en
+GET /api/sw                      ← language-agnostic
 
 // Tamil
-GET /public/config/ta/publicConfig
-GET /public/manifest/ta
+GET /api/config/ta/apiConfig
+GET /api/manifest/ta
 
 // Spanish
-GET /public/config/es/publicConfig
-GET /public/manifest/es
+GET /api/config/es/apiConfig
+GET /api/manifest/es
 
 // ... and 8 more languages
 ```
@@ -466,9 +466,9 @@ GET /public/manifest/es
 
 | Route | Cache Duration | Strategy |
 |-------|-----------------|----------|
-| `/public/config/*` | 1 hour | stale-while-revalidate |
-| `/public/manifest/*` | 1 day | stale-while-revalidate |
-| `/public/sw` | 1 hour | stale-while-revalidate |
+| `/api/config/*` | 1 hour | stale-while-revalidate |
+| `/api/manifest/*` | 1 day | stale-while-revalidate |
+| `/api/sw` | 1 hour | stale-while-revalidate |
 
 ---
 
@@ -491,16 +491,16 @@ navigator.serviceWorker.register(getServiceWorkerUrl());
 ### For Different Languages
 ```typescript
 // English
-getManifestUrl('en')           → /public/manifest/en
-getConfigRouteUrl('en', 'apiConfig') → /public/config/en/publicConfig
+getManifestUrl('en')           → /api/manifest/en
+getConfigRouteUrl('en', 'apiConfig') → /api/config/en/apiConfig
 
 // Tamil
-getManifestUrl('ta')           → /public/manifest/ta
-getConfigRouteUrl('ta', 'apiConfig') → /public/config/ta/publicConfig
+getManifestUrl('ta')           → /api/manifest/ta
+getConfigRouteUrl('ta', 'apiConfig') → /api/config/ta/apiConfig
 
 // Spanish
-getManifestUrl('es')           → /public/manifest/es
-getConfigRouteUrl('es', 'apiConfig') → /public/config/es/publicConfig
+getManifestUrl('es')           → /api/manifest/es
+getConfigRouteUrl('es', 'apiConfig') → /api/config/es/apiConfig
 ```
 
 ---
@@ -540,16 +540,16 @@ Test the new routes:
 
 ```bash
 # Test config route
-curl http://localhost:3000/public/config/en/publicConfig
+curl http://localhost:3000/api/config/en/apiConfig
 
 # Test manifest route
-curl http://localhost:3000/public/manifest/en
+curl http://localhost:3000/api/manifest/en
 
 # Test service worker
-curl http://localhost:3000/public/sw | head -20
+curl http://localhost:3000/api/sw | head -20
 
 # Check different language
-curl http://localhost:3000/public/manifest/ta
+curl http://localhost:3000/api/manifest/ta
 ```
 
 ---
@@ -592,7 +592,7 @@ This guide walks you through consolidating the bloated API layer into a clean, m
 ## Overview
 
 **Before**:
-- `src/lib/public/publicClient.ts` - 658 lines doing everything
+- `src/lib/api/apiClient.ts` - 658 lines doing everything
 - `src/lib/config/dataConfig.ts` - URL builders scattered
 - `src/lib/config/configLoader.ts` - Duplicate config loading
 - `src/lib/utils/contentLoader.ts` - More duplicate caching
@@ -607,7 +607,7 @@ This guide walks you through consolidating the bloated API layer into a clean, m
 ## New Directory Structure
 
 ```
-src/lib/public/
+src/lib/api/
 ├── core/
 │   ├── httpClient.ts      ← Raw HTTP requests with retries
 │   ├── cache.ts           ← Unified caching system
@@ -638,7 +638,7 @@ src/lib/utils/
 
 ### Step 1: Create Core Modules
 
-#### 1.1 `src/lib/public/core/types.ts`
+#### 1.1 `src/lib/api/core/types.ts`
 
 ```typescript
 /**
@@ -676,7 +676,7 @@ export interface FetchResult<T> {
 export type FetchFn<T> = (language: SupportedLanguage) => Promise<T>;
 ```
 
-#### 1.2 `src/lib/public/core/errors.ts`
+#### 1.2 `src/lib/api/core/errors.ts`
 
 ```typescript
 /**
@@ -731,7 +731,7 @@ export class CacheError extends APIError {
 }
 ```
 
-#### 1.3 `src/lib/public/core/cache.ts`
+#### 1.3 `src/lib/api/core/cache.ts`
 
 ```typescript
 /**
@@ -834,7 +834,7 @@ export class CacheManager {
 export const cacheManager = new CacheManager();
 ```
 
-#### 1.4 `src/lib/public/core/httpClient.ts`
+#### 1.4 `src/lib/api/core/httpClient.ts`
 
 ```typescript
 /**
@@ -934,7 +934,7 @@ export const httpClient = new HttpClient();
 
 ### Step 2: Create Builders
 
-#### 2.1 `src/lib/public/builders/urlBuilder.ts`
+#### 2.1 `src/lib/api/builders/urlBuilder.ts`
 
 ```typescript
 /**
@@ -953,7 +953,7 @@ export class UrlBuilder {
     type: DataCollectionType,
     language: SupportedLanguage = DEFAULT_LANGUAGE
   ): string {
-    return `${DOMAINS.PRODUCTION_API}/public/collections/${language}/data/${type}.json`;
+    return `${DOMAINS.PRODUCTION_API}/api/collections/${language}/data/${type}.json`;
   }
 
   /**
@@ -964,28 +964,28 @@ export class UrlBuilder {
     language: SupportedLanguage = DEFAULT_LANGUAGE
   ): string {
     // Use local API route for config (with built-in fallback to external API)
-    return `/public/config/${language}/${configType}`;
+    return `/api/config/${language}/${configType}`;
   }
 
   /**
    * Build URL for manifest file
    */
   manifest(language: SupportedLanguage = DEFAULT_LANGUAGE): string {
-    return `/public/manifest/${language}`;
+    return `/api/manifest/${language}`;
   }
 
   /**
    * Build URL for image
    */
   image(imagePath: string): string {
-    return `${DOMAINS.CDN}/public/image/${imagePath}`;
+    return `${DOMAINS.CDN}/api/image/${imagePath}`;
   }
 
   /**
    * Build URL for file (resume, logo, etc)
    */
   file(filePath: string): string {
-    return `${DOMAINS.PRODUCTION_API}/public/storage-files/${filePath}`;
+    return `${DOMAINS.PRODUCTION_API}/api/storage-files/${filePath}`;
   }
 
   /**
@@ -999,7 +999,7 @@ export class UrlBuilder {
    * Build URL for logo
    */
   logo(logoPath: string = 'logo-svg'): string {
-    return `${DOMAINS.PRODUCTION_API}/public/storage-files/${logoPath}`;
+    return `${DOMAINS.PRODUCTION_API}/api/storage-files/${logoPath}`;
   }
 
   /**
@@ -1010,7 +1010,7 @@ export class UrlBuilder {
     filename: string,
     language: SupportedLanguage = DEFAULT_LANGUAGE
   ): string {
-    return `${DOMAINS.PRODUCTION_API}/public/collections/${language}/${type}/${filename}.json`;
+    return `${DOMAINS.PRODUCTION_API}/api/collections/${language}/${type}/${filename}.json`;
   }
 
   /**
@@ -1032,7 +1032,7 @@ export const urlBuilder = new UrlBuilder();
 
 ### Step 3: Create Base Fetcher
 
-#### 3.1 `src/lib/public/fetchers/baseFetcher.ts`
+#### 3.1 `src/lib/api/fetchers/baseFetcher.ts`
 
 ```typescript
 /**
@@ -1134,7 +1134,7 @@ export abstract class BaseFetcher<T = any> {
 
 ### Step 4: Create Specialized Fetchers
 
-#### 4.1 `src/lib/public/fetchers/dataFetcher.ts`
+#### 4.1 `src/lib/api/fetchers/dataFetcher.ts`
 
 ```typescript
 /**
@@ -1222,7 +1222,7 @@ export class DataFetcher extends BaseFetcher<any> {
 export const dataFetcher = new DataFetcher();
 ```
 
-#### 4.2 `src/lib/public/fetchers/configFetcher.ts`
+#### 4.2 `src/lib/api/fetchers/configFetcher.ts`
 
 ```typescript
 /**
@@ -1272,7 +1272,7 @@ export class ConfigFetcher extends BaseFetcher<any> {
 export const configFetcher = new ConfigFetcher();
 ```
 
-#### 4.3 `src/lib/public/fetchers/resourceFetcher.ts`
+#### 4.3 `src/lib/api/fetchers/resourceFetcher.ts`
 
 ```typescript
 /**
@@ -1349,7 +1349,7 @@ export const resourceFetcher = new ResourceFetcher();
 
 ### Step 5: Create Public API
 
-#### 5.1 `src/lib/public/index.ts`
+#### 5.1 `src/lib/api/index.ts`
 
 ```typescript
 /**
@@ -1424,16 +1424,16 @@ export const DOMAINS = {
 export const API_ENDPOINTS = {
   // Collection-based endpoints
   dataCollections: (language: string, type: string) =>
-    `${DOMAINS.PRODUCTION_API}/public/collections/${language}/data/${type}.json`,
+    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/data/${type}.json`,
   configCollections: (language: string, type: string) =>
-    `${DOMAINS.PRODUCTION_API}/public/collections/${language}/config/${type}.json`,
+    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/config/${type}.json`,
 
   // Local API routes
-  manifest: (language: string) => `/public/manifest/${language}`,
-  configRoute: (language: string, type: string) => `/public/config/${language}/${type}`,
+  manifest: (language: string) => `/api/manifest/${language}`,
+  configRoute: (language: string, type: string) => `/api/config/${language}/${type}`,
 
   // Storage and files
-  storageFiles: (filename: string) => `${DOMAINS.PRODUCTION_API}/public/storage-files/${filename}`,
+  storageFiles: (filename: string) => `${DOMAINS.PRODUCTION_API}/api/storage-files/${filename}`,
   resume: (filename: string) => `${DOMAINS.PRODUCTION_API}/resume/${filename}`,
 
   // Third-party
@@ -1527,12 +1527,12 @@ export const logger = {
 
 ```typescript
 // Before (verbose, scattered imports):
-import { fetchProjects } from '@/lib/public/publicClient';
-import { getResume } from '@/lib/public/publicClient';
-import { getImage } from '@/lib/public/publicClient';
+import { fetchProjects } from '@/lib/api/apiClient';
+import { getResume } from '@/lib/api/apiClient';
+import { getImage } from '@/lib/api/apiClient';
 
 // After (clean, single import):
-import { api } from '@/lib/public';
+import { api } from '@/lib/api';
 
 // Usage:
 const projects = await api.data.getProjects(language);
@@ -1563,7 +1563,7 @@ const { data: projects, loading, error } = useData(
 ### Cache Management
 
 ```typescript
-import { cacheManager } from '@/lib/public';
+import { cacheManager } from '@/lib/api';
 
 // Clear cache by pattern
 cacheManager.clear('data:en:.*');  // Clear all English data
@@ -1577,7 +1577,7 @@ console.log(`Cache has ${stats.size} entries`);
 
 ## Migration Checklist
 
-- [ ] Create all new files in `/src/lib/public/`
+- [ ] Create all new files in `/src/lib/api/`
 - [ ] Create `logger.ts` in `/src/lib/utils/`
 - [ ] Move `src/config/domains.ts` to `src/lib/config/constants.ts`
 - [ ] Update imports in: projects.ts, skills.ts, experience.ts hooks
@@ -1593,14 +1593,14 @@ console.log(`Cache has ${stats.size} entries`);
 ## Testing Strategy
 
 For each new file, create corresponding test:
-- `src/lib/public/core/__tests__/cache.test.ts`
-- `src/lib/public/core/__tests__/httpClient.test.ts`
-- `src/lib/public/fetchers/__tests__/dataFetcher.test.ts`
+- `src/lib/api/core/__tests__/cache.test.ts`
+- `src/lib/api/core/__tests__/httpClient.test.ts`
+- `src/lib/api/fetchers/__tests__/dataFetcher.test.ts`
 - etc.
 
 Example test:
 ```typescript
-import { cacheManager } from '@/lib/public/core/cache';
+import { cacheManager } from '@/lib/api/core/cache';
 
 describe('CacheManager', () => {
   beforeEach(() => cacheManager.clear());
@@ -1804,8 +1804,8 @@ Before deploying to production:
 **Dependencies Added:** None (zero additional packages)
 
 **API Endpoints:**
-- Languages: https://static-api-opal.vercel.app/public/config/languages.json
-- Content: https://static-api-opal.vercel.app/public/collections/{code}/data/{fileType}.json
+- Languages: https://static-api-opal.vercel.app/api/config/languages.json
+- Content: https://static-api-opal.vercel.app/api/collections/{code}/data/{fileType}.json
 
 **Caching Strategy:**
 - API config: 1 hour
@@ -1925,9 +1925,9 @@ No additional work required before deployment.
 ### Files Created (9 total)
 
 #### Route Handlers (3)
-- ✅ `src/app/public/config/[language]/[configType]/route.ts` - Config endpoint
-- ✅ `src/app/public/manifest/[language]/route.ts` - Manifest endpoint
-- ✅ `src/app/public/sw/route.ts` - Service worker endpoint
+- ✅ `src/app/api/config/[language]/[configType]/route.ts` - Config endpoint
+- ✅ `src/app/api/manifest/[language]/route.ts` - Manifest endpoint
+- ✅ `src/app/api/sw/route.ts` - Service worker endpoint
 
 #### Documentation (6)
 - ✅ `DYNAMIC_ROUTES_SETUP.md` - Complete setup guide
@@ -1954,19 +1954,19 @@ No additional work required before deployment.
 ### New API Endpoints (3)
 
 ```
-GET /public/config/{language}/{configType}
+GET /api/config/{language}/{configType}
 ├── Returns: Language-specific config JSON
 ├── Cache: 1 hour
 ├── Fallback: English if language not found
 └── Supported configs: apiConfig, pageLayout, urlConfig
 
-GET /public/manifest/{language}
+GET /api/manifest/{language}
 ├── Returns: Language-specific manifest.json
 ├── Cache: 1 day
 ├── Supports: 11 languages
 └── Includes: Localized app name, description, shortcuts
 
-GET /public/sw
+GET /api/sw
 ├── Returns: Dynamically generated service worker
 ├── Cache: 1 hour
 ├── Features: Auto-versioning, cache management
@@ -2042,9 +2042,9 @@ Total: 11 languages × 3 routes = 33 language variations
 ## 🧪 Testing Checklist
 
 ### Manual Testing
-- [ ] Test config route: `curl /public/config/en/publicConfig`
-- [ ] Test manifest route: `curl /public/manifest/ta`
-- [ ] Test service worker: `curl /public/sw`
+- [ ] Test config route: `curl /api/config/en/apiConfig`
+- [ ] Test manifest route: `curl /api/manifest/ta`
+- [ ] Test service worker: `curl /api/sw`
 - [ ] Verify no 404s in Network tab
 - [ ] Check cache headers in DevTools
 - [ ] Test service worker registration
@@ -2287,11 +2287,11 @@ This document indexes all changes made to fix the 404 errors for config, manifes
 ### Route Handlers (3 files)
 
 #### 1. Config Route Handler
-**Path**: `src/app/public/config/[language]/[configType]/route.ts`
+**Path**: `src/app/api/config/[language]/[configType]/route.ts`
 
 ```typescript
 // Serves language-specific config files
-GET /public/config/{language}/{configType}
+GET /api/config/{language}/{configType}
 - Loads from /public/collections/{language}/config/
 - Falls back to English if language not found
 - Returns JSON with proper cache headers
@@ -2307,11 +2307,11 @@ GET /public/config/{language}/{configType}
 ---
 
 #### 2. Manifest Route Handler
-**Path**: `src/app/public/manifest/[language]/route.ts`
+**Path**: `src/app/api/manifest/[language]/route.ts`
 
 ```typescript
 // Generates language-specific PWA manifest
-GET /public/manifest/{language}
+GET /api/manifest/{language}
 - Generates localized app manifest
 - Includes language-specific metadata
 - Supports 11 languages
@@ -2327,11 +2327,11 @@ GET /public/manifest/{language}
 ---
 
 #### 3. Service Worker Route Handler
-**Path**: `src/app/public/sw/route.ts`
+**Path**: `src/app/api/sw/route.ts`
 
 ```typescript
 // Dynamically generates service worker
-GET /public/sw
+GET /api/sw
 - Generates service worker at runtime
 - Includes timestamp-based versioning
 - Cache management logic
@@ -2506,9 +2506,9 @@ src/
 ### Dynamic Routes
 Routes that generate content at runtime based on parameters:
 ```
-GET /public/config/ta/publicConfig → Tamil API config
-GET /public/manifest/en → English manifest
-GET /public/sw → Service worker (no language)
+GET /api/config/ta/apiConfig → Tamil API config
+GET /api/manifest/en → English manifest
+GET /api/sw → Service worker (no language)
 ```
 
 ### Language-Aware
@@ -2546,7 +2546,7 @@ Service Worker: 1 hour + stale-while-revalidate
 
 ### Issue: Service worker not registering
 **Solution**:
-1. Check `/public/sw` returns 200
+1. Check `/api/sw` returns 200
 2. Verify `Service-Worker-Allowed` header
 3. Clear browser cache and service workers
 
@@ -2586,16 +2586,16 @@ All of the following should be true:
 
 ```bash
 # Test config route
-curl http://localhost:3000/public/config/en/publicConfig
+curl http://localhost:3000/api/config/en/apiConfig
 
 # Test manifest route
-curl http://localhost:3000/public/manifest/ta
+curl http://localhost:3000/api/manifest/ta
 
 # Test service worker
-curl http://localhost:3000/public/sw | head -10
+curl http://localhost:3000/api/sw | head -10
 
 # Search for hardcoded paths
-grep -r "/config/" src/ | grep -v "/public/config"
+grep -r "/config/" src/ | grep -v "/api/config"
 grep -r "sw.js" src/ | grep -v getServiceWorkerUrl
 grep -r "manifest.json" src/ | grep -v getManifestUrl
 ```

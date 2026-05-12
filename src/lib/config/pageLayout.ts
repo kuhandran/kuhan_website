@@ -5,7 +5,7 @@ import { skillsData } from '@/lib/data/skills';
 import { educationData } from '@/lib/data/education';
 import { contentLabels } from '@/lib/data/contentLabels';
 import { fetchPageLayout, getPageLayoutSync } from '@/lib/config/loaders';
-import { fetchCollectionData } from '@/lib/public/fetchers';
+import { fetchCollectionData } from '@/lib/api/fetchers';
 import { DEFAULT_LANGUAGE, SupportedLanguage } from '@/lib/config/domains';
 
 /**

@@ -12,7 +12,7 @@ All components now use the `getImage()` utility function for handling image URLs
 **Status**: Already implemented
 
 ```typescript
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 const imageSrc = getImage(IMAGE_ASSETS.profile.webp);
 const webpSrc = getImage(IMAGE_ASSETS.profile.webp);
@@ -23,7 +23,7 @@ const webpSrc = getImage(IMAGE_ASSETS.profile.webp);
 ### 2. TimelineItem Component ✅
 **File**: `src/components/elements/TimelineItem.tsx`
 **Changes**:
-- ✅ Added `import { getImage } from '@/lib/public/publicClient';`
+- ✅ Added `import { getImage } from '@/lib/api/apiClient';`
 - ✅ Wrapped `logo` parameter with `getImage(logo)`
 - ✅ Applied to both source and img elements for WebP support
 
@@ -46,7 +46,7 @@ const webpSrc = getImage(IMAGE_ASSETS.profile.webp);
 ### 3. ProjectCard Component ✅
 **File**: `src/components/elements/ProjectCard.tsx`
 **Changes**:
-- ✅ Added `import { getImage } from '@/lib/public/publicClient';`
+- ✅ Added `import { getImage } from '@/lib/api/apiClient';`
 - ✅ Wrapped `image` parameter with `getImage(image)`
 - ✅ Applied to both source and img elements for WebP support
 
@@ -69,7 +69,7 @@ const webpSrc = getImage(IMAGE_ASSETS.profile.webp);
 ### 4. ImageCarousel Component ✅
 **File**: `src/components/elements/ImageCarousel.tsx`
 **Changes**:
-- ✅ Added `import { getImage } from '@/lib/public/publicClient';`
+- ✅ Added `import { getImage } from '@/lib/api/apiClient';`
 - ✅ Wrapped all `images[index]` references with `getImage()`
 - ✅ Applied to both main display and thumbnail images
 
@@ -170,7 +170,7 @@ getImage(url) → Extracts path, handles domain, returns full URL
 | `src/components/elements/TimelineItem.tsx` | Added `getImage()` import and wrapped logo | ✅ Done |
 | `src/components/elements/ProjectCard.tsx` | Added `getImage()` import and wrapped image | ✅ Done |
 | `src/components/elements/ImageCarousel.tsx` | Added `getImage()` import and wrapped images | ✅ Done |
-| `src/lib/public/publicClient.ts` | Created `getImage()` and `extractPath()` functions | ✅ Already done |
+| `src/lib/api/apiClient.ts` | Created `getImage()` and `extractPath()` functions | ✅ Already done |
 | `src/lib/data/contentLabels.ts` | Updated to use `getInfoFromAPI()` | ✅ Already done |
 | `src/lib/analytics/visitorAnalytics.ts` | Updated to use `getInfoFromAPI()` | ✅ Already done |
 
@@ -179,7 +179,7 @@ getImage(url) → Extracts path, handles domain, returns full URL
 ## Documentation References
 
 ### API Utilities
-- Main utility functions: [src/lib/public/publicClient.ts](src/lib/public/publicClient.ts)
+- Main utility functions: [src/lib/api/apiClient.ts](src/lib/api/apiClient.ts)
 - Usage guide: [API_UTILITY_FUNCTIONS_USAGE.md](API_UTILITY_FUNCTIONS_USAGE.md)
 
 ### Component Structure
@@ -253,7 +253,7 @@ All 11 language files have proper structure:
 ### Adding New Component with Images
 
 ```typescript
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 export function MyComponent({ imageUrl }: { imageUrl: string }) {
   return (
@@ -269,7 +269,7 @@ export function MyComponent({ imageUrl }: { imageUrl: string }) {
 ### Using Multiple Images
 
 ```typescript
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 export function MultiImageComponent({ images }: { images: string[] }) {
   return (
@@ -329,7 +329,7 @@ Comprehensive analysis of image URL handling and component JSON configuration ac
 - ✅ Automatic domain extraction from full URLs
 
 ```typescript
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 const imageSrc = getImage(IMAGE_ASSETS.profile.webp);
 const webpSrc = getImage(IMAGE_ASSETS.profile.webp);
@@ -454,7 +454,7 @@ const logo; // from prop
 <img src={logo} alt={company} />
 
 // AFTER
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 const displayLogo = logo ? getImage(logo) : null;
 <img src={displayLogo} alt={company} />
@@ -467,7 +467,7 @@ const displayLogo = logo ? getImage(logo) : null;
 <img src={image} alt={title} />
 
 // AFTER
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 const displayImage = getImage(image);
 const displayImageWebp = getImage(image.replace(/\.(png|jpg|jpeg)$/i, '.webp'));
@@ -481,7 +481,7 @@ const displayImageWebp = getImage(image.replace(/\.(png|jpg|jpeg)$/i, '.webp'));
 <img src={images[currentImageIndex]} alt={...} />
 
 // AFTER
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 const displayImage = getImage(images[currentImageIndex]);
 <img src={displayImage} alt={...} />
@@ -590,7 +590,7 @@ Estimated 3-4 additional updates needed to complete full image URL consistency a
 ### Template for Component Image Wrapping
 
 ```typescript
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 interface YourComponentProps {
   imageUrl: string;
@@ -614,7 +614,7 @@ export function YourComponent({ imageUrl, ...props }: YourComponentProps) {
 ### For Multiple Images (like ImageCarousel)
 
 ```typescript
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 
 interface ImageCarouselProps {
   images: string[];

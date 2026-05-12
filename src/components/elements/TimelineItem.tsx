@@ -4,7 +4,7 @@
 
 import { Badge } from './Badge';
 import { Card } from './Card';
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 import { CheckCircle2, Briefcase, MapPin, Calendar } from 'lucide-react';
 
 interface TimelineItemProps {

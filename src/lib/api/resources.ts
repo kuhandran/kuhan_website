@@ -12,8 +12,8 @@ import { getFromCache, setInCache } from './cache-legacy';
 // ============================================================================
 
 const STATIC_API_BASE = 'https://static.kuhandranchatbot.info';
-const BACKEND_API_BASE = 'https://public-gateway-9unh.onrender.com';
-const STORAGE_FILES_URL = `${STATIC_API_BASE}/public/storage-files`;
+const BACKEND_API_BASE = 'https://api-gateway-9unh.onrender.com';
+const STORAGE_FILES_URL = `${STATIC_API_BASE}/api/storage-files`;
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -61,11 +61,11 @@ export function getImage(path: string): string {
   // Remove duplicate API path prefixes to avoid duplication
   let finalPath = cleanPath;
   
-  // Remove '/public/image/' prefix if it already exists
+  // Remove '/api/image/' prefix if it already exists
   if (finalPath.startsWith('api/image/')) {
     finalPath = finalPath.substring(10); // Remove 'api/image/'
-  } else if (finalPath.startsWith('/public/image/')) {
-    finalPath = finalPath.substring(11); // Remove '/public/image/'
+  } else if (finalPath.startsWith('/api/image/')) {
+    finalPath = finalPath.substring(11); // Remove '/api/image/'
   }
   
   // Remove 'image/' prefix if it exists
@@ -73,7 +73,7 @@ export function getImage(path: string): string {
     finalPath = finalPath.substring(6); // Remove 'image/'
   }
   
-  const imageUrl = `${STATIC_API_BASE}/public/image/${finalPath}`;
+  const imageUrl = `${STATIC_API_BASE}/api/image/${finalPath}`;
   console.log(`[API] Image URL: ${imageUrl}`);
   return imageUrl;
 }
@@ -111,7 +111,7 @@ export async function preloadImages(imagePaths: string[]): Promise<void> {
  */
 export function getResume(path: string): string {
   const cleanPath = extractPath(path);
-  const resumeUrl = `${STATIC_API_BASE}/public/resume/${cleanPath}`;
+  const resumeUrl = `${STATIC_API_BASE}/api/resume/${cleanPath}`;
   console.log(`[API] Resume URL: ${resumeUrl}`);
   return resumeUrl;
 }
@@ -127,7 +127,7 @@ export function getResume(path: string): string {
  */
 export function getConfig(path: string): string {
   const cleanPath = extractPath(path);
-  const configUrl = `${STATIC_API_BASE}/public/config/${cleanPath}`;
+  const configUrl = `${STATIC_API_BASE}/api/config/${cleanPath}`;
   console.log(`[API] Config URL: ${configUrl}`);
   return configUrl;
 }
@@ -217,7 +217,7 @@ export async function getCollection<T = unknown>(
   if (cached) return cached;
 
   try {
-    const fullUrl = `${STATIC_API_BASE}/public/collections/${language}/${type}/${cleanUrl}`;
+    const fullUrl = `${STATIC_API_BASE}/api/collections/${language}/${type}/${cleanUrl}`;
     console.log(`[API] Fetching collection: ${fullUrl}`);
     
     const response = await fetch(fullUrl, {

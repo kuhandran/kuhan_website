@@ -7,8 +7,8 @@ import { getDataSourceUrl } from '@/lib/config/loaders';
  * Language-Specific Config Route Handler
  * Serves config files based on language code
  * 
- * Usage: GET /public/config/{language}/{configType}
- * Example: GET /public/config/en/publicConfig
+ * Usage: GET /api/config/{language}/{configType}
+ * Example: GET /api/config/en/apiConfig
  *          → returns English apiConfig.json with Content-Type: application/json
  *
  * Supported config types:

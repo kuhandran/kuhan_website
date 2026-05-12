@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { getErrorMessageSync } from '@/lib/config/loaders';
-import { fetchContentLabels as fetchContentLabelsAPI } from '@/lib/public/publicClient';
+import { fetchContentLabels as fetchContentLabelsAPI } from '@/lib/api/apiClient';
 import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
 import { useLanguage } from '@/lib/hooks/useLanguageHook';
 

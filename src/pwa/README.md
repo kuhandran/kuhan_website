@@ -372,8 +372,8 @@ caches.delete('v1.0.0-api');
 ## 📚 Resources
 
 - [Web App Manifest](https://www.w3.org/TR/appmanifest/)
-- [Service Workers API](https://developer.mozilla.org/docs/Web/public/Service_Worker_API)
-- [Cache API](https://developer.mozilla.org/docs/Web/public/Cache)
+- [Service Workers API](https://developer.mozilla.org/docs/Web/API/Service_Worker_API)
+- [Cache API](https://developer.mozilla.org/docs/Web/API/Cache)
 - [PWA Best Practices](https://web.dev/pwa/)
 
 ---

@@ -318,7 +318,7 @@ export function getApiConfigSync() {
  * - getDataSourceUrl('contentLabels.json', 'en', 'data')
  *   → https://static-api-opal.vercel.app/collections/en/data/contentLabels.json
  * - getDataSourceUrl('apiConfig.json', 'ta', 'config')
- *   → https://static-api-opal.vercel.app/collections/ta/config/publicConfig.json
+ *   → https://static-api-opal.vercel.app/collections/ta/config/apiConfig.json
  */
 export function getDataSourceUrl(
   filename: string,
@@ -360,16 +360,16 @@ export function getMultilingualUrl(
  * 
  * Examples:
  * - getConfigUrl('apiConfig', 'en')
- *   → /public/config/en/publicConfig
+ *   → /api/config/en/apiConfig
  * - getConfigUrl('pageLayout', 'ta')
- *   → /public/config/ta/pageLayout
+ *   → /api/config/ta/pageLayout
  */
 export function getConfigUrl(
   configName: string,
   languageCode: string = DEFAULT_LANGUAGE
 ): string {
   // Use local dynamic API route instead of external API
-  return `/public/config/${languageCode}/${configName}`;
+  return `/api/config/${languageCode}/${configName}`;
 }
 
 // ============================================================================

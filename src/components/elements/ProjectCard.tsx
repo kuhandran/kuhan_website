@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import { Badge } from './Badge';
-import { getImage } from '@/lib/public/publicClient';
+import { getImage } from '@/lib/api/apiClient';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 
 interface ProjectCardProps {

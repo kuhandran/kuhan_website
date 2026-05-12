@@ -1,7 +1,7 @@
 /**
  * Cache Clear API Endpoint
- * GET /public/cache/clear - Clears all service worker caches
- * GET /public/cache/clear?type=api - Clears specific cache type
+ * GET /api/cache/clear - Clears all service worker caches
+ * GET /api/cache/clear?type=api - Clears specific cache type
  */
 
 import { NextRequest, NextResponse } from 'next/server';

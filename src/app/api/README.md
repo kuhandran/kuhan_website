@@ -1,4 +1,4 @@
-# src/app/public/ - API Routes
+# src/app/api/ - API Routes
 
 Server-side endpoints and backend logic for the application.
 
@@ -23,10 +23,10 @@ API routes are serverless functions that handle:
 
 ## 📋 Endpoint Reference
 
-### POST /public/contact
+### POST /api/contact
 Contact form submission endpoint with email notifications and auto-reply.
 
-**Endpoint:** `POST /public/contact`
+**Endpoint:** `POST /api/contact`
 
 **Content-Type:** `multipart/form-data`
 
@@ -53,7 +53,7 @@ formData.append('subject', 'Collaboration Inquiry')
 formData.append('message', 'I would like to discuss a potential project...')
 formData.append('phoneNumber', '+1 (555) 123-4567')
 
-const response = await fetch('/public/contact', {
+const response = await fetch('/api/contact', {
   method: 'POST',
   body: formData
 })
@@ -221,7 +221,7 @@ function ContactForm() {
     }
 
     try {
-      const response = await fetch('/public/contact', {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         body: formData
       })
@@ -280,7 +280,7 @@ async function sendContactMessage(data) {
     formData.append(key, value)
   })
 
-  const response = await fetch('/public/contact', {
+  const response = await fetch('/api/contact', {
     method: 'POST',
     body: formData
   })
@@ -474,10 +474,10 @@ console.log(`Request completed in ${duration}ms`)
 
 ### Unit Tests
 ```typescript
-describe('POST /public/contact', () => {
+describe('POST /api/contact', () => {
   it('returns 400 for missing fields', async () => {
     const res = await POST(
-      new NextRequest(new URL('http://localhost:3000/public/contact'), {
+      new NextRequest(new URL('http://localhost:3000/api/contact'), {
         method: 'POST'
       })
     )
@@ -492,7 +492,7 @@ describe('POST /public/contact', () => {
     formData.append('message', 'Test message')
 
     const res = await POST(
-      new NextRequest(new URL('http://localhost:3000/public/contact'), {
+      new NextRequest(new URL('http://localhost:3000/api/contact'), {
         method: 'POST',
         body: formData
       })

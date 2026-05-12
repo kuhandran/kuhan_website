@@ -8,7 +8,7 @@ import { SectionCard } from '../elements/SectionCard';
 import { Users, Briefcase, TrendingUp } from 'lucide-react';
 import { useContentLabels } from '../../lib/data/contentLabels';
 import { API_ENDPOINTS, IMAGE_ASSETS } from '@/lib/config/domains';
-import { getImage, getResume } from '@/lib/public/publicClient';
+import { getImage, getResume } from '@/lib/api/apiClient';
 
 // Default fallback for About section - matches CDN data exactly
 const DEFAULT_ABOUT_LABELS = {

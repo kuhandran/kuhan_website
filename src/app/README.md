@@ -95,7 +95,7 @@ Keyframe animations and animation utilities.
 ### `api/contact/route.ts`
 Contact form API endpoint.
 
-**Endpoint:** `POST /public/contact`
+**Endpoint:** `POST /api/contact`
 
 **Request Body:**
 ```typescript
@@ -127,7 +127,7 @@ export default function NewPage() {
 
 ### Add New API Endpoint
 ```typescript
-// app/public/new-endpoint/route.ts
+// app/api/new-endpoint/route.ts
 export async function POST(req: Request) {
   const data = await req.json()
   // Process and respond
@@ -195,4 +195,4 @@ All files use strict TypeScript mode
 
 - [Parent: README.md](../../README.md) - Project overview
 - [Components: components/README.md](../components/README.md) - Component system
-- [API: components/public/README.md](../components/public/README.md) - API endpoints
+- [API: components/api/README.md](../components/api/README.md) - API endpoints

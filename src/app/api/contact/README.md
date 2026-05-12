@@ -17,7 +17,7 @@ Main API route handler for POST requests from the contact form.
 - ✅ Sends auto-reply email to visitor
 - ✅ Handles errors and returns appropriate status codes
 
-**Endpoint**: `POST /public/contact`
+**Endpoint**: `POST /api/contact`
 
 **Request Body**:
 ```typescript

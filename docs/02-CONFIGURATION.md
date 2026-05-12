@@ -7,13 +7,13 @@
 
 ### Dynamic Config Routes (with language support)
 ```
-GET /public/config/{language}/{configType}
+GET /api/config/{language}/{configType}
 ```
 
 **Examples:**
-- `http://localhost:3000/public/config/en/publicConfig` → Returns English API config
-- `http://localhost:3000/public/config/es/pageLayout` → Returns Spanish page layout
-- `http://localhost:3000/public/config/ta/urlConfig` → Returns Tamil URL config
+- `http://localhost:3000/api/config/en/apiConfig` → Returns English API config
+- `http://localhost:3000/api/config/es/pageLayout` → Returns Spanish page layout
+- `http://localhost:3000/api/config/ta/urlConfig` → Returns Tamil URL config
 
 **Supported Languages:** en, es, fr, de, hi, ta, ar-AE, id, my, si, th
 
@@ -31,12 +31,12 @@ Registration: navigator.serviceWorker.register('/files/sw.js')
 
 ### Web App Manifest
 ```
-GET /public/manifest/{language}
+GET /api/manifest/{language}
 ```
 
 **Examples:**
-- `http://localhost:3000/public/manifest/en` → English manifest
-- `http://localhost:3000/public/manifest/es` → Spanish manifest
+- `http://localhost:3000/api/manifest/en` → English manifest
+- `http://localhost:3000/api/manifest/es` → Spanish manifest
 
 ---
 
@@ -73,7 +73,7 @@ Features:
 │   ├── sw.js             # Service worker
 │   ├── logo.svg          # Logo icon
 │   ├── apple-touch-icon.svg
-│   ├── manifest.json     # Legacy (use /public/manifest/{lang} instead)
+│   ├── manifest.json     # Legacy (use /api/manifest/{lang} instead)
 │   ├── robots.txt
 │   ├── sitemap.xml
 │   └── ...
@@ -132,13 +132,13 @@ All domains, endpoints, and file names are defined in:
 ### Test Config Routes
 ```bash
 # English config
-curl http://localhost:3000/public/config/en/publicConfig
+curl http://localhost:3000/api/config/en/apiConfig
 
 # Spanish config
-curl http://localhost:3000/public/config/es/pageLayout
+curl http://localhost:3000/api/config/es/pageLayout
 
 # Tamil config with fallback
-curl http://localhost:3000/public/config/ta/urlConfig
+curl http://localhost:3000/api/config/ta/urlConfig
 ```
 
 ### Browser Navigation
@@ -157,7 +157,7 @@ https://static.kuhandranchatbot.info/public/collections/{language}/config/{confi
 
 Now served locally via:
 ```
-GET /public/config/{language}/{configType}
+GET /api/config/{language}/{configType}
 ```
 
 This allows:
@@ -170,10 +170,10 @@ This allows:
 
 ## Migration Notes
 
-- Old path: `/config/pageLayout.json` → New: `/public/config/en/pageLayout`
-- Old path: `/config/publicConfig.json` → New: `/public/config/en/publicConfig`
-- Old path: `/public/sw` → New: `/files/sw.js` (static file)
-- Old path: `/manifest.json` → New: `/public/manifest/en` (dynamic)
+- Old path: `/config/pageLayout.json` → New: `/api/config/en/pageLayout`
+- Old path: `/config/apiConfig.json` → New: `/api/config/en/apiConfig`
+- Old path: `/api/sw` → New: `/files/sw.js` (static file)
+- Old path: `/manifest.json` → New: `/api/manifest/en` (dynamic)
 
 All code has been updated to use the new routes through centralized helpers.
 # Centralized Domain Configuration Guide
@@ -249,10 +249,10 @@ const url = API_ENDPOINTS.cdnImage('profile.webp');
 
 // Internal API routes
 const url = API_ENDPOINTS.contentProxy('data');
-// → '/public/content/data'
+// → '/api/content/data'
 
 const url = API_ENDPOINTS.analyticsVisitor();
-// → '/public/analytics/visitor'
+// → '/api/analytics/visitor'
 
 // Local files
 const url = API_ENDPOINTS.localConfig('urlConfig');
@@ -340,7 +340,7 @@ The following files have been updated to use the centralized domain configuratio
 5. **[src/components/sections/About.tsx](src/components/sections/About.tsx)**
    - Uses `API_ENDPOINTS.cdnImage()` and `IMAGE_ASSETS` for profile images
 
-6. **[src/app/public/content/[type]/route.ts](src/app/public/content/[type]/route.ts)**
+6. **[src/app/api/content/[type]/route.ts](src/app/api/content/[type]/route.ts)**
    - Uses `getCollectionUrl()` for API calls
    - Uses `DOMAINS.getAppUrl()` for dynamic host URLs
 
@@ -354,7 +354,7 @@ To add a new domain or API endpoint:
 ```typescript
 export const DOMAINS = {
   // ... existing
-  NEW_SERVICE: 'https://public.newservice.com',
+  NEW_SERVICE: 'https://api.newservice.com',
 } as const;
 ```
 
@@ -363,7 +363,7 @@ export const DOMAINS = {
 export const API_ENDPOINTS = {
   // ... existing
   newServiceEndpoint: (param: string) =>
-    `${DOMAINS.NEW_SERVICE}/public/${param}`,
+    `${DOMAINS.NEW_SERVICE}/api/${param}`,
 } as const;
 ```
 
@@ -436,8 +436,8 @@ GET /image/{imagePath}
 
 ### Internal API Routes
 ```
-POST /public/analytics/visitor
-GET /public/content/{type}?language={lang}&file={file}
+POST /api/analytics/visitor
+GET /api/content/{type}?language={lang}&file={file}
 ```
 
 ### Third-Party APIs

@@ -9,7 +9,7 @@ import { Button } from '../elements/Button';
 import { ResumePDFViewer } from '../elements/ResumePDFViewer';
 import { LanguageSwitcher } from '../language/LanguageSwitcher';
 import { Menu, X, Download } from 'lucide-react';
-import { getResume } from '@/lib/public/publicClient';
+import { getResume } from '@/lib/api/apiClient';
 import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
 export const Navbar = () => {

@@ -260,7 +260,7 @@ async function networkFirstStrategy(request) {
  */
 function isImageRequest(url) {
   return /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i.test(url.pathname) ||
-         url.pathname.includes('/public/image/') ||
+         url.pathname.includes('/api/image/') ||
          url.hostname === 'static.kuhandranchatbot.info' &&
          (url.pathname.includes('/image/') || /\.(webp|png|jpg|jpeg|gif)$/i.test(url.pathname));
 }
@@ -269,7 +269,7 @@ function isImageRequest(url) {
  * Check if request is for API endpoint
  */
 function isApiRequest(url) {
-  return url.pathname.includes('/public/') && !isImageRequest(url);
+  return url.pathname.includes('/api/') && !isImageRequest(url);
 }
 
 /**

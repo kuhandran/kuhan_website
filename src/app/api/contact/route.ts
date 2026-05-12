@@ -1,5 +1,5 @@
 // ============================================
-// FILE: src/app/public/contact/route.ts
+// FILE: src/app/api/contact/route.ts
 // Clean API Route Using Organized Templates
 // ============================================
 

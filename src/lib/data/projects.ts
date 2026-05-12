@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { ProjectCardProps } from '@/lib/config/types';
-import { fetchProjects as fetchProjectsAPI } from '@/lib/public/publicClient';
+import { fetchProjects as fetchProjectsAPI } from '@/lib/api/apiClient';
 import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
 import { useLanguage } from '@/lib/hooks/useLanguageHook';
 

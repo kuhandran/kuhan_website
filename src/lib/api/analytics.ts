@@ -20,7 +20,7 @@ export async function submitContact(data: {
   subject?: string;
 }): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch('/public/contact', {
+    const response = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -51,7 +51,7 @@ export async function trackEvent(event: {
   value?: number;
 }): Promise<void> {
   try {
-    await fetch('/public/analytics/event', {
+    await fetch('/api/analytics/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(event),

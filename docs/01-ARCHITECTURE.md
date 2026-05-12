@@ -4,7 +4,7 @@
 
 ### BEFORE (❌ 404 Errors)
 ```
-Browser Request: GET /config/publicConfig.json
+Browser Request: GET /config/apiConfig.json
                     ↓
             Check /public/ directory
                     ↓
@@ -31,17 +31,17 @@ Browser Request: GET /sw.js
 
 ### AFTER (✅ All Working)
 ```
-Browser Request: GET /public/config/en/publicConfig
+Browser Request: GET /api/config/en/apiConfig
                     ↓
             Route Handler: [language]/[configType]/route.ts
                     ↓
-            Load: /public/collections/en/config/publicConfig.json
+            Load: /public/collections/en/config/apiConfig.json
                     ↓
             Serve with Cache-Control headers
                     ↓
             Return 200 + JSON
                     
-Browser Request: GET /public/manifest/ta
+Browser Request: GET /api/manifest/ta
                     ↓
             Route Handler: manifest/[language]/route.ts
                     ↓
@@ -51,7 +51,7 @@ Browser Request: GET /public/manifest/ta
                     ↓
             Return 200 + Manifest JSON
                     
-Browser Request: GET /public/sw
+Browser Request: GET /api/sw
                     ↓
             Route Handler: sw/route.ts
                     ↓
@@ -164,7 +164,7 @@ Project Root
                  ┌───────────────┼───────────────┐
                  │               │               │
         ┌────────▼─────┐ ┌───────▼─────┐ ┌──────▼────────┐
-        │ /public/config/ │ │/public/manifest/│ │    /public/sw    │
+        │ /api/config/ │ │/api/manifest/│ │    /api/sw    │
         │ [lang]/      │ │   [lang]     │ │               │
         │ [configType] │ │              │ │               │
         ├──────────────┤ ├──────────────┤ ├───────────────┤
@@ -211,7 +211,7 @@ User Changes Language → 'ta' (Tamil)
            ├─── getManifestUrl('ta')
            │    │
            │    ▼
-           │    /public/manifest/ta
+           │    /api/manifest/ta
            │    │
            │    ▼
            │    Load MANIFEST_TEMPLATES['ta']
@@ -222,7 +222,7 @@ User Changes Language → 'ta' (Tamil)
            ├─── getConfigRouteUrl('ta', 'pageLayout')
            │    │
            │    ▼
-           │    /public/config/ta/pageLayout
+           │    /api/config/ta/pageLayout
            │    │
            │    ▼
            │    Load /public/collections/ta/config/pageLayout.json
@@ -244,7 +244,7 @@ User Changes Language → 'ta' (Tamil)
 Request Timeline:
 
 T=0ms
-  GET /public/config/en/publicConfig
+  GET /api/config/en/apiConfig
   │
   ├─ Check browser cache (miss)
   │
@@ -257,12 +257,12 @@ T=0ms
      stale-while-revalidate=86400
 
 T=1-3600ms
-  GET /public/config/en/publicConfig
+  GET /api/config/en/apiConfig
   │
   └─ Served from browser cache ⚡ (instant)
 
 T=3600ms+
-  GET /public/config/en/publicConfig
+  GET /api/config/en/apiConfig
   │
   ├─ Stale in cache (but still valid for 1 day)
   │
@@ -277,7 +277,7 @@ T=3600ms+
 ## 6. Language Code Resolution
 
 ```
-Request: GET /public/manifest/{language}
+Request: GET /api/manifest/{language}
          │
          ▼
 ┌─────────────────────────────┐
@@ -308,28 +308,28 @@ Request: GET /public/manifest/{language}
 ## 7. Route Hierarchy
 
 ```
-/public/
+/api/
 ├── /config/
 │   └── /[language]/
 │       └── /[configType]/
 │           └── route.ts
 │
-│   GET /public/config/en/publicConfig
-│   GET /public/config/ta/pageLayout
-│   GET /public/config/ar-AE/urlConfig
+│   GET /api/config/en/apiConfig
+│   GET /api/config/ta/pageLayout
+│   GET /api/config/ar-AE/urlConfig
 │
 ├── /manifest/
 │   └── /[language]/
 │       └── route.ts
 │
-│   GET /public/manifest/en
-│   GET /public/manifest/ta
-│   GET /public/manifest/ar-AE
+│   GET /api/manifest/en
+│   GET /api/manifest/ta
+│   GET /api/manifest/ar-AE
 │
 └── /sw/
     └── route.ts
     
-    GET /public/sw
+    GET /api/sw
 ```
 
 ---
@@ -340,13 +340,13 @@ Request: GET /public/manifest/{language}
 Browser Request
      │
      ├─ Accept: application/json
-     │  └─ /public/config/* → Returns JSON
+     │  └─ /api/config/* → Returns JSON
      │
      ├─ Accept: application/manifest+json
-     │  └─ /public/manifest/* → Returns Manifest
+     │  └─ /api/manifest/* → Returns Manifest
      │
      └─ Accept: application/javascript
-        └─ /public/sw → Returns Service Worker JS
+        └─ /api/sw → Returns Service Worker JS
 ```
 
 ---
@@ -354,7 +354,7 @@ Browser Request
 ## 9. Error Handling Flow
 
 ```
-GET /public/config/invalid-lang/publicConfig
+GET /api/config/invalid-lang/apiConfig
          │
          ▼
 ┌──────────────────────────────┐
@@ -417,7 +417,7 @@ Improvement: 5.2× faster, 0 errors
 └───┬────┘ └────┬────┘ └──────┬──────┘
     │           │             │
     ▼           ▼             ▼
-/public/manifest/ /public/config/  /public/sw
+/api/manifest/ /api/config/  /api/sw
  {language}    {lang}/{type}
 ```
 

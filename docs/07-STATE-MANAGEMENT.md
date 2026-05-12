@@ -82,7 +82,7 @@ import {
   fetchProjects, 
   submitContact,
   trackEvent 
-} from '@/lib/public/publicClient';
+} from '@/lib/api/apiClient';
 
 // Fetch data
 const projects = await fetchProjects('en');
@@ -184,7 +184,7 @@ export function Header() {
 'use client';
 
 import { useState } from 'react';
-import { fetchAllEssentialData } from '@/lib/public/publicClient';
+import { fetchAllEssentialData } from '@/lib/api/apiClient';
 import { useCurrentLanguage } from '@/lib/hooks/useRedux';
 
 export function ManualDataLoader() {

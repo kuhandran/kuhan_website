@@ -65,7 +65,7 @@ export default async function Home() {
 │         Next.js Build Time              │
 ├─────────────────────────────────────────┤
 │                                         │
-│  1. Request → /public/.../data.js          │
+│  1. Request → /api/.../data.js          │
 │  2. Static API → CacheManager           │
 │  3. Render HTML with data               │
 │  4. Save as static .html file           │
@@ -140,7 +140,7 @@ Next.js now **prebuilds** the home page during `npm run build`:
 Route (app)
 ┌ ○ /                          ← Static (prerendered at build time)
 ├ ○ /_not-found                ← Static
-├ ƒ /public/...                   ← Dynamic (server-rendered)
+├ ƒ /api/...                   ← Dynamic (server-rendered)
 ├ ○ /case-studies              ← Static
 ├ ○ /config                    ← Static
 ```
@@ -165,7 +165,7 @@ Browser                Server
   |                      |
   |-- Execute JS         |
   |-- useEffect()        |
-  |-- fetch /public/data    |-------|
+  |-- fetch /api/data    |-------|
   |                      |       |
   |                      |<-- API Response
   |                      |-------|
@@ -184,7 +184,7 @@ Browser                Server
 Build Time
 ┌─────────────────────────┐
 │ npm run build           │
-│ ├─ fetch /public/data      │
+│ ├─ fetch /api/data      │
 │ ├─ render HTML          │
 │ └─ save static file     │
 └─────────────────────────┘
@@ -295,7 +295,7 @@ return (
 
 ### Server-Side (During Build)
 ```typescript
-// CacheManager in src/lib/public/cache/manager.ts
+// CacheManager in src/lib/api/cache/manager.ts
 class CacheManager {
   private cache = new Map();
   private ttl = 5 * 60 * 1000; // 5 minutes
@@ -330,7 +330,7 @@ class CacheManager {
 
 ### Server Component (page.tsx)
 - ✅ Async function
-- ✅ Direct database/public access
+- ✅ Direct database/API access
 - ✅ Sensitive data (keys, tokens) safe
 - ✅ Large dependencies don't reach browser
 - ✅ Fetches data once at build time
@@ -370,11 +370,11 @@ export const PageRenderer: React.FC<PageRendererProps> = ({ config }) => {
 Route (app)
 ┌ ○ /                          ← Static ✅ (prerendered as static content)
 ├ ○ /_not-found
-├ ƒ /public/analytics/visitor
-├ ƒ /public/config/[language]/[configType]
-├ ƒ /public/contact
-├ ƒ /public/content/[type]
-├ ƒ /public/manifest/[language]
+├ ƒ /api/analytics/visitor
+├ ƒ /api/config/[language]/[configType]
+├ ƒ /api/contact
+├ ƒ /api/content/[type]
+├ ƒ /api/manifest/[language]
 ├ ○ /case-studies              ← Static ✅
 ├ ƒ /case-studies/[slug]       ← Dynamic
 ├ ○ /config                    ← Static ✅

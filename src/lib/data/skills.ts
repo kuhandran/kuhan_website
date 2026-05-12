@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { fetchSkills as fetchSkillsAPI } from '@/lib/public/publicClient';
+import { fetchSkills as fetchSkillsAPI } from '@/lib/api/apiClient';
 import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
 import { useLanguage } from '@/lib/hooks/useLanguageHook';
 
