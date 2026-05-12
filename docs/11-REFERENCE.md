@@ -292,7 +292,7 @@ This caused 404 errors when loading configurations.
 ## Root Cause
 The API route was using `readFile()` to read from a local `/public/collections/` directory that doesn't exist. The config files are actually served from the static API:
 ```
-https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+https://static.kuhandranchatbot.info/api/collections/en/config/apiConfig
 ```
 
 ---
@@ -311,7 +311,7 @@ const response = await fetch(url);  // ❌ Relative URL, server-side fetch fails
 **After:**
 ```typescript
 const url = getDataSourceUrl('apiConfig', languageCode, 'config');
-// → https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+// → https://static.kuhandranchatbot.info/api/collections/en/config/apiConfig
 const response = await fetch(url);  // ✅ Full URL, works on server
 ```
 
@@ -352,7 +352,7 @@ API Route Handler (route.ts)
     ↓
 Calls getApiConfig('en')
     ↓
-Fetches: https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+Fetches: https://static.kuhandranchatbot.info/api/collections/en/config/apiConfig
     ↓
 Returns JSON Response with proper caching headers
     ↓
@@ -390,7 +390,7 @@ Before:
 
 After:
 ✅ Loading config: en/apiConfig
-✅ Fetching config: https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+✅ Fetching config: https://static.kuhandranchatbot.info/api/collections/en/config/apiConfig
 ✅ Loaded apiConfig for en
 ```
 # Code Review & Fixes - Progress Report

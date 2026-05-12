@@ -8,7 +8,7 @@ The website now features a fully automated language dropdown system that fetches
 ### Components & Files
 
 #### 1. **Language Configuration** (`src/lib/config/languageConfig.ts`)
-- Fetches language list from API: `https://static.kuhandranchatbot.info/public/config/languages`
+- Fetches language list from API: `https://static.kuhandranchatbot.info/api/config/languages`
 - Caches language configuration for 1 hour
 - Provides fallback to local default languages if API is unavailable
 - Supports 10 languages: English, Arabic, Spanish, French, Hindi, Indonesian, Burmese, Sinhala, Tamil, Thai
@@ -123,7 +123,7 @@ export function MyComponent() {
 
 ### Languages Configuration
 ```
-GET https://static.kuhandranchatbot.info/public/config-file/languages
+GET https://static.kuhandranchatbot.info/api/config-file/languages
 ```
 
 **Response:**
@@ -157,13 +157,13 @@ GET https://static.kuhandranchatbot.info/public/config-file/languages
 
 ### Locale Data
 ```
-GET https://static.kuhandranchatbot.info/public/collections/{code}/data/{fileType}
+GET https://static.kuhandranchatbot.info/api/collections/{code}/data/{fileType}
 ```
 
 **Example:**
 ```
-https://static.kuhandranchatbot.info/public/collections/ta/data/contentLabels
-https://static.kuhandranchatbot.info/public/collections/ar-AE/data/projects
+https://static.kuhandranchatbot.info/api/collections/ta/data/contentLabels
+https://static.kuhandranchatbot.info/api/collections/ar-AE/data/projects
 ```
 
 ## Supported Languages
@@ -2299,7 +2299,7 @@ export function LanguageButtons() {
 
 /*
 FETCH LANGUAGES:
-GET https://static.kuhandranchatbot.info/public/config/languages
+GET https://static.kuhandranchatbot.info/api/config/languages
 
 Response Structure:
 {
@@ -2330,12 +2330,12 @@ Response Structure:
 }
 
 FETCH CONTENT FOR A LANGUAGE:
-GET https://static.kuhandranchatbot.info/public/collections/{code}/data/{fileType}
+GET https://static.kuhandranchatbot.info/api/collections/{code}/data/{fileType}
 
 Examples:
-https://static.kuhandranchatbot.info/public/collections/ta/data/contentLabels
-https://static.kuhandranchatbot.info/public/collections/ar-AE/data/projects
-https://static.kuhandranchatbot.info/public/collections/en/data/experience
+https://static.kuhandranchatbot.info/api/collections/ta/data/contentLabels
+https://static.kuhandranchatbot.info/api/collections/ar-AE/data/projects
+https://static.kuhandranchatbot.info/api/collections/en/data/experience
 */
 
 // ============================================================================
