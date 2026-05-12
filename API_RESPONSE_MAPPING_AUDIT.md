@@ -15,7 +15,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
 #### Functions Modified:
 
 #### `fetchConfig<T>()` 
-- **Endpoint Pattern:** `https://static.kuhandranchatbot.info/api/collections/{language}/config/{configType}`
+- **Endpoint Pattern:** `https://static.kuhandranchatbot.info/public/collections/{language}/config/{configType}`
 - **Config Types:** `apiConfig`, `pageLayout`, `urlConfig`
 - **Change:** Extract `response.data || response` to unwrap API wrapper
 - **Before:**
@@ -32,7 +32,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
   ```
 
 #### `fetchCollectionData<T>()`
-- **Endpoint Pattern:** `https://static.kuhandranchatbot.info/api/collections/{language}/data/{dataType}`
+- **Endpoint Pattern:** `https://static.kuhandranchatbot.info/public/collections/{language}/data/{dataType}`
 - **Data Types:** `projects`, `experience`, `skills`, `education`, `achievements`, `caseStudies`, `contentLabels`
 - **Change:** Extract `response.data || response` to unwrap API wrapper
 - **Before:**
@@ -49,7 +49,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
   ```
 
 #### `fetchManifest()`
-- **Endpoint:** `https://static.kuhandranchatbot.info/api/manifest/{language}`
+- **Endpoint:** `https://static.kuhandranchatbot.info/public/manifest/{language}`
 - **Change:** Extract `response.data || response`
 - **Applied same mapping pattern as above**
 
@@ -87,7 +87,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
 **Purpose:** Static API resource utilities (images, resumes, configs, storage files)
 
 #### `getStorageFile<T>()`
-- **Endpoint:** `https://static.kuhandranchatbot.info/api/storage-files/{fileName}`
+- **Endpoint:** `https://static.kuhandranchatbot.info/public/storage-files/{fileName}`
 - **Change:** Extract `response.data || response`
 - **Before:**
   ```typescript
@@ -103,7 +103,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
   ```
 
 #### `getCollection<T>()`
-- **Endpoint:** `https://static.kuhandranchatbot.info/api/collections/{language}/{type}/{cleanUrl}`
+- **Endpoint:** `https://static.kuhandranchatbot.info/public/collections/{language}/{type}/{cleanUrl}`
 - **Change:** Extract `response.data || response`
 - **Applied same mapping pattern as above**
 
@@ -135,7 +135,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
 
 #### GET Handler
 - **Route:** `/api/content/[type]?language={language}&file={fileName}`
-- **External API Call:** Proxies to `https://static.kuhandranchatbot.info/api/collections/{language}/{type}/{fileName}`
+- **External API Call:** Proxies to `https://static.kuhandranchatbot.info/public/collections/{language}/{type}/{fileName}`
 - **Change:** Extract `response.data || response` before returning
 - **Before:**
   ```typescript

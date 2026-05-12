@@ -87,10 +87,10 @@ async function precacheEssentialData() {
     }
 
     const essentialUrls = [
-      'https://static.kuhandranchatbot.info/api/collections/en/data/contentLabels',
-      'https://static.kuhandranchatbot.info/api/collections/en/data/projects',
-      'https://static.kuhandranchatbot.info/api/collections/en/data/experience',
-      'https://static.kuhandranchatbot.info/api/collections/en/data/skills',
+      'https://static.kuhandranchatbot.info/public/collections/en/data/contentLabels',
+      'https://static.kuhandranchatbot.info/public/collections/en/data/projects',
+      'https://static.kuhandranchatbot.info/public/collections/en/data/experience',
+      'https://static.kuhandranchatbot.info/public/collections/en/data/skills',
     ];
 
     // Send message to active service worker

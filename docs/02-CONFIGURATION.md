@@ -152,7 +152,7 @@ curl http://localhost:3000/api/config/ta/urlConfig
 
 The application previously used:
 ```
-https://static.kuhandranchatbot.info/api/collections/{language}/config/{configType}
+https://static.kuhandranchatbot.info/public/collections/{language}/config/{configType}
 ```
 
 Now served locally via:
@@ -237,11 +237,11 @@ const appUrl = DOMAINS.getAppUrl();
 ```typescript
 // Production API collection
 const url = API_ENDPOINTS.collections('en', 'data', 'experience');
-// → 'https://static.kuhandranchatbot.info/api/collections/en/data/experience'
+// → 'https://static.kuhandranchatbot.info/public/collections/en/data/experience'
 
 // CDN data
 const url = API_ENDPOINTS.cdnData('skills');
-// → 'https://static.kuhandranchatbot.info/api/collections/en/data/skills'
+// → 'https://static.kuhandranchatbot.info/public/collections/en/data/skills'
 
 // CDN images
 const url = API_ENDPOINTS.cdnImage('profile.webp');
@@ -303,7 +303,7 @@ const logo = IMAGE_ASSETS.logo;                 // 'logo.svg'
 ```typescript
 const imageSrc = 'https://static.kuhandranchatbot.info/image/profile.webp';
 const response = await fetch('https://ipapi.co/json/');
-const apiUrl = 'https://static.kuhandranchatbot.info/api/collections/en/data/experience';
+const apiUrl = 'https://static.kuhandranchatbot.info/public/collections/en/data/experience';
 ```
 
 ### After (Using Centralized Config)
@@ -402,7 +402,7 @@ export const SUPPORTED_LANGUAGES = [
 
 ### Production API
 ```
-Base: https://static.kuhandranchatbot.info/api
+Base: https://static.kuhandranchatbot.info/public
 
 Data Collections:
 GET /collections/{language}/data/{file}

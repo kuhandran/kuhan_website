@@ -55,7 +55,7 @@ CACHE_NAMES = {
 - WebP optimized versions
 
 ### API Endpoints
-- `https://static.kuhandranchatbot.info/api/collections/*/data/*.json`
+- `https://static.kuhandranchatbot.info/public/collections/*/data/*.json`
 - `https://api-gateway-9unh.onrender.com/api/*`
 - Config and manifest files
 
@@ -140,8 +140,8 @@ import {
 
 // Pre-cache specific API URLs
 await precacheApis([
-  'https://static.kuhandranchatbot.info/api/collections/en/data/projects.json',
-  'https://static.kuhandranchatbot.info/api/collections/en/data/experience.json',
+  'https://static.kuhandranchatbot.info/public/collections/en/data/projects.json',
+  'https://static.kuhandranchatbot.info/public/collections/en/data/experience.json',
 ]);
 
 // Pre-cache images
@@ -152,7 +152,7 @@ await precacheImages([
 
 // Pre-cache CDN content
 await precacheCdnContent([
-  'https://static.kuhandranchatbot.info/api/collections/en/data/contentLabels.json',
+  'https://static.kuhandranchatbot.info/public/collections/en/data/contentLabels.json',
 ]);
 
 // Clear all caches

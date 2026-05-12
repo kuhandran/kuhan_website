@@ -4,7 +4,7 @@
  * - Each component loads its own data via useXXX() hooks
  * - Data is fetched on-demand when component renders
  * - Uses production API with language codes
- * API: https://static.kuhandranchatbot.info/api/collections/{language}/data/{fileType}
+ * API: https://static.kuhandranchatbot.info/public/collections/{language}/data/{fileType}
  */
 
 import { getApiBaseUrl } from '@/lib/config/loaders';
