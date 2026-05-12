@@ -40,25 +40,25 @@ export const DOMAINS = {
 export const API_ENDPOINTS = {
   // Production API paths
   collections: (language: string, type: 'data' | 'config', file: string) =>
-    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/${type}/${file}`,
+    `${DOMAINS.PRODUCTION_API}/public/collections/${language}/${type}/${file}`,
 
   // Internal API routes
-  contentProxy: (type: string) => `/api/content/${type}`,
-  analyticsVisitor: () => '/api/analytics/visitor',
+  contentProxy: (type: string) => `/public/content/${type}`,
+  analyticsVisitor: () => '/public/analytics/visitor',
 
   // Language-specific config routes
   configRoute: (language: string, configType: string) =>
-    `/api/config/${language}/${configType}`,
+    `/public/config/${language}/${configType}`,
   manifestRoute: (language: string = DEFAULT_LANGUAGE) =>
-    `/api/manifest/${language}`,
+    `/public/manifest/${language}`,
 
   // CDN paths
   cdnData: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/data/${file}`,
+    `${DOMAINS.CDN}/public/collections/en/data/${file}`,
   cdnConfig: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/config/${file}`,
+    `${DOMAINS.CDN}/public/collections/en/config/${file}`,
   cdnImage: (imagePath: string) =>
-    `${DOMAINS.CDN}/api/image/${imagePath}`,
+    `${DOMAINS.CDN}/public/image/${imagePath}`,
 
   // Third-party APIs
   ipGeolocation: () => `${DOMAINS.IP_API}/json/`,
@@ -193,7 +193,7 @@ export function getIpGeolocationUrl(): string {
 /**
  * Get content proxy URL for internal API
  * @example getContentProxyUrl('data')
- *          → '/api/content/data'
+ *          → '/public/content/data'
  */
 export function getContentProxyUrl(
   type: 'data' | 'config',
@@ -220,7 +220,7 @@ export function getAppUrl(): string {
 /**
  * Get language-specific config URL
  * @example getConfigRouteUrl('en', 'apiConfig')
- *          → '/api/config/en/apiConfig'
+ *          → '/public/config/en/publicConfig'
  */
 export function getConfigRouteUrl(
   language: SupportedLanguage = DEFAULT_LANGUAGE,
@@ -232,7 +232,7 @@ export function getConfigRouteUrl(
 /**
  * Get language-specific manifest URL
  * @example getManifestUrl('en')
- *          → '/api/manifest/en'
+ *          → '/public/manifest/en'
  */
 export function getManifestUrl(
   language: SupportedLanguage = DEFAULT_LANGUAGE

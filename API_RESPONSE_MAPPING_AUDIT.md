@@ -9,7 +9,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
 
 ## Files Updated
 
-### 1. [src/lib/api/fetchers.ts](src/lib/api/fetchers.ts)
+### 1. [src/lib/public/fetchers.ts](src/lib/public/fetchers.ts)
 **Purpose:** Central API data fetcher for configurations and collections
 
 #### Functions Modified:
@@ -59,7 +59,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
 **Purpose:** Multilingual content loader with caching
 
 #### `getMultilingualContent()`
-- **Endpoint:** `/api/content/data?language={language}&file={fileType}` (proxied to CDN)
+- **Endpoint:** `/public/content/data?language={language}&file={fileType}` (proxied to CDN)
 - **Change:** Extract `response.data || response` from proxy response
 - **Before:**
   ```typescript
@@ -83,7 +83,7 @@ This document outlines the audit and fixes applied to ensure all API responses f
 
 ---
 
-### 3. [src/lib/api/resources.ts](src/lib/api/resources.ts)
+### 3. [src/lib/public/resources.ts](src/lib/public/resources.ts)
 **Purpose:** Static API resource utilities (images, resumes, configs, storage files)
 
 #### `getStorageFile<T>()`
@@ -130,11 +130,11 @@ This document outlines the audit and fixes applied to ensure all API responses f
 
 ---
 
-### 5. [src/app/api/content/[type]/route.ts](src/app/api/content/[type]/route.ts)
+### 5. [src/app/public/content/[type]/route.ts](src/app/public/content/[type]/route.ts)
 **Purpose:** Next.js API proxy route for fetching multilingual content
 
 #### GET Handler
-- **Route:** `/api/content/[type]?language={language}&file={fileName}`
+- **Route:** `/public/content/[type]?language={language}&file={fileName}`
 - **External API Call:** Proxies to `https://static.kuhandranchatbot.info/public/collections/{language}/{type}/{fileName}`
 - **Change:** Extract `response.data || response` before returning
 - **Before:**
@@ -157,26 +157,26 @@ This document outlines the audit and fixes applied to ensure all API responses f
 ### Configuration Endpoints
 | Endpoint | Pattern | Status |
 |----------|---------|--------|
-| API Config | `/api/collections/{lang}/config/apiConfig` | ✅ Fixed |
-| Page Layout | `/api/collections/{lang}/config/pageLayout` | ✅ Fixed |
-| URL Config | `/api/collections/{lang}/config/urlConfig` | ✅ Fixed |
-| Manifest | `/api/manifest/{lang}` | ✅ Fixed |
+| API Config | `/public/collections/{lang}/config/publicConfig` | ✅ Fixed |
+| Page Layout | `/public/collections/{lang}/config/pageLayout` | ✅ Fixed |
+| URL Config | `/public/collections/{lang}/config/urlConfig` | ✅ Fixed |
+| Manifest | `/public/manifest/{lang}` | ✅ Fixed |
 
 ### Data Endpoints
 | Endpoint | Pattern | Status |
 |----------|---------|--------|
-| Projects | `/api/collections/{lang}/data/projects` | ✅ Fixed |
-| Experience | `/api/collections/{lang}/data/experience` | ✅ Fixed |
-| Skills | `/api/collections/{lang}/data/skills` | ✅ Fixed |
-| Education | `/api/collections/{lang}/data/education` | ✅ Fixed |
-| Achievements | `/api/collections/{lang}/data/achievements` | ✅ Fixed |
-| Case Studies | `/api/collections/{lang}/data/caseStudies` | ✅ Fixed |
-| Content Labels | `/api/collections/{lang}/data/contentLabels` | ✅ Fixed |
+| Projects | `/public/collections/{lang}/data/projects` | ✅ Fixed |
+| Experience | `/public/collections/{lang}/data/experience` | ✅ Fixed |
+| Skills | `/public/collections/{lang}/data/skills` | ✅ Fixed |
+| Education | `/public/collections/{lang}/data/education` | ✅ Fixed |
+| Achievements | `/public/collections/{lang}/data/achievements` | ✅ Fixed |
+| Case Studies | `/public/collections/{lang}/data/caseStudies` | ✅ Fixed |
+| Content Labels | `/public/collections/{lang}/data/contentLabels` | ✅ Fixed |
 
 ### Storage Endpoints
 | Endpoint | Pattern | Status |
 |----------|---------|--------|
-| Storage Files | `/api/storage-files/{fileName}` | ✅ Fixed |
+| Storage Files | `/public/storage-files/{fileName}` | ✅ Fixed |
 
 ---
 
@@ -251,7 +251,7 @@ const data = responseData.data || responseData;
 
 - [src/lib/config/domains.ts](src/lib/config/domains.ts) - API endpoint definitions
 - [src/lib/config/loaders.ts](src/lib/config/loaders.ts) - Data source URL resolution
-- [src/lib/api/cache-legacy.ts](src/lib/api/cache-legacy.ts) - Cache management
+- [src/lib/public/cache-legacy.ts](src/lib/public/cache-legacy.ts) - Cache management
 
 ---
 

@@ -7,7 +7,7 @@
  */
 
 import { API_ENDPOINTS } from '@/lib/config/domains';
-import { getInfoFromAPI } from '@/lib/api/apiClient';
+import { getInfoFromAPI } from '@/lib/public/publicClient';
 
 export interface LocationResponse {
   city: string;
@@ -120,7 +120,7 @@ async function detectOrganization(): Promise<null> {
     // This requires API key - alternative: use clearbit.com
     
     // For now, return null - you can integrate paid service later
-    // Example: Clearbit API - https://clearbit.com/resources/api
+    // Example: Clearbit API - https://clearbit.com/resources/public
     
     return null;
   } catch (error) {

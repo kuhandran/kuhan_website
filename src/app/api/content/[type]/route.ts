@@ -5,8 +5,8 @@ import { DOMAINS, DEFAULT_LANGUAGE, getCollectionUrl } from '@/lib/config/domain
  * API Proxy Route for fetching multilingual content
  * Handles both external API and local fallback
  * 
- * Usage: /api/content/[type]?language=en&file=experience
- * Example: /api/content/data?language=ta&file=experience
+ * Usage: /public/content/[type]?language=en&file=experience
+ * Example: /public/content/data?language=ta&file=experience
  * 
  * ⚠️ Domains are now centralized in src/config/domains.ts
  */

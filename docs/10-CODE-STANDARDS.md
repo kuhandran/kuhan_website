@@ -7,7 +7,7 @@ Each module should have ONE reason to change.
 
 ❌ **BAD** - Too many responsibilities:
 ```typescript
-// src/lib/api/apiClient.ts (658 lines)
+// src/lib/public/publicClient.ts (658 lines)
 // - Cache management
 // - HTTP requests
 // - URL building
@@ -17,10 +17,10 @@ Each module should have ONE reason to change.
 
 ✅ **GOOD** - Clear separation:
 ```typescript
-// src/lib/api/core/cache.ts → Cache management only
-// src/lib/api/core/httpClient.ts → HTTP requests only
-// src/lib/api/builders/urlBuilder.ts → URL building only
-// src/lib/api/fetchers/dataFetcher.ts → Data fetching only
+// src/lib/public/core/cache.ts → Cache management only
+// src/lib/public/core/httpClient.ts → HTTP requests only
+// src/lib/public/builders/urlBuilder.ts → URL building only
+// src/lib/public/fetchers/dataFetcher.ts → Data fetching only
 ```
 
 ---
@@ -42,7 +42,7 @@ const [cache, setCache] = useState({});
 
 ✅ **GOOD** - Single cache system:
 ```typescript
-import { cacheManager } from '@/lib/api';
+import { cacheManager } from '@/lib/public';
 
 cacheManager.set(key, data);
 const cached = cacheManager.get(key);
@@ -148,7 +148,7 @@ src/
 ```typescript
 // src/lib/hooks/useProjects.ts
 import { useData } from './useData';
-import { api } from '@/lib/api';
+import { api } from '@/lib/public';
 
 export function useProjects() {
   return useData((language) => api.data.getProjects(language));
@@ -184,7 +184,7 @@ const url = urlBuilder.image('profile.png');
 ❌ **WRONG**:
 ```typescript
 // URLs hardcoded everywhere
-const url = 'https://static-api-opal.vercel.app/api/collections/en/data/projects.json';
+const url = 'https://static-api-opal.vercel.app/public/collections/en/data/projects.json';
 const url = 'https://static.kuhandranchatbot.info/resume/resume.pdf';
 ```
 
@@ -194,7 +194,7 @@ const url = 'https://static.kuhandranchatbot.info/resume/resume.pdf';
 
 ✅ **CORRECT**:
 ```typescript
-import { APIError, NotFoundError, TimeoutError } from '@/lib/api';
+import { APIError, NotFoundError, TimeoutError } from '@/lib/public';
 
 try {
   const data = await api.data.getProjects(language);
@@ -403,7 +403,7 @@ Before Refactoring:
 
 After Refactoring:
 - Lines per file: 100-150 (max)
-- Import sources: 1 (src/lib/api)
+- Import sources: 1 (src/lib/public)
 - Caching implementations: 1
 - Code duplication: 0%
 ```
@@ -429,7 +429,7 @@ The codebase has **significant structural issues** and **redundancies** that don
 - `src/lib/config/appConfig.ts` - Config file loading
 - `src/lib/config/configLoader.ts` - Another config loader
 - `src/lib/utils/contentLoader.ts` - Yet another content loader
-- `src/lib/api/apiClient.ts` - API client with its own URL builders
+- `src/lib/public/publicClient.ts` - API client with its own URL builders
 
 **Impact**: 
 - Same logic duplicated across files
@@ -442,7 +442,7 @@ The codebase has **significant structural issues** and **redundancies** that don
 // In domains.ts
 export const API_ENDPOINTS = {
   collections: (language, type, file) => 
-    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/${type}/${file}.json`
+    `${DOMAINS.PRODUCTION_API}/public/collections/${language}/${type}/${file}.json`
 }
 
 // In dataConfig.ts
@@ -462,7 +462,7 @@ All three are building the same URLs differently!
 
 ### 2. **Bloated API Client (MAJOR)**
 
-**Problem**: `src/lib/api/apiClient.ts` (658 lines) is doing too much:
+**Problem**: `src/lib/public/publicClient.ts` (658 lines) is doing too much:
 - Generic fetch functions (`fetchConfig`, `fetchCollectionData`)
 - Specialized fetch functions (`fetchProjects`, `fetchSkills`, `fetchExperience`)
 - URL builders (`getResume`, `getLogoSvg`, `getManifestFromStorage`)
@@ -540,7 +540,7 @@ src/
 **Problems**:
 - `src/config/domains.ts` should be in `src/lib/config/` not separate
 - `lib/hooks/` and `lib/data/` are basically the same thing
-- `lib/utils/contentLoader.ts` duplicates `lib/api/apiClient.ts` functionality
+- `lib/utils/contentLoader.ts` duplicates `lib/public/publicClient.ts` functionality
 - No clear separation between data fetching, caching, and state management
 - `redux/` folder exists but unused
 
@@ -673,22 +673,22 @@ if (!response.ok) throw new Error(...);
 **Goal**: Single, unified API client with clear responsibilities
 
 **Files to Create**:
-1. `src/lib/api/core/httpClient.ts` - Raw HTTP requests with retries
-2. `src/lib/api/core/cache.ts` - Unified caching system
-3. `src/lib/api/core/types.ts` - API types and interfaces
-4. `src/lib/api/builders/urlBuilder.ts` - URL construction
-5. `src/lib/api/builders/requestBuilder.ts` - Request construction
-6. `src/lib/api/fetchers/baseFetcher.ts` - Base class for all fetchers
-7. `src/lib/api/fetchers/dataFetcher.ts` - Data collection fetching
-8. `src/lib/api/fetchers/configFetcher.ts` - Config fetching
-9. `src/lib/api/fetchers/resourceFetcher.ts` - Images, files, etc
-10. `src/lib/api/index.ts` - Clean public API
+1. `src/lib/public/core/httpClient.ts` - Raw HTTP requests with retries
+2. `src/lib/public/core/cache.ts` - Unified caching system
+3. `src/lib/public/core/types.ts` - API types and interfaces
+4. `src/lib/public/builders/urlBuilder.ts` - URL construction
+5. `src/lib/public/builders/requestBuilder.ts` - Request construction
+6. `src/lib/public/fetchers/baseFetcher.ts` - Base class for all fetchers
+7. `src/lib/public/fetchers/dataFetcher.ts` - Data collection fetching
+8. `src/lib/public/fetchers/configFetcher.ts` - Config fetching
+9. `src/lib/public/fetchers/resourceFetcher.ts` - Images, files, etc
+10. `src/lib/public/index.ts` - Clean public API
 
 **Files to Merge/Delete**:
-- Delete: `src/lib/config/dataConfig.ts` → Move to `src/lib/api/builders/`
+- Delete: `src/lib/config/dataConfig.ts` → Move to `src/lib/public/builders/`
 - Delete: `src/lib/config/configLoader.ts` → Merge into configFetcher
 - Delete: `src/lib/utils/contentLoader.ts` → Merge into dataFetcher
-- Refactor: `src/lib/api/apiClient.ts` → Split into modules above
+- Refactor: `src/lib/public/publicClient.ts` → Split into modules above
 - Update: `src/config/domains.ts` → Move to `src/lib/config/constants.ts`
 
 ---
@@ -709,7 +709,7 @@ export const FEATURE_FLAGS = { ... };
 export interface AppConfig { ... }
 export type SupportedLanguage = 'en' | 'es' | ...;
 
-// src/lib/api/index.ts - Clean public API
+// src/lib/public/index.ts - Clean public API
 export { httpClient } from './core/httpClient';
 export { getDataFetcher } from './fetchers/dataFetcher';
 export { getConfigFetcher } from './fetchers/configFetcher';
@@ -794,7 +794,7 @@ logger.debug('API', 'Fetching projects', { language });
 ### Phase 5: Improve Error Handling
 
 ```typescript
-// src/lib/api/core/errors.ts
+// src/lib/public/core/errors.ts
 export class APIError extends Error {
   constructor(
     public code: string,
@@ -834,14 +834,14 @@ if (!response.ok) {
 
 **Before** (Confusing - multiple sources):
 ```typescript
-import { fetchProjects } from '@/lib/api/apiClient';
+import { fetchProjects } from '@/lib/public/publicClient';
 import { getDataSourceUrl } from '@/lib/config/dataConfig';
 import { getApiConfig } from '@/lib/utils/contentLoader';
 ```
 
 **After** (Clear - single source):
 ```typescript
-import { api } from '@/lib/api';
+import { api } from '@/lib/public';
 // Use: api.data.getProjects(language)
 // Or: api.config.get('apiConfig', language)
 ```
@@ -1007,10 +1007,10 @@ npm run dev
 #### 2.1 Add Error Handling to API Routes (3-4 hours)
 
 **Files to Fix**:
-1. `src/app/api/contact/route.ts`
-2. `src/app/api/analytics/visitor/route.ts`
-3. `src/app/api/manifest/[language]/route.ts`
-4. `src/app/api/config/[language]/[configType]/route.ts`
+1. `src/app/public/contact/route.ts`
+2. `src/app/public/analytics/visitor/route.ts`
+3. `src/app/public/manifest/[language]/route.ts`
+4. `src/app/public/config/[language]/[configType]/route.ts`
 
 **Pattern to Apply**:
 ```typescript
@@ -1079,7 +1079,7 @@ if (!validateLanguage(params.language)) {
 
 #### 2.3 Create Unified Cache System (4-5 hours)
 
-**File to Create**: `src/lib/api/core/cache.ts`
+**File to Create**: `src/lib/public/core/cache.ts`
 
 ```typescript
 export class CacheManager {
@@ -1122,7 +1122,7 @@ export const cacheManager = new CacheManager();
 ```
 
 **Files to Update**:
-1. `src/lib/api/apiClient.ts` - Replace Map-based cache with CacheManager
+1. `src/lib/public/publicClient.ts` - Replace Map-based cache with CacheManager
 2. `src/lib/utils/contentLoader.ts` - Replace object-based cache with CacheManager
 
 **Estimated Effort**: 4-5 hours (includes testing)
@@ -1166,7 +1166,7 @@ grep -r "from '@/lib/redux'" src/
 **Target**: 5 focused modules
 
 ```
-src/lib/api/
+src/lib/public/
 ├── core/
 │   ├── httpClient.ts     (100-150 lines)
 │   ├── cache.ts          (Already created above)
@@ -1486,7 +1486,7 @@ fetchProjectsAPI(language as any)
 ---
 
 ### 1.2 Missing Error Handling in API Routes
-**Files**: src/app/api/contact/route.ts, src/app/api/analytics/visitor/route.ts
+**Files**: src/app/public/contact/route.ts, src/app/public/analytics/visitor/route.ts
 **Severity**: 🔴 CRITICAL  
 **Issue**: No try-catch or error handling in API endpoints
 **Status**: ❌ NOT FIXED
@@ -1505,7 +1505,7 @@ fetchProjectsAPI(language as any)
 ---
 
 ### 1.4 No Input Validation on API Routes
-**Files**: src/app/api/config/[language]/[configType]/route.ts, src/app/api/contact/route.ts
+**Files**: src/app/public/config/[language]/[configType]/route.ts, src/app/public/contact/route.ts
 **Severity**: 🔴 CRITICAL
 **Issue**: Missing validation for language codes and parameters
 **Status**: ❌ NOT FIXED
@@ -1541,7 +1541,7 @@ const language = languages?.[0];
 ## PRIORITY 2: IMPORTANT ISSUES (SHOULD FIX)
 
 ### 2.1 Massive apiClient.ts File (658 Lines)
-**File**: src/lib/api/apiClient.ts
+**File**: src/lib/public/publicClient.ts
 **Severity**: 🟠 HIGH
 **Issue**: Single file doing too much - violates SRP
 - Cache management
@@ -1765,7 +1765,7 @@ const scale = 100  // ← What scale?
 ---
 
 ### 3.5 Missing README in Subdirectories
-**Files**: src/lib/api/, src/components/, etc
+**Files**: src/lib/public/, src/components/, etc
 **Severity**: 🟡 LOW
 **Issue**: Complex folders lack documentation
 **Status**: ❌ NOT FIXED
@@ -1820,7 +1820,7 @@ const scale = 100  // ← What scale?
 - [ ] Export environment-based configuration
 - [ ] Add JSDoc for each export
 
-### src/lib/api/apiClient.ts (658 lines!)
+### src/lib/public/publicClient.ts (658 lines!)
 - [ ] Split into: httpClient.ts, cache.ts, fetchers.ts, urlBuilder.ts
 - [ ] Remove all `as any` type casts
 - [ ] Add error type definitions
@@ -1963,7 +1963,7 @@ const scale = 100  // ← What scale?
 - [ ] Verify all sections are rendered
 - [ ] Check responsive breakpoints
 
-### src/app/api/contact/route.ts
+### src/app/public/contact/route.ts
 - [ ] Add input validation
 - [ ] Add error handling
 - [ ] Add rate limiting
@@ -1972,20 +1972,20 @@ const scale = 100  // ← What scale?
 - [ ] Validate email format
 - [ ] Add JSDoc
 
-### src/app/api/analytics/visitor/route.ts
+### src/app/public/analytics/visitor/route.ts
 - [ ] Add error handling
 - [ ] Add validation for visitor data
 - [ ] Add rate limiting
 - [ ] Add request logging
 - [ ] Validate IP parsing
 
-### src/app/api/manifest/[language]/route.ts
+### src/app/public/manifest/[language]/route.ts
 - [ ] Validate language parameter
 - [ ] Add error handling
 - [ ] Add caching headers
 - [ ] Add JSDoc
 
-### src/app/api/config/[language]/[configType]/route.ts
+### src/app/public/config/[language]/[configType]/route.ts
 - [ ] Validate language parameter
 - [ ] Validate configType parameter
 - [ ] Add error handling

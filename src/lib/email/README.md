@@ -90,7 +90,7 @@ const userEmail = generateAutoReplyEmail({
 
 ## Email Configuration
 
-Emails are sent via `src/app/api/contact/route.ts` using:
+Emails are sent via `src/app/public/contact/route.ts` using:
 - **Service**: Nodemailer with Gmail
 - **Configuration**: Environment variables for SMTP details
 - **From Address**: Configured in API route
@@ -111,4 +111,4 @@ Emails are sent via `src/app/api/contact/route.ts` using:
 
 ## Environment Variables Required
 
-See `src/app/api/contact/route.ts` for email configuration requirements.
+See `src/app/public/contact/route.ts` for email configuration requirements.

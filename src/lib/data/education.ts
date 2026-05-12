@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { fetchEducation as fetchEducationAPI } from '@/lib/api/apiClient';
+import { fetchEducation as fetchEducationAPI } from '@/lib/public/publicClient';
 import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
 import { useLanguage } from '@/lib/hooks/useLanguageHook';
 

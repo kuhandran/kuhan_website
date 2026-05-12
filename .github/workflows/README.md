@@ -445,7 +445,7 @@ jobs:
     steps:
       - name: Generate Report
         run: |
-          curl https://api.github.com/repos/kuhandran/kuhan_website/code-scanning/alerts \
+          curl https://public.github.com/repos/kuhandran/kuhan_website/code-scanning/alerts \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             > security-report.json
       

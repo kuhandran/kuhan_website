@@ -1,7 +1,7 @@
 /**
  * Legacy API Cache Utilities
  * Used by fetchers.ts and resources.ts
- * NOTE: In future, migrate to CacheManager from '@/lib/api/cache'
+ * NOTE: In future, migrate to CacheManager from '@/lib/public/cache'
  */
 
 // Map-based cache for API responses (for backwards compatibility)

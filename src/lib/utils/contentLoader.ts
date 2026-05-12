@@ -3,11 +3,11 @@
  * Helper functions to fetch and cache multilingual content via Next.js API proxy
  * Automatically uses language code from context or defaults to 'en'
  * 
- * Flow: Component → /api/content/[type] → External API or Local Fallback
+ * Flow: Component → /public/content/[type] → External API or Local Fallback
  */
 
 import { getDataSourceUrl } from '@/lib/config/loaders';
-import { cacheManager } from '@/lib/api/cache';
+import { cacheManager } from '@/lib/public/cache';
 
 /**
  * Fetch multilingual content through Next.js API proxy
@@ -19,9 +19,9 @@ import { cacheManager } from '@/lib/api/cache';
  * 
  * Examples:
  * - getMultilingualContent('en', 'contentLabels')
- *   → GET /api/content/data?language=en&file=contentLabels
+ *   → GET /public/content/data?language=en&file=contentLabels
  * - getMultilingualContent('ta', 'projects')
- *   → GET /api/content/data?language=ta&file=projects
+ *   → GET /public/content/data?language=ta&file=projects
  */
 export async function getMultilingualContent(
   languageCode: string,
@@ -43,7 +43,7 @@ export async function getMultilingualContent(
   try {
     // Use Next.js API proxy instead of direct external API call
     // This avoids CORS issues and provides automatic fallback to local data
-    const proxyUrl = `/api/content/data?language=${languageCode}&file=${fileType}`;
+    const proxyUrl = `/public/content/data?language=${languageCode}&file=${fileType}`;
     console.log('[ContentLoader] Fetching via proxy', { language: languageCode, file: fileType });
     
     const response = await fetch(proxyUrl, {
@@ -144,7 +144,7 @@ export async function getAchievements(languageCode: string): Promise<unknown> {
  * 
  * Example:
  * const config = await getApiConfig('en');
- * // Access from: https://static-api-opal.vercel.app/collections/en/config/apiConfig.json
+ * // Access from: https://static-api-opal.vercel.app/collections/en/config/publicConfig.json
  */
 export async function getApiConfig(languageCode: string): Promise<unknown> {
   const cacheKey = `content-${languageCode}-apiConfig`;

@@ -45,7 +45,7 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
   languagesConfigPromise = (async () => {
     try {
       // Try to fetch from production API first
-      const { getInfoFromAPI } = await import('@/lib/api');
+      const { getInfoFromAPI } = await import('@/lib/public');
       const response = await getInfoFromAPI<{ data?: LanguagesConfig } | LanguagesConfig>(
         'GET',
         'api/config/languages',
@@ -170,8 +170,8 @@ export function getDefaultLanguagesConfig(): LanguagesConfig {
       'achievements',
     ],
     apiEndpoints: {
-      listLanguages: 'GET /api/config/languages',
-      getLocaleData: 'GET /api/collections/:language/:type/:file',
+      listLanguages: 'GET /public/config/languages',
+      getLocaleData: 'GET /public/collections/:language/:type/:file',
     },
   };
 }
@@ -204,7 +204,7 @@ export async function fetchLocaleData(
   fileType: string
 ): Promise<Record<string, unknown> | null> {
   try {
-    const { getCollection } = await import('@/lib/api');
+    const { getCollection } = await import('@/lib/public');
     const result = await getCollection<Record<string, unknown>>(
       `${fileType}`,
       'data',

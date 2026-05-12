@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { TimelineItemProps } from '@/lib/config/types';
-import { fetchExperience as fetchExperienceAPI } from '@/lib/api/apiClient';
+import { fetchExperience as fetchExperienceAPI } from '@/lib/public/publicClient';
 import { SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
 import { useLanguage } from '@/lib/hooks/useLanguageHook';
 

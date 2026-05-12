@@ -1607,9 +1607,9 @@ const projects = await loadLanguageData('ta', 'projects');
 The system provides these API endpoints (if using Next.js API routes):
 
 ```
-GET /api/config/languages          - Get languages configuration
-GET /api/collections/:lang/data/:type/:file   - Get language-specific data
-GET /api/content/data              - Get content via proxy
+GET /public/config/languages          - Get languages configuration
+GET /public/collections/:lang/data/:type/:file   - Get language-specific data
+GET /public/content/data              - Get content via proxy
 ```
 
 ## Example: Complete Language-Aware Component

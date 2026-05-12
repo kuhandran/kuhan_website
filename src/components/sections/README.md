@@ -437,7 +437,7 @@ export function Contact() {
   const handleOtpSuccess = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('/public/contact', {
         method: 'POST',
         body: JSON.stringify(formData)
       })

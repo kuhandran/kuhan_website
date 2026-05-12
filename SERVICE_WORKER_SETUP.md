@@ -56,7 +56,7 @@ CACHE_NAMES = {
 
 ### API Endpoints
 - `https://static.kuhandranchatbot.info/public/collections/*/data/*.json`
-- `https://api-gateway-9unh.onrender.com/api/*`
+- `https://public-gateway-9unh.onrender.com/public/*`
 - Config and manifest files
 
 ### Static Assets
@@ -263,6 +263,6 @@ This creates new cache storage, and old caches are automatically deleted during 
 
 ## API References
 
-- [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
-- [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache)
-- [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+- [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/public/Service_Worker_API)
+- [Cache API](https://developer.mozilla.org/en-US/docs/Web/public/Cache)
+- [Fetch API](https://developer.mozilla.org/en-US/docs/Web/public/Fetch_API)

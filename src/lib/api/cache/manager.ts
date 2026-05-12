@@ -10,7 +10,7 @@
  * 
  * Usage:
  * ```typescript
- * import { cacheManager } from '@/lib/api/cache/manager';
+ * import { cacheManager } from '@/lib/public/cache/manager';
  * 
  * // Set cache
  * cacheManager.set('projects-en', projects, 5 * 60 * 1000); // 5 minutes

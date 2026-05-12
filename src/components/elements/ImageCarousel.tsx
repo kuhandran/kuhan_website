@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getImage } from '@/lib/api/apiClient';
+import { getImage } from '@/lib/public/publicClient';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ImageCarouselProps {

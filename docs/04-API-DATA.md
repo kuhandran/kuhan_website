@@ -7,13 +7,13 @@ All data loading has been updated to use the production API with language code p
 ## API Endpoint Structure
 
 ```
-Base API: https://static-api-opal.vercel.app/api
+Base API: https://static-api-opal.vercel.app/public
 
 Data Files:
-https://static-api-opal.vercel.app/api/collections/{languageCode}/data/{fileType}.json
+https://static-api-opal.vercel.app/public/collections/{languageCode}/data/{fileType}.json
 
 Config Files:
-https://static-api-opal.vercel.app/api/collections/{languageCode}/config/{configName}.json
+https://static-api-opal.vercel.app/public/collections/{languageCode}/config/{configName}.json
 ```
 
 ## URL Examples
@@ -21,27 +21,27 @@ https://static-api-opal.vercel.app/api/collections/{languageCode}/config/{config
 ### Data Files
 ```
 English (en):
-- https://static-api-opal.vercel.app/api/collections/en/data/experience.json
-- https://static-api-opal.vercel.app/api/collections/en/data/contentLabels.json
-- https://static-api-opal.vercel.app/api/collections/en/data/projects.json
-- https://static-api-opal.vercel.app/api/collections/en/data/skills.json
-- https://static-api-opal.vercel.app/api/collections/en/data/education.json
-- https://static-api-opal.vercel.app/api/collections/en/data/achievements.json
+- https://static-api-opal.vercel.app/public/collections/en/data/experience.json
+- https://static-api-opal.vercel.app/public/collections/en/data/contentLabels.json
+- https://static-api-opal.vercel.app/public/collections/en/data/projects.json
+- https://static-api-opal.vercel.app/public/collections/en/data/skills.json
+- https://static-api-opal.vercel.app/public/collections/en/data/education.json
+- https://static-api-opal.vercel.app/public/collections/en/data/achievements.json
 
 Tamil (ta):
-- https://static-api-opal.vercel.app/api/collections/ta/data/experience.json
-- https://static-api-opal.vercel.app/api/collections/ta/data/contentLabels.json
+- https://static-api-opal.vercel.app/public/collections/ta/data/experience.json
+- https://static-api-opal.vercel.app/public/collections/ta/data/contentLabels.json
 
 Arabic (ar-AE):
-- https://static-api-opal.vercel.app/api/collections/ar-AE/data/experience.json
-- https://static-api-opal.vercel.app/api/collections/ar-AE/data/contentLabels.json
+- https://static-api-opal.vercel.app/public/collections/ar-AE/data/experience.json
+- https://static-api-opal.vercel.app/public/collections/ar-AE/data/contentLabels.json
 ```
 
 ### Config Files
 ```
-https://static-api-opal.vercel.app/api/collections/en/config/apiConfig.json
-https://static-api-opal.vercel.app/api/collections/ta/config/apiConfig.json
-https://static-api-opal.vercel.app/api/collections/ar-AE/config/pageLayout.json
+https://static-api-opal.vercel.app/public/collections/en/config/publicConfig.json
+https://static-api-opal.vercel.app/public/collections/ta/config/publicConfig.json
+https://static-api-opal.vercel.app/public/collections/ar-AE/config/pageLayout.json
 ```
 
 ## Updated Functions in `dataConfig.ts`
@@ -54,11 +54,11 @@ import { getDataSourceUrl } from '@/lib/config/dataConfig';
 
 // Get data file
 const url = getDataSourceUrl('experience.json', 'en', 'data');
-// → https://static-api-opal.vercel.app/api/collections/en/data/experience.json
+// → https://static-api-opal.vercel.app/public/collections/en/data/experience.json
 
 // Get config file
 const url = getDataSourceUrl('apiConfig.json', 'ta', 'config');
-// → https://static-api-opal.vercel.app/api/collections/ta/config/apiConfig.json
+// → https://static-api-opal.vercel.app/public/collections/ta/config/publicConfig.json
 ```
 
 ### 2. `getMultilingualUrl(fileType, languageCode)`
@@ -68,10 +68,10 @@ Shorthand for data files only.
 import { getMultilingualUrl } from '@/lib/config/dataConfig';
 
 const url = getMultilingualUrl('experience', 'en');
-// → https://static-api-opal.vercel.app/api/collections/en/data/experience.json
+// → https://static-api-opal.vercel.app/public/collections/en/data/experience.json
 
 const url = getMultilingualUrl('contentLabels', 'ar-AE');
-// → https://static-api-opal.vercel.app/api/collections/ar-AE/data/contentLabels.json
+// → https://static-api-opal.vercel.app/public/collections/ar-AE/data/contentLabels.json
 ```
 
 ### 3. `getConfigUrl(configName, languageCode)`
@@ -81,10 +81,10 @@ Shorthand for config files.
 import { getConfigUrl } from '@/lib/config/dataConfig';
 
 const url = getConfigUrl('apiConfig', 'en');
-// → https://static-api-opal.vercel.app/api/collections/en/config/apiConfig.json
+// → https://static-api-opal.vercel.app/public/collections/en/config/publicConfig.json
 
 const url = getConfigUrl('pageLayout', 'ta');
-// → https://static-api-opal.vercel.app/api/collections/ta/config/pageLayout.json
+// → https://static-api-opal.vercel.app/public/collections/ta/config/pageLayout.json
 ```
 
 ### 4. `getApiBaseUrl()`
@@ -94,7 +94,7 @@ Get the base API URL.
 import { getApiBaseUrl } from '@/lib/config/dataConfig';
 
 const base = getApiBaseUrl();
-// → https://static-api-opal.vercel.app/api
+// → https://static-api-opal.vercel.app/public
 ```
 
 ## Updated Functions in `contentLoader.ts`
@@ -149,7 +149,7 @@ export function ExperienceSection() {
   useEffect(() => {
     const loadExperience = async () => {
       // This will fetch from:
-      // https://static-api-opal.vercel.app/api/collections/{language}/data/experience.json
+      // https://static-api-opal.vercel.app/public/collections/{language}/data/experience.json
       const data = await getExperience(language);
       setExperience(data);
     };
@@ -339,7 +339,7 @@ try {
 Check console logs to see which URLs are being requested:
 
 ```
-📡 Fetching: https://static-api-opal.vercel.app/api/collections/en/data/experience.json
+📡 Fetching: https://static-api-opal.vercel.app/public/collections/en/data/experience.json
 ✅ Loaded experience for en
 ```
 
@@ -347,7 +347,7 @@ Check console logs to see which URLs are being requested:
 
 | Old Approach | New Approach |
 |---|---|
-| `/data/experience.json` | `https://static-api-opal.vercel.app/api/collections/{language}/data/experience.json` |
+| `/data/experience.json` | `https://static-api-opal.vercel.app/public/collections/{language}/data/experience.json` |
 | `getDataSourceUrl('experience.json')` | `getMultilingualUrl('experience', language)` |
 | Single language hardcoded | Dynamic language code parameter |
 | No API structure | Production API with collections/config pattern |
@@ -364,13 +364,13 @@ Check console logs to see which URLs are being requested:
 ## 📡 FETCH API CALLS
 
 ### 1. **Production API Base**
-- **Base URL**: `https://static-api-opal.vercel.app/api`
+- **Base URL**: `https://static-api-opal.vercel.app/public`
 - **File**: [src/lib/config/dataConfig.ts](src/lib/config/dataConfig.ts)
 - **Description**: Main production API for multilingual content
 
 #### Data Endpoints (Collections)
 ```
-https://static-api-opal.vercel.app/api/collections/{languageCode}/data/{filename}.json
+https://static-api-opal.vercel.app/public/collections/{languageCode}/data/{filename}.json
 ```
 
 **Files fetched:**
@@ -404,7 +404,7 @@ https://static-api-opal.vercel.app/api/collections/{languageCode}/data/{filename
 
 #### Config Endpoints
 ```
-https://static-api-opal.vercel.app/api/collections/{languageCode}/config/{configName}.json
+https://static-api-opal.vercel.app/public/collections/{languageCode}/config/{configName}.json
 ```
 
 **Files fetched:**
@@ -471,7 +471,7 @@ https://static.kuhandranchatbot.info/config/urlConfig.json
 - **Headers**: `User-Agent: Kuhandran-Portfolio-Analytics`
 
 #### Organization Detection (Commented)
-- **Service**: Clearbit API (`https://clearbit.com/resources/api`)
+- **Service**: Clearbit API (`https://clearbit.com/resources/public`)
 - **File**: [src/lib/analytics/visitorAnalytics.ts](src/lib/analytics/visitorAnalytics.ts)
 - **Status**: Currently not implemented (returns null)
 
@@ -481,7 +481,7 @@ https://static.kuhandranchatbot.info/config/urlConfig.json
 
 #### Analytics Endpoint
 ```
-POST /api/analytics/visitor
+POST /public/analytics/visitor
 ```
 - **File**: [src/lib/analytics/visitorAnalytics.ts](src/lib/analytics/visitorAnalytics.ts)
 - **Purpose**: Send visitor analytics data
@@ -489,9 +489,9 @@ POST /api/analytics/visitor
 
 #### Content Proxy Endpoint
 ```
-GET /api/content/{type}?language={languageCode}&file={fileName}
+GET /public/content/{type}?language={languageCode}&file={fileName}
 ```
-- **File**: [src/app/api/content/[type]/route.ts](src/app/api/content/[type]/route.ts)
+- **File**: [src/app/public/content/[type]/route.ts](src/app/public/content/[type]/route.ts)
 - **Parameters**:
   - `type`: "data" or "config"
   - `language`: Language code (e.g., "en", "ta")
@@ -501,7 +501,7 @@ GET /api/content/{type}?language={languageCode}&file={fileName}
 ---
 
 ### 7. **Dynamic Host Fallback**
-- **File**: [src/app/api/content/[type]/route.ts](src/app/api/content/[type]/route.ts)
+- **File**: [src/app/public/content/[type]/route.ts](src/app/public/content/[type]/route.ts)
 
 ```
 Development:  http://localhost:3000{filePath}
@@ -540,11 +540,11 @@ Production:   https://{VERCEL_URL}{filePath}
 
 | API | Type | Method | Purpose | File |
 |-----|------|--------|---------|------|
-| `https://static-api-opal.vercel.app/api` | Production API | GET | Multilingual data & config | [dataConfig.ts](src/lib/config/dataConfig.ts) |
+| `https://static-api-opal.vercel.app/public` | Production API | GET | Multilingual data & config | [dataConfig.ts](src/lib/config/dataConfig.ts) |
 | `https://static.kuhandranchatbot.info` | CDN | GET | Fallback content & images | [contentLabels.ts](src/lib/data/contentLabels.ts) |
 | `https://ipapi.co/json/` | Third-party | GET | Visitor location analytics | [visitorAnalytics.ts](src/lib/analytics/visitorAnalytics.ts) |
-| `/api/analytics/visitor` | Internal | POST | Send analytics data | [visitorAnalytics.ts](src/lib/analytics/visitorAnalytics.ts) |
-| `/api/content/{type}` | Internal | GET | Proxy for external data | [route.ts](src/app/api/content/[type]/route.ts) |
+| `/public/analytics/visitor` | Internal | POST | Send analytics data | [visitorAnalytics.ts](src/lib/analytics/visitorAnalytics.ts) |
+| `/public/content/{type}` | Internal | GET | Proxy for external data | [route.ts](src/app/public/content/[type]/route.ts) |
 
 ---
 
@@ -553,7 +553,7 @@ Production:   https://{VERCEL_URL}{filePath}
 ### URL Configuration Sources
 1. **Local Static**: `/config/urlConfig.json`
 2. **CDN**: `https://static.kuhandranchatbot.info/config/urlConfig.json`
-3. **Production API**: `https://static-api-opal.vercel.app/api/collections/{lang}/config/urlConfig.json`
+3. **Production API**: `https://static-api-opal.vercel.app/public/collections/{lang}/config/urlConfig.json`
 
 ### Error Messages
 - **File**: `/data/errorMessages.json`
@@ -565,7 +565,7 @@ Production:   https://{VERCEL_URL}{filePath}
 
 - **Cache Strategy**: Most API calls implement 1-hour cache with stale-while-revalidate
 - **Fallback Mechanism**: If primary API fails, system falls back to local JSON files
-- **CORS Handling**: Internal `/api/content/` route acts as proxy to avoid CORS issues
+- **CORS Handling**: Internal `/public/content/` route acts as proxy to avoid CORS issues
 - **Language Support**: 11 languages across all data endpoints
 - **Image Optimization**: WebP format preferred with PNG/JPG fallback
 
@@ -670,7 +670,7 @@ const resumeUrl = getResume('en/resume.pdf');
 **Example**:
 ```typescript
 const configUrl = getConfig('apiConfig.json');
-// Returns: https://static-api-opal.vercel.app/config/apiConfig.json
+// Returns: https://static-api-opal.vercel.app/config/publicConfig.json
 ```
 
 ---
@@ -695,7 +695,7 @@ const configUrl = getConfig('apiConfig.json');
 
 **API Bases**:
 - Static API: `https://static-api-opal.vercel.app`
-- Backend API: `https://api-gateway-9unh.onrender.com`
+- Backend API: `https://public-gateway-9unh.onrender.com`
 
 **Example**:
 ```typescript
@@ -705,7 +705,7 @@ const data = await getInfoFromAPI('GET', '/config/languages.json', undefined, tr
 // POST request to backend API
 const response = await getInfoFromAPI(
   'POST',
-  '/api/contact',
+  '/public/contact',
   { name: 'John', message: 'Hello' },
   false
 );
@@ -713,7 +713,7 @@ const response = await getInfoFromAPI(
 // Full URL (domain extracted)
 const data = await getInfoFromAPI(
   'GET',
-  'https://api-gateway-9unh.onrender.com/api/users',
+  'https://public-gateway-9unh.onrender.com/public/users',
   undefined,
   false
 );
@@ -750,7 +750,7 @@ const webpSrc = API_ENDPOINTS.cdnImage(IMAGE_ASSETS.profile.webp);
 
 **New Code**:
 ```typescript
-import { getImage } from '@/lib/api/apiClient';
+import { getImage } from '@/lib/public/publicClient';
 
 const imageSrc = getImage(IMAGE_ASSETS.profile.webp);
 const webpSrc = getImage(IMAGE_ASSETS.profile.webp);
@@ -777,7 +777,7 @@ const data = await response.json();
 
 **New Code**:
 ```typescript
-import { getInfoFromAPI } from '@/lib/api/apiClient';
+import { getInfoFromAPI } from '@/lib/public/publicClient';
 
 const locationData = await getInfoFromAPI<any>(
   'GET',
@@ -809,7 +809,7 @@ const data = await response.json();
 
 **New Code**:
 ```typescript
-import { getInfoFromAPI } from '@/lib/api/apiClient';
+import { getInfoFromAPI } from '@/lib/public/publicClient';
 
 defaultLabelsData = await getInfoFromAPI<any>(
   'GET',
@@ -875,7 +875,7 @@ const imageSrc = getImage(IMAGE_ASSETS.profile.png);
 **Pattern 3: Backend API**
 ```typescript
 // Old
-const response = await fetch('/api/contact', {
+const response = await fetch('/public/contact', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(data)
@@ -883,7 +883,7 @@ const response = await fetch('/api/contact', {
 const result = await response.json();
 
 // New
-const result = await getInfoFromAPI('POST', '/api/contact', data, false);
+const result = await getInfoFromAPI('POST', '/public/contact', data, false);
 ```
 
 ---
@@ -956,7 +956,7 @@ if (data) {
 1. ✅ `src/components/sections/About.tsx` - Now uses `getImage()`
 2. ✅ `src/lib/analytics/visitorAnalytics.ts` - Now uses `getInfoFromAPI()`
 3. ✅ `src/lib/data/contentLabels.ts` - Now uses `getInfoFromAPI()`
-4. ✅ `src/lib/api/apiClient.ts` - Core utility functions with `extractPath()`
+4. ✅ `src/lib/public/publicClient.ts` - Core utility functions with `extractPath()`
 
 ---
 
@@ -966,7 +966,7 @@ Continue migrating remaining fetch() calls:
 - [ ] `src/lib/config/appConfig.ts`
 - [ ] `src/lib/config/configLoader.ts`
 - [ ] `src/app/config/page.tsx`
-- [ ] `src/app/api/content/[type]/route.ts`
+- [ ] `src/app/public/content/[type]/route.ts`
 - [ ] Any component files with direct fetch calls
 
 Use this guide as reference for each replacement!
@@ -989,9 +989,9 @@ BEFORE:
 - https://static.kuhandranchatbot.info/data/skills.json
 
 AFTER:
-- https://static-api-opal.vercel.app/api/collections/en/data/experience.json
-- https://static-api-opal.vercel.app/api/collections/ta/data/projects.json
-- https://static-api-opal.vercel.app/api/collections/ar-AE/data/skills.json
+- https://static-api-opal.vercel.app/public/collections/en/data/experience.json
+- https://static-api-opal.vercel.app/public/collections/ta/data/projects.json
+- https://static-api-opal.vercel.app/public/collections/ar-AE/data/skills.json
 ```
 
 ## Key Updates
@@ -1031,7 +1031,7 @@ AFTER:
 ## API Endpoint Structure
 
 ```
-Base: https://static-api-opal.vercel.app/api
+Base: https://static-api-opal.vercel.app/public
 
 Data Files:
 GET /collections/{languageCode}/data/{fileType}.json
@@ -1058,22 +1058,22 @@ th       - Thai
 
 ### Data File URLs
 ```
-https://static-api-opal.vercel.app/api/collections/en/data/contentLabels.json
-https://static-api-opal.vercel.app/api/collections/en/data/experience.json
-https://static-api-opal.vercel.app/api/collections/en/data/projects.json
-https://static-api-opal.vercel.app/api/collections/en/data/skills.json
-https://static-api-opal.vercel.app/api/collections/en/data/education.json
-https://static-api-opal.vercel.app/api/collections/en/data/achievements.json
+https://static-api-opal.vercel.app/public/collections/en/data/contentLabels.json
+https://static-api-opal.vercel.app/public/collections/en/data/experience.json
+https://static-api-opal.vercel.app/public/collections/en/data/projects.json
+https://static-api-opal.vercel.app/public/collections/en/data/skills.json
+https://static-api-opal.vercel.app/public/collections/en/data/education.json
+https://static-api-opal.vercel.app/public/collections/en/data/achievements.json
 
-https://static-api-opal.vercel.app/api/collections/ta/data/experience.json
-https://static-api-opal.vercel.app/api/collections/ar-AE/data/contentLabels.json
+https://static-api-opal.vercel.app/public/collections/ta/data/experience.json
+https://static-api-opal.vercel.app/public/collections/ar-AE/data/contentLabels.json
 ```
 
 ### Config File URLs
 ```
-https://static-api-opal.vercel.app/api/collections/en/config/apiConfig.json
-https://static-api-opal.vercel.app/api/collections/ta/config/apiConfig.json
-https://static-api-opal.vercel.app/api/collections/ar-AE/config/pageLayout.json
+https://static-api-opal.vercel.app/public/collections/en/config/publicConfig.json
+https://static-api-opal.vercel.app/public/collections/ta/config/publicConfig.json
+https://static-api-opal.vercel.app/public/collections/ar-AE/config/pageLayout.json
 ```
 
 ## Usage Examples
@@ -1120,11 +1120,11 @@ import { getMultilingualUrl, getConfigUrl } from '@/lib/config/dataConfig';
 
 // Get data file URL
 const url = getMultilingualUrl('experience', 'en');
-// → https://static-api-opal.vercel.app/api/collections/en/data/experience.json
+// → https://static-api-opal.vercel.app/public/collections/en/data/experience.json
 
 // Get config file URL
 const configUrl = getConfigUrl('apiConfig', 'ta');
-// → https://static-api-opal.vercel.app/api/collections/ta/config/apiConfig.json
+// → https://static-api-opal.vercel.app/public/collections/ta/config/publicConfig.json
 ```
 
 ### 4. Fetch Config Files
@@ -1170,7 +1170,7 @@ const data = await getExperience(language);
 Console logs show all API requests:
 
 ```
-📡 Fetching: https://static-api-opal.vercel.app/api/collections/en/data/experience.json
+📡 Fetching: https://static-api-opal.vercel.app/public/collections/en/data/experience.json
 ✅ Loaded experience for en
 ```
 
@@ -1188,7 +1188,7 @@ Console logs show all API requests:
 
 ## Performance
 
-- **API Base:** Single constant `https://static-api-opal.vercel.app/api`
+- **API Base:** Single constant `https://static-api-opal.vercel.app/public`
 - **Caching:** In-memory cache per language
 - **Requests:** Only made when data is actually needed
 - **Parallel Loading:** Supports Promise.all() for multiple files
@@ -1212,7 +1212,7 @@ try {
 ## Documentation
 
 For detailed information, see:
-- [API_DATA_LOADING.md](./API_DATA_LOADING.md) - Comprehensive guide
+- [API_DATA_LOADING.md](./public_DATA_LOADING.md) - Comprehensive guide
 - [LANGUAGE_SYSTEM.md](./LANGUAGE_SYSTEM.md) - Language system details
 - [src/lib/config/dataConfig.ts](./src/lib/config/dataConfig.ts) - Source code comments
 
@@ -1254,7 +1254,7 @@ All data loading now uses the production API with dynamic language code paramete
 
 ### Request: English API Config
 ```http
-GET /api/config/en/apiConfig HTTP/1.1
+GET /public/config/en/publicConfig HTTP/1.1
 Host: localhost:3000
 Accept: application/json
 ```
@@ -1268,9 +1268,9 @@ Date: Thu, 01 Jan 2026 12:00:00 GMT
 
 {
   "endpoints": {
-    "analytics": "/api/analytics",
-    "content": "/api/content",
-    "config": "/api/config"
+    "analytics": "/public/analytics",
+    "content": "/public/content",
+    "config": "/public/config"
   },
   "apiKeys": {
     "googleAnalytics": "UA-XXXXXXXXX-X",
@@ -1283,7 +1283,7 @@ Date: Thu, 01 Jan 2026 12:00:00 GMT
 
 ### Request: Tamil API Config
 ```http
-GET /api/config/ta/apiConfig HTTP/1.1
+GET /public/config/ta/publicConfig HTTP/1.1
 Host: localhost:3000
 Accept: application/json
 ```
@@ -1298,9 +1298,9 @@ Cache-Control: public, max-age=3600, stale-while-revalidate=86400
   "lang": "ta",
   "language": "Tamil",
   "endpoints": {
-    "analytics": "/api/analytics?lang=ta",
-    "content": "/api/content?lang=ta",
-    "config": "/api/config/ta"
+    "analytics": "/public/analytics?lang=ta",
+    "content": "/public/content?lang=ta",
+    "config": "/public/config/ta"
   }
 }
 ```
@@ -1309,7 +1309,7 @@ Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
 ### Request: Invalid Config Type
 ```http
-GET /api/config/en/invalidConfig HTTP/1.1
+GET /public/config/en/invalidConfig HTTP/1.1
 Host: localhost:3000
 ```
 
@@ -1329,7 +1329,7 @@ Content-Type: application/json
 
 ### Request: English Manifest
 ```http
-GET /api/manifest/en HTTP/1.1
+GET /public/manifest/en HTTP/1.1
 Host: localhost:3000
 Accept: application/manifest+json
 ```
@@ -1404,7 +1404,7 @@ Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 ### Request: Tamil Manifest
 ```http
-GET /api/manifest/ta HTTP/1.1
+GET /public/manifest/ta HTTP/1.1
 Host: localhost:3000
 ```
 
@@ -1430,7 +1430,7 @@ Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 ### Request: Service Worker
 ```http
-GET /api/sw HTTP/1.1
+GET /public/sw HTTP/1.1
 Host: localhost:3000
 Accept: application/javascript
 ```
@@ -1474,26 +1474,26 @@ self.addEventListener('install', (event) => {
 
 ### Get English Config
 ```bash
-curl -X GET http://localhost:3000/api/config/en/apiConfig \
+curl -X GET http://localhost:3000/public/config/en/publicConfig \
   -H "Accept: application/json" \
   -H "User-Agent: curl/7.68.0"
 ```
 
 ### Get Tamil Manifest
 ```bash
-curl -X GET http://localhost:3000/api/manifest/ta \
+curl -X GET http://localhost:3000/public/manifest/ta \
   -H "Accept: application/manifest+json"
 ```
 
 ### Get Service Worker
 ```bash
-curl -X GET http://localhost:3000/api/sw \
+curl -X GET http://localhost:3000/public/sw \
   -H "Accept: application/javascript"
 ```
 
 ### Get with Pretty Print (jq)
 ```bash
-curl http://localhost:3000/api/manifest/en | jq '.'
+curl http://localhost:3000/public/manifest/en | jq '.'
 ```
 
 ---
@@ -1503,7 +1503,7 @@ curl http://localhost:3000/api/manifest/en | jq '.'
 ### Register Service Worker
 ```javascript
 // Using the new route
-navigator.serviceWorker.register('/api/sw', {
+navigator.serviceWorker.register('/public/sw', {
   scope: '/',
   updateViaCache: 'none'
 })
@@ -1513,7 +1513,7 @@ navigator.serviceWorker.register('/api/sw', {
 
 ### Load Config Dynamically
 ```javascript
-fetch('/api/config/en/apiConfig')
+fetch('/public/config/en/publicConfig')
   .then(res => res.json())
   .then(config => console.log('Config:', config))
   .catch(err => console.error('Error:', err));
@@ -1522,7 +1522,7 @@ fetch('/api/config/en/apiConfig')
 ### Load Language-Specific Manifest
 ```javascript
 const lang = navigator.language.split('-')[0]; // 'en', 'ta', etc.
-fetch(`/api/manifest/${lang}`)
+fetch(`/public/manifest/${lang}`)
   .then(res => res.json())
   .then(manifest => console.log(`${lang} Manifest:`, manifest));
 ```
@@ -1533,7 +1533,7 @@ fetch(`/api/manifest/${lang}`)
 
 ### Config Route Timeline
 ```
-GET /api/config/en/apiConfig
+GET /public/config/en/publicConfig
 ├─ Request Headers (26 bytes)
 ├─ Query String Parameters: none
 ├─ Request Body: (empty)
@@ -1551,7 +1551,7 @@ GET /api/config/en/apiConfig
 
 ### Manifest Route Timeline
 ```
-GET /api/manifest/en
+GET /public/manifest/en
 ├─ Status: 200 OK
 ├─ Type: fetch
 ├─ Size: 2.4 KB / 2.1 KB
@@ -1561,7 +1561,7 @@ GET /api/manifest/en
 
 ### Service Worker Route Timeline
 ```
-GET /api/sw
+GET /public/sw
 ├─ Status: 200 OK
 ├─ Type: script
 ├─ Size: 3.2 KB / 2.8 KB
@@ -1575,7 +1575,7 @@ GET /api/sw
 
 ### Missing Language Parameter
 ```http
-GET /api/config/invalid-lang/apiConfig
+GET /public/config/invalid-lang/publicConfig
 ```
 
 ### Response: 404 (Fallback to Default)
@@ -1630,7 +1630,7 @@ Cache-Control: public, max-age=3600, stale-while-revalidate=86400
           }
         ],
         "url": {
-          "raw": "{{base_url}}/api/config/en/apiConfig",
+          "raw": "{{base_url}}/public/config/en/publicConfig",
           "host": ["{{base_url}}"],
           "path": ["api", "config", "en", "apiConfig"]
         }
@@ -1641,7 +1641,7 @@ Cache-Control: public, max-age=3600, stale-while-revalidate=86400
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{base_url}}/api/manifest/en",
+          "raw": "{{base_url}}/public/manifest/en",
           "host": ["{{base_url}}"],
           "path": ["api", "manifest", "en"]
         }
@@ -1652,7 +1652,7 @@ Cache-Control: public, max-age=3600, stale-while-revalidate=86400
       "request": {
         "method": "GET",
         "url": {
-          "raw": "{{base_url}}/api/sw",
+          "raw": "{{base_url}}/public/sw",
           "host": ["{{base_url}}"],
           "path": ["api", "sw"]
         }
@@ -1737,7 +1737,7 @@ import {
   fetchApiConfig,
   fetchPageLayout,
   fetchUrlConfig 
-} from '@/lib/api/apiClient';
+} from '@/lib/public/publicClient';
 
 // Get specific config
 const config = await fetchConfig('apiConfig', 'en');
@@ -1760,7 +1760,7 @@ import {
   fetchAchievements,
   fetchCaseStudies,
   fetchContentLabels
-} from '@/lib/api/apiClient';
+} from '@/lib/public/publicClient';
 
 // Fetch specific data type
 const projects = await fetchProjects('en');
@@ -1784,7 +1784,7 @@ import {
   fetchAllEssentialData,
   clearLanguageCache,
   clearApiCache
-} from '@/lib/api/apiClient';
+} from '@/lib/public/publicClient';
 
 // Fetch manifest for PWA
 const manifest = await fetchManifest('en');
@@ -2000,7 +2000,7 @@ export function ProjectsList() {
 import { 
   clearApiCache, 
   clearLanguageCache 
-} from '@/lib/api/apiClient';
+} from '@/lib/public/publicClient';
 
 // Clear all cache
 clearApiCache();
@@ -2113,9 +2113,9 @@ const cache = await caches.open('v1-static');
 
 // Pre-cache essential URLs
 const essentialUrls = [
-  '/api/config/en/apiConfig',
-  '/api/config/en/pageLayout',
-  '/api/manifest/en',
+  '/public/config/en/publicConfig',
+  '/public/config/en/pageLayout',
+  '/public/manifest/en',
   '/',
 ];
 
@@ -2139,16 +2139,16 @@ for (const url of essentialUrls) {
 ### Working Routes ✅
 ```
 GET /                          → 200 OK (Home page)
-GET /api/config/en/apiConfig   → 200 OK (Config API)
-GET /api/config/en/pageLayout  → 200 OK (Page layout)
-GET /api/manifest/en           → 200 OK (PWA Manifest)
+GET /public/config/en/publicConfig   → 200 OK (Config API)
+GET /public/config/en/pageLayout  → 200 OK (Page layout)
+GET /public/manifest/en           → 200 OK (PWA Manifest)
 GET /config                    → 200 OK (Config browser)
 ```
 
 ### Removed Routes ✅
 ```
 /files/sw.js                   → Removed (no longer needed)
-/api/sw                        → Removed (was redundant)
+/public/sw                        → Removed (was redundant)
 ```
 
 ---
@@ -2182,9 +2182,9 @@ All config files continue to work via dynamic API routes:
 ```
 public/collections/
 ├── en/config/
-│   ├── apiConfig.json       → GET /api/config/en/apiConfig
-│   ├── pageLayout.json      → GET /api/config/en/pageLayout
-│   └── urlConfig.json       → GET /api/config/en/urlConfig
+│   ├── apiConfig.json       → GET /public/config/en/publicConfig
+│   ├── pageLayout.json      → GET /public/config/en/pageLayout
+│   └── urlConfig.json       → GET /public/config/en/urlConfig
 ├── es/config/
 ├── fr/config/
 └── ... (all 11 languages)
@@ -2222,10 +2222,10 @@ Features remain the same:
 ### Test Routes
 ```bash
 # Test config endpoint
-curl http://localhost:3000/api/config/en/apiConfig
+curl http://localhost:3000/public/config/en/publicConfig
 
 # Test manifest endpoint
-curl http://localhost:3000/api/manifest/en
+curl http://localhost:3000/public/manifest/en
 
 # Test page load
 curl http://localhost:3000/
@@ -2253,9 +2253,9 @@ export function ServiceWorkerManager() {
           const cache = await caches.open('v1-static');
           
           const essentialUrls = [
-            '/api/config/en/apiConfig',
-            '/api/config/en/pageLayout',
-            '/api/manifest/en',
+            '/public/config/en/publicConfig',
+            '/public/config/en/pageLayout',
+            '/public/manifest/en',
             '/',
           ];
 

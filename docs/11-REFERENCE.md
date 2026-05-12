@@ -9,7 +9,7 @@ import { getConfigRouteUrl } from '@/config/domains';
 
 // Get URL
 const url = getConfigRouteUrl('en', 'apiConfig');
-// → '/api/config/en/apiConfig'
+// → '/public/config/en/publicConfig'
 
 // Fetch
 const config = await fetch(url).then(r => r.json());
@@ -29,7 +29,7 @@ import { getManifestUrl } from '@/config/domains';
 
 // Get URL
 const url = getManifestUrl('ta');
-// → '/api/manifest/ta'
+// → '/public/manifest/ta'
 
 // Use in layout
 manifest: getManifestUrl(DEFAULT_LANGUAGE)
@@ -47,7 +47,7 @@ import { getServiceWorkerUrl } from '@/config/domains';
 
 // Get URL
 const url = getServiceWorkerUrl();
-// → '/api/sw'
+// → '/public/sw'
 
 // Register
 navigator.serviceWorker.register(getServiceWorkerUrl());
@@ -59,9 +59,9 @@ navigator.serviceWorker.register(getServiceWorkerUrl());
 
 | Route | Method | Parameters | Returns |
 |-------|--------|-----------|---------|
-| `/api/config/{lang}/{type}` | GET | language, configType | JSON |
-| `/api/manifest/{lang}` | GET | language | manifest.json |
-| `/api/sw` | GET | — | service-worker.js |
+| `/public/config/{lang}/{type}` | GET | language, configType | JSON |
+| `/public/manifest/{lang}` | GET | language | manifest.json |
+| `/public/sw` | GET | — | service-worker.js |
 
 ---
 
@@ -87,9 +87,9 @@ navigator.serviceWorker.register(getServiceWorkerUrl());
 
 ```
 New Route Handlers:
-├── src/app/api/config/[language]/[configType]/route.ts
-├── src/app/api/manifest/[language]/route.ts
-└── src/app/api/sw/route.ts
+├── src/app/public/config/[language]/[configType]/route.ts
+├── src/app/public/manifest/[language]/route.ts
+└── src/app/public/sw/route.ts
 
 Updated Files:
 ├── src/config/domains.ts
@@ -106,7 +106,7 @@ Updated Files:
 
 ```typescript
 // ❌ BEFORE: Hardcoded paths
-const url = '/config/apiConfig.json';
+const url = '/config/publicConfig.json';
 const manifest = '/manifest.json';
 await navigator.serviceWorker.register('/sw.js');
 
@@ -134,15 +134,15 @@ await navigator.serviceWorker.register(getServiceWorkerUrl());
 
 ```bash
 # Test all routes
-curl http://localhost:3000/api/config/en/apiConfig
-curl http://localhost:3000/api/manifest/en
-curl http://localhost:3000/api/sw
+curl http://localhost:3000/public/config/en/publicConfig
+curl http://localhost:3000/public/manifest/en
+curl http://localhost:3000/public/sw
 
 # Check headers
-curl -i http://localhost:3000/api/manifest/en
+curl -i http://localhost:3000/public/manifest/en
 
 # Pretty print
-curl http://localhost:3000/api/config/en/apiConfig | jq '.'
+curl http://localhost:3000/public/config/en/publicConfig | jq '.'
 ```
 
 ---
@@ -151,9 +151,9 @@ curl http://localhost:3000/api/config/en/apiConfig | jq '.'
 
 | Issue | Solution |
 |-------|----------|
-| 404 on manifest | Verify route handler exists at `/api/manifest/[language]/route.ts` |
-| 404 on config | Check `/api/config/[language]/[configType]/route.ts` exists |
-| 404 on SW | Ensure `/api/sw/route.ts` is created |
+| 404 on manifest | Verify route handler exists at `/public/manifest/[language]/route.ts` |
+| 404 on config | Check `/public/config/[language]/[configType]/route.ts` exists |
+| 404 on SW | Ensure `/public/sw/route.ts` is created |
 | Wrong language | Invalid languages fallback to `DEFAULT_LANGUAGE` ('en') |
 | Cache issues | Routes use `updateViaCache: 'none'` |
 
@@ -260,15 +260,15 @@ import { DEFAULT_LANGUAGE, DATA_FILES, IMAGE_ASSETS } from '@/config/domains';
 ```
 BEFORE: 4 × 404 errors
 ├─ GET /config/pageLayout.json → 404
-├─ GET /config/apiConfig.json → 404
+├─ GET /config/publicConfig.json → 404
 ├─ GET /manifest.json → 404
 └─ GET /sw.js → 404
 
 AFTER: 0 × 404 errors  
-├─ GET /api/config/en/pageLayout → 200 ✓
-├─ GET /api/config/en/apiConfig → 200 ✓
-├─ GET /api/manifest/en → 200 ✓
-└─ GET /api/sw → 200 ✓
+├─ GET /public/config/en/pageLayout → 200 ✓
+├─ GET /public/config/en/publicConfig → 200 ✓
+├─ GET /public/manifest/en → 200 ✓
+└─ GET /public/sw → 200 ✓
 ```
 
 ---
@@ -280,9 +280,9 @@ AFTER: 0 × 404 errors
 # ✅ API Config Loading Fix - Complete
 
 ## Problem
-The `/api/config/[language]/[configType]` route handler was trying to read config files directly from the filesystem:
+The `/public/config/[language]/[configType]` route handler was trying to read config files directly from the filesystem:
 ```
-/public/collections/en/config/apiConfig.json  ❌ File not found
+/public/collections/en/config/publicConfig.json  ❌ File not found
 ```
 
 This caused 404 errors when loading configurations.
@@ -292,7 +292,7 @@ This caused 404 errors when loading configurations.
 ## Root Cause
 The API route was using `readFile()` to read from a local `/public/collections/` directory that doesn't exist. The config files are actually served from the static API:
 ```
-https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+https://static.kuhandranchatbot.info/public/collections/en/config/publicConfig
 ```
 
 ---
@@ -304,18 +304,18 @@ Changed `getApiConfig()` and `getPageLayout()` functions to fetch from the stati
 
 **Before:**
 ```typescript
-const url = getConfigUrl('apiConfig', languageCode);  // Returns: /api/config/en/apiConfig
+const url = getConfigUrl('apiConfig', languageCode);  // Returns: /public/config/en/publicConfig
 const response = await fetch(url);  // ❌ Relative URL, server-side fetch fails
 ```
 
 **After:**
 ```typescript
 const url = getDataSourceUrl('apiConfig', languageCode, 'config');
-// → https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+// → https://static.kuhandranchatbot.info/public/collections/en/config/publicConfig
 const response = await fetch(url);  // ✅ Full URL, works on server
 ```
 
-### 2. Updated `/api/config/[language]/[configType]/route.ts`
+### 2. Updated `/public/config/[language]/[configType]/route.ts`
 Changed to call the functions from `contentLoader.ts` which now fetch the correct URLs:
 
 ```typescript
@@ -346,13 +346,13 @@ async function loadConfigFile(language: string, configType: string): Promise<any
 ```
 Browser Request
     ↓
-GET /api/config/en/apiConfig
+GET /public/config/en/publicConfig
     ↓
 API Route Handler (route.ts)
     ↓
 Calls getApiConfig('en')
     ↓
-Fetches: https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+Fetches: https://static.kuhandranchatbot.info/public/collections/en/config/publicConfig
     ↓
 Returns JSON Response with proper caching headers
     ↓
@@ -360,9 +360,9 @@ Browser receives config data ✅
 ```
 
 ### Tested Endpoints
-✅ `GET /api/config/en/apiConfig` → Returns API configuration
-✅ `GET /api/config/en/pageLayout` → Returns page layout configuration
-✅ `GET /api/manifest/en` → Properly loads configs without errors
+✅ `GET /public/config/en/publicConfig` → Returns API configuration
+✅ `GET /public/config/en/pageLayout` → Returns page layout configuration
+✅ `GET /public/manifest/en` → Properly loads configs without errors
 
 ---
 
@@ -370,7 +370,7 @@ Browser receives config data ✅
 | File | Change |
 |------|--------|
 | `src/lib/utils/contentLoader.ts` | Use `getDataSourceUrl()` for absolute URLs |
-| `src/app/api/config/[language]/[configType]/route.ts` | Call proper loader functions |
+| `src/app/public/config/[language]/[configType]/route.ts` | Call proper loader functions |
 
 ---
 
@@ -386,11 +386,11 @@ Browser receives config data ✅
 ## No More Errors! 🎉
 ```
 Before:
-❌ Error loading config (en/apiConfig): ENOENT: no such file or directory
+❌ Error loading config (en/publicConfig): ENOENT: no such file or directory
 
 After:
-✅ Loading config: en/apiConfig
-✅ Fetching config: https://static.kuhandranchatbot.info/public/collections/en/config/apiConfig
+✅ Loading config: en/publicConfig
+✅ Fetching config: https://static.kuhandranchatbot.info/public/collections/en/config/publicConfig
 ✅ Loaded apiConfig for en
 ```
 # Code Review & Fixes - Progress Report
@@ -436,10 +436,10 @@ const data = await fetchProjectsAPI(language as SupportedLanguage);
 #### 1.1 Error Handling in API Routes ❌
 **Severity**: 🔴 CRITICAL  
 **Files**: 
-- `src/app/api/contact/route.ts`
-- `src/app/api/analytics/visitor/route.ts`
-- `src/app/api/manifest/[language]/route.ts`
-- `src/app/api/config/[language]/[configType]/route.ts`
+- `src/app/public/contact/route.ts`
+- `src/app/public/analytics/visitor/route.ts`
+- `src/app/public/manifest/[language]/route.ts`
+- `src/app/public/config/[language]/[configType]/route.ts`
 
 **Issue**: No try-catch, no error responses
 
@@ -510,7 +510,7 @@ export async function GET(
 
 **Consolidation Strategy**:
 ```typescript
-// Create src/lib/api/cache.ts
+// Create src/lib/public/cache.ts
 export class CacheManager {
   private cache = new Map<string, { data: any; timestamp: number }>();
 
@@ -548,11 +548,11 @@ cache.set('projects:en', data);
 
 #### 2.1 Split apiClient.ts (658 lines) ❌
 **Files to Create**:
-- `src/lib/api/httpClient.ts` - Core HTTP requests
-- `src/lib/api/cache.ts` - Cache management (see above)
-- `src/lib/api/fetchers.ts` - Specialized fetchers
-- `src/lib/api/urlBuilder.ts` - URL construction
-- `src/lib/api/errors.ts` - Error types
+- `src/lib/public/httpClient.ts` - Core HTTP requests
+- `src/lib/public/cache.ts` - Cache management (see above)
+- `src/lib/public/fetchers.ts` - Specialized fetchers
+- `src/lib/public/urlBuilder.ts` - URL construction
+- `src/lib/public/errors.ts` - Error types
 
 **Estimated Time**: 8-10 hours (includes testing)
 
@@ -836,7 +836,7 @@ You requested to fix the 404 errors for config and manifest files, moving them f
 ### Original 404 Errors
 ```
 GET /config/pageLayout.json    → 404 in 117ms
-GET /config/apiConfig.json     → 404 in 254ms  
+GET /config/publicConfig.json     → 404 in 254ms  
 GET /manifest.json             → 404 in 93ms
 GET /sw.js                     → 404 in 90ms
 ```
@@ -852,13 +852,13 @@ GET /sw.js                     → 404 in 90ms
 
 ### 1. **Dynamic Config Routes** (Language-Aware)
 ```
-OLD: GET /config/apiConfig.json
-NEW: GET /api/config/{language}/{configType}
+OLD: GET /config/publicConfig.json
+NEW: GET /public/config/{language}/{configType}
 
 Examples:
-✓ GET /api/config/en/apiConfig
-✓ GET /api/config/ta/pageLayout
-✓ GET /api/config/ar-AE/urlConfig
+✓ GET /public/config/en/publicConfig
+✓ GET /public/config/ta/pageLayout
+✓ GET /public/config/ar-AE/urlConfig
 ```
 
 **Features**:
@@ -872,12 +872,12 @@ Examples:
 ### 2. **Dynamic Manifest Route** (Language-Specific)
 ```
 OLD: GET /manifest.json
-NEW: GET /api/manifest/{language}
+NEW: GET /public/manifest/{language}
 
 Examples:
-✓ GET /api/manifest/en
-✓ GET /api/manifest/ta
-✓ GET /api/manifest/ar-AE
+✓ GET /public/manifest/en
+✓ GET /public/manifest/ta
+✓ GET /public/manifest/ar-AE
 ```
 
 **Features**:
@@ -891,9 +891,9 @@ Examples:
 ### 3. **Dynamic Service Worker Route**
 ```
 OLD: GET /sw.js
-NEW: GET /api/sw
+NEW: GET /public/sw
 
-✓ GET /api/sw → Dynamically generated service worker
+✓ GET /public/sw → Dynamically generated service worker
 ```
 
 **Features**:
@@ -983,9 +983,9 @@ navigator.serviceWorker.register(getServiceWorkerUrl());
 ### After
 ```
 0 × 404 Errors
-✓ Config loads from /api/config/{lang}/{type}
-✓ Manifest generates at /api/manifest/{lang}
-✓ Service worker available at /api/sw
+✓ Config loads from /public/config/{lang}/{type}
+✓ Manifest generates at /public/manifest/{lang}
+✓ Service worker available at /public/sw
 ✓ All routes language-aware and dynamic
 ```
 
@@ -1042,13 +1042,13 @@ All 11 languages supported:
 
 ### Config Route
 ```
-Browser Request: /api/config/ta/apiConfig
+Browser Request: /public/config/ta/publicConfig
          ↓
-Route Handler: /api/config/[language]/[configType]/route.ts
+Route Handler: /public/config/[language]/[configType]/route.ts
          ↓
-Load: /public/collections/ta/config/apiConfig.json
+Load: /public/collections/ta/config/publicConfig.json
          ↓
-Fallback (if missing): /public/collections/en/config/apiConfig.json
+Fallback (if missing): /public/collections/en/config/publicConfig.json
          ↓
 Response: JSON with Cache-Control headers
          ↓
@@ -1057,9 +1057,9 @@ Browser: 200 OK ✓
 
 ### Manifest Route
 ```
-Browser Request: /api/manifest/ta
+Browser Request: /public/manifest/ta
          ↓
-Route Handler: /api/manifest/[language]/route.ts
+Route Handler: /public/manifest/[language]/route.ts
          ↓
 Template Lookup: MANIFEST_TEMPLATES['ta']
          ↓
@@ -1072,9 +1072,9 @@ Browser: 200 OK ✓
 
 ### Service Worker Route
 ```
-Browser Request: /api/sw
+Browser Request: /public/sw
          ↓
-Route Handler: /api/sw/route.ts
+Route Handler: /public/sw/route.ts
          ↓
 Generate: Service worker code with timestamp
          ↓
@@ -1146,9 +1146,9 @@ Browser: 200 OK ✓
 ### If Something Breaks
 1. Check browser DevTools Network tab for 404s
 2. Verify route handlers exist at:
-   - `/api/config/[language]/[configType]/route.ts`
-   - `/api/manifest/[language]/route.ts`
-   - `/api/sw/route.ts`
+   - `/public/config/[language]/[configType]/route.ts`
+   - `/public/manifest/[language]/route.ts`
+   - `/public/sw/route.ts`
 3. Restart development server
 4. Clear browser cache
 5. Review documentation files for usage
@@ -1156,9 +1156,9 @@ Browser: 200 OK ✓
 ### Common Issues
 | Issue | Solution |
 |-------|----------|
-| Manifest 404 | Check `/api/manifest/[language]/route.ts` exists |
-| Config 404 | Verify `/api/config/[language]/[configType]/route.ts` |
-| SW 404 | Ensure `/api/sw/route.ts` is created |
+| Manifest 404 | Check `/public/manifest/[language]/route.ts` exists |
+| Config 404 | Verify `/public/config/[language]/[configType]/route.ts` |
+| SW 404 | Ensure `/public/sw/route.ts` is created |
 | Wrong content | Verify language code is valid |
 | Stale cache | Routes use `updateViaCache: 'none'` |
 
@@ -1166,9 +1166,9 @@ Browser: 200 OK ✓
 
 ## 🎓 Learning Resources
 
-- [Next.js API Routes Documentation](https://nextjs.org/docs/pages/building-your-application/routing/api-routes)
+- [Next.js API Routes Documentation](https://nextjs.org/docs/pages/building-your-application/routing/public-routes)
 - [Web App Manifest Specification](https://www.w3.org/TR/appmanifest/)
-- [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+- [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/public/Service_Worker_API)
 - [Cache-Control Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
 
 ---
@@ -1178,9 +1178,9 @@ Browser: 200 OK ✓
 | Aspect | Before | After |
 |--------|--------|-------|
 | **404 Errors** | 4 types | 0 |
-| **Config Location** | `/public/config/` | `/api/config/{lang}/` |
-| **Manifest Location** | `/public/manifest.json` | `/api/manifest/{lang}` |
-| **Service Worker** | `/public/sw.js` | `/api/sw` |
+| **Config Location** | `/public/config/` | `/public/config/{lang}/` |
+| **Manifest Location** | `/public/manifest.json` | `/public/manifest/{lang}` |
+| **Service Worker** | `/public/sw.js` | `/public/sw` |
 | **Language Support** | Manual | Automatic |
 | **Cache Handling** | Manual | Automatic with headers |
 | **Type Safety** | Partial | Full with helpers |

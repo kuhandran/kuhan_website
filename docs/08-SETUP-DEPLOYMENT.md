@@ -4,17 +4,17 @@
 
 ### Dynamic Config Routes ✅
 ```
-GET /api/config/{language}/{configType}  →  200 OK
+GET /public/config/{language}/{configType}  →  200 OK
 ```
-- `http://localhost:3000/api/config/en/apiConfig` ✅ 200
-- `http://localhost:3000/api/config/en/pageLayout` ✅ 200
-- `http://localhost:3000/api/config/es/apiConfig` ✅ 200 (with other languages)
+- `http://localhost:3000/public/config/en/publicConfig` ✅ 200
+- `http://localhost:3000/public/config/en/pageLayout` ✅ 200
+- `http://localhost:3000/public/config/es/publicConfig` ✅ 200 (with other languages)
 
 ### Dynamic Manifest ✅
 ```
-GET /api/manifest/{language}  →  200 OK
+GET /public/manifest/{language}  →  200 OK
 ```
-- `http://localhost:3000/api/manifest/en` ✅ 200
+- `http://localhost:3000/public/manifest/en` ✅ 200
 - Automatically redirects invalid languages to DEFAULT_LANGUAGE (en)
 
 ### Service Worker ✅
@@ -22,7 +22,7 @@ GET /api/manifest/{language}  →  200 OK
 Static file: /files/sw.js  →  200 OK
 Registration: navigator.serviceWorker.register('/files/sw.js')
 ```
-- Service worker correctly caches config routes: `/api/config/en/apiConfig`, `/api/config/en/pageLayout`
+- Service worker correctly caches config routes: `/public/config/en/publicConfig`, `/public/config/en/pageLayout`
 - Handles offline mode with stale-while-revalidate strategy
 
 ### Static Files (/files/) ✅
@@ -32,7 +32,7 @@ Registration: navigator.serviceWorker.register('/files/sw.js')
 /files/apple-touch-icon.svg     → Apple touch icon
 /files/robots.txt               → Robots directive
 /files/sitemap.xml              → Sitemap
-/files/manifest.json            → Legacy (use /api/manifest/{lang} instead)
+/files/manifest.json            → Legacy (use /public/manifest/{lang} instead)
 ```
 
 ---
@@ -41,7 +41,7 @@ Registration: navigator.serviceWorker.register('/files/sw.js')
 
 ### API Routes
 ```
-src/app/api/
+src/app/public/
 ├── config/[language]/[configType]/route.ts
 │   ├─ Reads: /public/collections/{language}/config/{configType}.json
 │   ├─ Returns: JSON with 1-hour cache
@@ -76,8 +76,8 @@ src/config/domains.ts
 ├─ API_ENDPOINTS: Route builders
 ├─ SUPPORTED_LANGUAGES: 11 languages (en, es, fr, de, hi, ta, ar-AE, id, my, si, th)
 ├─ DATA_FILES: File name constants
-├─ getConfigRouteUrl(language, configType)  → /api/config/{lang}/{type}
-└─ getManifestUrl(language)                 → /api/manifest/{lang}
+├─ getConfigRouteUrl(language, configType)  → /public/config/{lang}/{type}
+└─ getManifestUrl(language)                 → /public/manifest/{lang}
 ```
 
 ---
@@ -85,13 +85,13 @@ src/config/domains.ts
 ## What Was Fixed
 
 ### ✅ Removed Non-Functional Routes
-- Deleted `/src/app/api/sw/route.ts` (dynamic service worker generation)
+- Deleted `/src/app/public/sw/route.ts` (dynamic service worker generation)
 - Service worker now uses static `/files/sw.js` file
 
 ### ✅ Updated Service Worker
-- Updated cache endpoints from `/config/pageLayout.json` → `/api/config/en/pageLayout`
-- Updated cache endpoints from `/config/apiConfig.json` → `/api/config/en/apiConfig`
-- Added handler for `/api/config/*` routes
+- Updated cache endpoints from `/config/pageLayout.json` → `/public/config/en/pageLayout`
+- Updated cache endpoints from `/config/publicConfig.json` → `/public/config/en/publicConfig`
+- Added handler for `/public/config/*` routes
 - Maintains offline support with cached responses
 
 ### ✅ Updated Config File Paths
@@ -120,13 +120,13 @@ Features:
 ### Test Specific Routes
 ```bash
 # English config
-curl http://localhost:3000/api/config/en/apiConfig
+curl http://localhost:3000/public/config/en/publicConfig
 
 # Spanish config
-curl http://localhost:3000/api/config/es/pageLayout
+curl http://localhost:3000/public/config/es/pageLayout
 
 # English manifest
-curl http://localhost:3000/api/manifest/en
+curl http://localhost:3000/public/manifest/en
 ```
 
 ---
@@ -135,10 +135,10 @@ curl http://localhost:3000/api/manifest/en
 
 | Old Path | New Path | Status |
 |----------|----------|--------|
-| `/config/apiConfig.json` | `/api/config/en/apiConfig` | ✅ Redirects to new route |
-| `/config/pageLayout.json` | `/api/config/en/pageLayout` | ✅ Uses new dynamic route |
-| `/api/sw` | `/files/sw.js` | ✅ Static file now |
-| `/manifest.json` | `/api/manifest/en` | ✅ Dynamic route now |
+| `/config/publicConfig.json` | `/public/config/en/publicConfig` | ✅ Redirects to new route |
+| `/config/pageLayout.json` | `/public/config/en/pageLayout` | ✅ Uses new dynamic route |
+| `/public/sw` | `/files/sw.js` | ✅ Static file now |
+| `/manifest.json` | `/public/manifest/en` | ✅ Dynamic route now |
 
 ---
 
@@ -148,8 +148,8 @@ curl http://localhost:3000/api/manifest/en
 Server: http://localhost:3000 ✅
 Routes:
   GET /                         → 200 OK
-  GET /api/config/{lang}/{type} → 200 OK
-  GET /api/manifest/{lang}      → 200 OK
+  GET /public/config/{lang}/{type} → 200 OK
+  GET /public/manifest/{lang}      → 200 OK
   GET /config                   → 200 OK (Config browser)
   GET /files/sw.js              → 200 OK (Service worker)
 ```
@@ -166,7 +166,7 @@ The following static files in `/public` should be **removed** as they've been re
 ## ❌ Files to Remove
 
 ### 1. `/public/manifest.json`
-**Replacement**: `/api/manifest/{language}`
+**Replacement**: `/public/manifest/{language}`
 
 **Why Remove**: 
 - Now generated dynamically based on language
@@ -178,7 +178,7 @@ The following static files in `/public` should be **removed** as they've been re
 ---
 
 ### 2. `/public/sw.js` (if exists)
-**Replacement**: `/api/sw`
+**Replacement**: `/public/sw`
 
 **Why Remove**:
 - Service worker is now dynamically generated
@@ -190,7 +190,7 @@ The following static files in `/public` should be **removed** as they've been re
 ---
 
 ### 3. `/public/config/` directory (Optional - Legacy)
-**Replacement**: `/api/config/{language}/{configType}`
+**Replacement**: `/public/config/{language}/{configType}`
 
 **Why Remove**:
 - Config files are now served from language-specific routes
@@ -200,7 +200,7 @@ The following static files in `/public` should be **removed** as they've been re
 **Note**: Only remove if you've migrated all config loading to use the new routes.
 
 **Files to potentially remove**:
-- `/public/config/apiConfig.json`
+- `/public/config/publicConfig.json`
 - `/public/config/pageLayout.json`
 - `/public/config/urlConfig.json`
 
@@ -252,14 +252,14 @@ Before removing files, verify:
    ```typescript
    // Should use dynamic route
    const url = getConfigRouteUrl(language, 'apiConfig');
-   // NOT: '/config/apiConfig.json'
+   // NOT: '/config/publicConfig.json'
    ```
 
 4. **Search codebase**
    ```bash
    grep -r "manifest.json" src/
    grep -r "sw.js" src/
-   grep -r "/config/" src/ | grep -v "/api/config/"
+   grep -r "/config/" src/ | grep -v "/public/config/"
    ```
 
    All matches should be in comments or domain config, not actual code.
@@ -293,9 +293,9 @@ If something breaks after removal:
 1. Check browser console for errors
 2. Check Network tab for 404 responses
 3. Verify route handlers are created:
-   - `/api/config/[language]/[configType]/route.ts`
-   - `/api/manifest/[language]/route.ts`
-   - `/api/sw/route.ts`
+   - `/public/config/[language]/[configType]/route.ts`
+   - `/public/manifest/[language]/route.ts`
+   - `/public/sw/route.ts`
 
 4. Restart development server
 5. Clear browser cache and cookies
@@ -338,17 +338,17 @@ All static `/public` config files have been replaced with **dynamic API routes**
 ### Before (Static Files - ❌ Now Removed)
 ```
 GET /config/pageLayout.json           → 404
-GET /config/apiConfig.json            → 404
+GET /config/publicConfig.json            → 404
 GET /manifest.json                     → 404
 GET /sw.js                            → 404
 ```
 
 ### After (Dynamic Routes - ✅ Now Working)
 ```
-GET /api/config/{language}/pageLayout  → 200 ✓
-GET /api/config/{language}/apiConfig   → 200 ✓
-GET /api/manifest/{language}           → 200 ✓
-GET /api/sw                            → 200 ✓
+GET /public/config/{language}/pageLayout  → 200 ✓
+GET /public/config/{language}/publicConfig   → 200 ✓
+GET /public/manifest/{language}           → 200 ✓
+GET /public/sw                            → 200 ✓
 ```
 
 ---
@@ -356,14 +356,14 @@ GET /api/sw                            → 200 ✓
 ## 📋 New Route Handlers
 
 ### 1. **Config Route** (Language-Specific)
-**Path**: `/api/config/[language]/[configType]/route.ts`
+**Path**: `/public/config/[language]/[configType]/route.ts`
 
 ```typescript
-// GET /api/config/{language}/{configType}
+// GET /public/config/{language}/{configType}
 // Examples:
-GET /api/config/en/apiConfig           → English apiConfig
-GET /api/config/ta/pageLayout          → Tamil pageLayout
-GET /api/config/ar-AE/urlConfig        → Arabic (UAE) urlConfig
+GET /public/config/en/publicConfig           → English apiConfig
+GET /public/config/ta/pageLayout          → Tamil pageLayout
+GET /public/config/ar-AE/urlConfig        → Arabic (UAE) urlConfig
 ```
 
 **Returns**: Language-specific configuration JSON
@@ -378,14 +378,14 @@ GET /api/config/ar-AE/urlConfig        → Arabic (UAE) urlConfig
 ---
 
 ### 2. **Manifest Route** (Language-Specific)
-**Path**: `/api/manifest/[language]/route.ts`
+**Path**: `/public/manifest/[language]/route.ts`
 
 ```typescript
-// GET /api/manifest/{language}
+// GET /public/manifest/{language}
 // Examples:
-GET /api/manifest/en                   → English manifest
-GET /api/manifest/ta                   → Tamil manifest
-GET /api/manifest/ar-AE                → Arabic (UAE) manifest
+GET /public/manifest/en                   → English manifest
+GET /public/manifest/ta                   → Tamil manifest
+GET /public/manifest/ar-AE                → Arabic (UAE) manifest
 ```
 
 **Returns**: Language-specific `manifest.json` for PWA
@@ -400,11 +400,11 @@ GET /api/manifest/ar-AE                → Arabic (UAE) manifest
 ---
 
 ### 3. **Service Worker Route** (Dynamic Generation)
-**Path**: `/api/sw/route.ts`
+**Path**: `/public/sw/route.ts`
 
 ```typescript
-// GET /api/sw
-GET /api/sw                            → Generated service worker
+// GET /public/sw
+GET /public/sw                            → Generated service worker
 ```
 
 **Returns**: Dynamically generated `service-worker-compatible JavaScript`
@@ -435,15 +435,15 @@ import {
 
 // Get config for specific language
 const configUrl = API_ENDPOINTS.configRoute('en', 'apiConfig');
-// → '/api/config/en/apiConfig'
+// → '/public/config/en/publicConfig'
 
 // Get manifest
 const manifestUrl = getManifestUrl('ta');
-// → '/api/manifest/ta'
+// → '/public/manifest/ta'
 
 // Get service worker
 const swUrl = getServiceWorkerUrl();
-// → '/api/sw'
+// → '/public/sw'
 ```
 
 ### In Components/Pages
@@ -512,7 +512,7 @@ All routes support these language codes:
 ## 📂 File Structure
 
 ```
-src/app/api/
+src/app/public/
 ├── config/
 │   └── [language]/
 │       └── [configType]/
@@ -559,9 +559,9 @@ src/app/api/
 
 ## 🚀 Migration Checklist
 
-- ✅ Config routes created (`/api/config/[language]/[configType]`)
-- ✅ Manifest route created (`/api/manifest/[language]`)
-- ✅ Service worker route created (`/api/sw`)
+- ✅ Config routes created (`/public/config/[language]/[configType]`)
+- ✅ Manifest route created (`/public/manifest/[language]`)
+- ✅ Service worker route created (`/public/sw`)
 - ✅ Domain configuration updated
 - ✅ Layout updated to use dynamic manifest
 - ✅ Service worker manager updated
@@ -575,28 +575,28 @@ src/app/api/
 ### Test Config Routes
 ```bash
 # Get English API config
-curl http://localhost:3000/api/config/en/apiConfig
+curl http://localhost:3000/public/config/en/publicConfig
 
 # Get Tamil page layout
-curl http://localhost:3000/api/config/ta/pageLayout
+curl http://localhost:3000/public/config/ta/pageLayout
 
 # Get Arabic URL config
-curl http://localhost:3000/api/config/ar-AE/urlConfig
+curl http://localhost:3000/public/config/ar-AE/urlConfig
 ```
 
 ### Test Manifest
 ```bash
 # Get English manifest
-curl http://localhost:3000/api/manifest/en | jq
+curl http://localhost:3000/public/manifest/en | jq
 
 # Get Tamil manifest
-curl http://localhost:3000/api/manifest/ta | jq
+curl http://localhost:3000/public/manifest/ta | jq
 ```
 
 ### Test Service Worker
 ```bash
 # Get service worker script
-curl http://localhost:3000/api/sw | head -20
+curl http://localhost:3000/public/sw | head -20
 ```
 
 ---
@@ -607,8 +607,8 @@ curl http://localhost:3000/api/sw | head -20
 ```json
 {
   "apiEndpoints": {
-    "analytics": "/api/analytics",
-    "content": "/api/content"
+    "analytics": "/public/analytics",
+    "content": "/public/content"
   },
   // ... other config
 }
@@ -644,23 +644,23 @@ const CACHE_NAME = 'kuhandran-portfolio-v...';
 4. **Cached**: Proper cache headers for optimal performance
 5. **SEO Friendly**: Manifest serves proper content-type headers
 
-# Why `/api/config/en/apiConfig` Uses Localhost
+# Why `/public/config/en/publicConfig` Uses Localhost
 
 ## Current Architecture
 
 ### What's Happening Now
 ```
-Browser Request → http://localhost:3000/api/config/en/apiConfig
+Browser Request → http://localhost:3000/public/config/en/publicConfig
                            ↓
              Next.js API Route Handler
-           /src/app/api/config/[language]/[configType]/route.ts
+           /src/app/public/config/[language]/[configType]/route.ts
                            ↓
-        Reads from /public/collections/en/config/apiConfig.json
+        Reads from /public/collections/en/config/publicConfig.json
                            ↓
         Returns JSON response to browser
 ```
 
-**Route Handler**: `src/app/api/config/[language]/[configType]/route.ts`
+**Route Handler**: `src/app/public/config/[language]/[configType]/route.ts`
 - Serves config files from `public/collections/{language}/config/` directory
 - Runs on localhost:3000 during development
 - Acts as a proxy between browser and static files
@@ -683,7 +683,7 @@ Browser Request → http://localhost:3000/api/config/en/apiConfig
 ## Two Possible Approaches
 
 ### Approach 1: Current (RECOMMENDED FOR DEVELOPMENT)
-**URL**: `http://localhost:3000/api/config/en/apiConfig`
+**URL**: `http://localhost:3000/public/config/en/publicConfig`
 **Pros**:
 - ✅ Works in development without external API
 - ✅ No CORS issues
@@ -697,7 +697,7 @@ Browser Request → http://localhost:3000/api/config/en/apiConfig
 ---
 
 ### Approach 2: Direct Static API Call
-**URL**: `https://static-api-opal.vercel.app/config/en/apiConfig.json`
+**URL**: `https://static-api-opal.vercel.app/config/en/publicConfig.json`
 **Pros**:
 - ✅ Works everywhere (dev, staging, production)
 - ✅ CDN delivery
@@ -716,10 +716,10 @@ Browser Request → http://localhost:3000/api/config/en/apiConfig
 Use local API routes in development and switch to static API in production via environment variables.
 
 ```typescript
-// src/lib/api/apiClient.ts
+// src/lib/public/publicClient.ts
 const CONFIG_URL = process.env.NODE_ENV === 'production'
   ? 'https://static-api-opal.vercel.app/config'
-  : 'http://localhost:3000/api/config';
+  : 'http://localhost:3000/public/config';
 ```
 
 ### Option B: Always Use Static API
@@ -739,7 +739,7 @@ export function getConfigRouteUrl(
 ## Summary
 
 **localhost is being used because:**
-1. `/api/config/` is a local Next.js route handler
+1. `/public/config/` is a local Next.js route handler
 2. It reads files from `/public/collections/` directory
 3. It's designed for development and testing
 

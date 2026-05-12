@@ -5,8 +5,8 @@ import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from '@/lib/config/domains';
  * Dynamic Web App Manifest Route
  * Generates language-specific manifest.json
  * 
- * Usage: GET /api/manifest/{language}
- * Example: GET /api/manifest/en
+ * Usage: GET /public/manifest/{language}
+ * Example: GET /public/manifest/en
  *          → returns manifest.json with language-specific content
  */
 
