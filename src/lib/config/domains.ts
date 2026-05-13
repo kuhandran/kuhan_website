@@ -26,10 +26,10 @@ export const DOMAINS = {
       return window.location.origin;
     }
     // Server-side: use environment variable or default
-    if (process.env.VERCEL_URL) {
-      return `https://${process.env.VERCEL_URL}`;
-    }
-    return 'http://localhost:3000';
+    // if (process.env.VERCEL_URL) {
+    //   return `https://${process.env.VERCEL_URL}`;
+    // }
+    return 'https://static.kuhandranchatbot.info';
   },
 } as const;
 
@@ -39,26 +39,27 @@ export const DOMAINS = {
 
 export const API_ENDPOINTS = {
   // Production API paths
-  collections: (language: string, type: 'data' | 'config', file: string) =>
-    `${DOMAINS.PRODUCTION_API}/api/collections/${language}/${type}/${file}`,
+  collections: (language: string, type: 'data' | 'config', file: string) => {
+    const normalizedFile = file.replace(/\.json$/i, '');
+    return `${DOMAINS.PRODUCTION_API}/public/collections/${language}/${type}/${normalizedFile}.json`;
+  },
 
   // Internal API routes
   contentProxy: (type: string) => `/api/content/${type}`,
-  analyticsVisitor: () => '/api/analytics/visitor',
+  analyticsVisitor: () => '/public/analytics/visitor',
 
   // Language-specific config routes
   configRoute: (language: string, configType: string) =>
-    `/api/config/${language}/${configType}`,
+    `${DOMAINS.PRODUCTION_API}/public/config/${language}/${configType}`,
   manifestRoute: (language: string = DEFAULT_LANGUAGE) =>
-    `/api/manifest/${language}`,
-
+    `${DOMAINS.PRODUCTION_API}/public/manifest/${language}`,
   // CDN paths
   cdnData: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/data/${file}`,
+    `${DOMAINS.CDN}/public/collections/en/data/${file}.json`,
   cdnConfig: (file: string) =>
-    `${DOMAINS.CDN}/api/collections/en/config/${file}`,
+    `${DOMAINS.CDN}/public/collections/en/config/${file}`,
   cdnImage: (imagePath: string) =>
-    `${DOMAINS.CDN}/api/image/${imagePath}`,
+    `${DOMAINS.CDN}/public/image/${imagePath}`,
 
   // Third-party APIs
   ipGeolocation: () => `${DOMAINS.IP_API}/json/`,
@@ -144,32 +145,51 @@ export const IMAGE_ASSETS = {
 /**
  * Get full URL for production API collection data
  * @example getCollectionUrl('en', 'data', 'experience')
- *          → 'https://static-api-opal.vercel.app/collections/en/data/experience.json'
+ *          → 'https://static.kuhandranchatbot.info/public/collections/en/data/experience.json'
  */
 export function getCollectionUrl(
   language: SupportedLanguage = DEFAULT_LANGUAGE,
   type: 'data' | 'config',
   file: string
 ): string {
-  return API_ENDPOINTS.collections(language, type, file);
+  const normalizedFile = file.replace(/\.json$/i, '');
+  return API_ENDPOINTS.collections(language, type, normalizedFile);
 }
 
 /**
  * Get full URL for CDN data
  * @example getCdnDataUrl('skills')
- *          → 'https://static.kuhandranchatbot.info/data/skills.json'
+ *          → 'https://static.kuhandranchatbot.info/public/collections/en/data/skills.json'
  */
 export function getCdnDataUrl(file: string): string {
-  return API_ENDPOINTS.cdnData(file);
+  const normalizedFile = file.replace(/\.json$/i, '');
+  return API_ENDPOINTS.cdnData(normalizedFile);
 }
 
 /**
  * Get full URL for CDN image
  * @example getCdnImageUrl('profile.webp')
- *          → 'https://static.kuhandranchatbot.info/image/profile.webp'
+ *          → 'https://static.kuhandranchatbot.info/public/image/profile.webp'
  */
 export function getCdnImageUrl(imagePath: string): string {
-  return API_ENDPOINTS.cdnImage(imagePath);
+  // Normalize path: remove common prefixes
+  let normalizedPath = imagePath.replace(/^\/+/, ''); // Remove leading slashes
+  
+  // Strip duplicate/nested path prefixes
+  const prefixes = ['public/api/image/', 'api/image/', 'public/image/', 'image/'];
+  let matched = true;
+  
+  while (matched) {
+    matched = false;
+    for (const prefix of prefixes) {
+      if (normalizedPath.startsWith(prefix)) {
+        normalizedPath = normalizedPath.substring(prefix.length);
+        matched = true;
+      }
+    }
+  }
+  
+  return API_ENDPOINTS.cdnImage(normalizedPath);
 }
 
 /**

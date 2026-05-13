@@ -1,0 +1,7 @@
+{
+  "skills": [
+    { "name": "JavaScript", "level": "advanced" },
+    { "name": "TypeScript", "level": "advanced" },
+    { "name": "React", "level": "advanced" }
+  ]
+}

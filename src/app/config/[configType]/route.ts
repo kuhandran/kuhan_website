@@ -11,5 +11,5 @@ export async function GET(request: Request) {
   const configType = url.pathname.split('/').pop()?.replace('.json', '') || 'apiConfig';
   
   // Redirect to the new dynamic route with default language
-  redirect(`/api/config/${DEFAULT_LANGUAGE}/${configType}`);
+  redirect(`/public/config/${DEFAULT_LANGUAGE}/${configType}`);
 }

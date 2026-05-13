@@ -196,7 +196,7 @@ export async function fetchPageLayout() {
   pageLayoutPromise = (async () => {
     try {
       // Fetch from external API
-      const url = getDataSourceUrl('pageLayout.json', DEFAULT_LANGUAGE, 'config');
+      const url = `${getApiBaseUrl()}${getConfigUrl('pageLayout', DEFAULT_LANGUAGE)}`;
       console.log('[Loaders] Fetching pageLayout from:', url);
       
       const response = await fetch(url);
@@ -270,7 +270,7 @@ export async function fetchApiConfig() {
   apiConfigPromise = (async () => {
     try {
       // Fetch from external API
-      const url = getDataSourceUrl('apiConfig.json', DEFAULT_LANGUAGE, 'config');
+      const url = `${getApiBaseUrl()}${getConfigUrl('apiConfig', DEFAULT_LANGUAGE)}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));
       
@@ -369,7 +369,7 @@ export function getConfigUrl(
   languageCode: string = DEFAULT_LANGUAGE
 ): string {
   // Use local dynamic API route instead of external API
-  return `/api/config/${languageCode}/${configName}`;
+  return `/public/collections/${languageCode}/config/${configName}.json`;
 }
 
 // ============================================================================

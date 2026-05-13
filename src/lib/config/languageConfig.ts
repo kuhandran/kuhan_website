@@ -44,14 +44,28 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
 
   languagesConfigPromise = (async () => {
     try {
-      // Try to fetch from production API first
-      const { getInfoFromAPI } = await import('@/lib/api');
-      const response = await getInfoFromAPI<{ data?: LanguagesConfig } | LanguagesConfig>(
-        'GET',
-        'api/config/languages',
-        undefined,
-        true
-      );
+      // Fetch directly from static CDN config to avoid API path rewriting issues
+      const configUrl = 'https://static.kuhandranchatbot.info/public/config/languages.json';
+      console.log('Fetching languages config from static CDN...', configUrl);
+
+      const staticResponse = await fetch(configUrl, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!staticResponse.ok) {
+        throw new Error(
+          `Failed to fetch languages config: ${staticResponse.status} ${staticResponse.statusText}`
+        );
+      }
+
+      const response: { data?: LanguagesConfig } | LanguagesConfig =
+        await staticResponse.json();
+
+      console.log('Languages config raw response:', response);
       
       // Extract data from API response wrapper
       const result = response && typeof response === 'object' && 'data' in response 
@@ -170,8 +184,8 @@ export function getDefaultLanguagesConfig(): LanguagesConfig {
       'achievements',
     ],
     apiEndpoints: {
-      listLanguages: 'GET /api/config/languages',
-      getLocaleData: 'GET /api/collections/:language/:type/:file',
+      listLanguages: 'GET /public/config/languages.json',
+      getLocaleData: 'GET /public/collections/:language/:type/:file',
     },
   };
 }

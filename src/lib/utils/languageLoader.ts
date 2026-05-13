@@ -4,8 +4,8 @@
  * Falls back to English (en) if requested language or file is not available
  * 
  * API Endpoints:
- * - Config: https://static.kuhandranchatbot.info/api/collections/{language}/config/{type}
- * - Data: https://static.kuhandranchatbot.info/api/collections/{language}/data/{type}
+ * - Config: https://static.kuhandranchatbot.info/public/collections/{language}/config/{type}
+ * - Data: https://static.kuhandranchatbot.info/public/collections/{language}/data/{type}
  */
 
 import { getCollectionUrl } from '@/lib/config/domains';

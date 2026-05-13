@@ -7,8 +7,8 @@ import { getDataSourceUrl } from '@/lib/config/loaders';
  * Language-Specific Config Route Handler
  * Serves config files based on language code
  * 
- * Usage: GET /api/config/{language}/{configType}
- * Example: GET /api/config/en/apiConfig
+ * Usage: GET /public/config/{language}/{configType}
+ * Example: GET /public/config/en/apiConfig
  *          → returns English apiConfig.json with Content-Type: application/json
  *
  * Supported config types:
@@ -23,7 +23,15 @@ async function loadConfigFile(language: string, configType: string): Promise<unk
     const validLanguages = SUPPORTED_LANGUAGES as readonly string[];
     const normalizedLanguage = validLanguages.includes(language) ? language : DEFAULT_LANGUAGE;
 
-    // Load config using proper functions from contentLoader
+    // Return pointer to static file for apiConfig (ar-AE example)
+    if (configType === 'apiConfig' && normalizedLanguage === 'ar-AE') {
+      return {
+        url: 'https://static.kuhandranchatbot.info/public/collections/ar-AE/config/apiConfig.json',
+        note: 'Static pointer to ar-AE apiConfig.json',
+      };
+    }
+
+    // Load config using proper functions from contentLoader for other cases
     switch (configType) {
       case DATA_FILES.apiConfig:
         return await getApiConfig(normalizedLanguage);

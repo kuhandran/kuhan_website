@@ -1,6 +1,6 @@
 /**
  * Achievements Data
- * Loaded from: /data/achievements.json (dev) or https://static.kuhandranchatbot.info/api/collections/{language}/data/achievements (prod)
+ * Loaded from: /data/achievements.json (dev) or https://static.kuhandranchatbot.info/public/collections/{language}/data/achievements (prod)
  */
 
 import { getDataSourceUrl } from '@/lib/config/loaders';

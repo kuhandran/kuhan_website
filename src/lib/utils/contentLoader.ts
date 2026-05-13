@@ -43,7 +43,7 @@ export async function getMultilingualContent(
   try {
     // Use Next.js API proxy instead of direct external API call
     // This avoids CORS issues and provides automatic fallback to local data
-    const proxyUrl = `/api/content/data?language=${languageCode}&file=${fileType}`;
+    const proxyUrl = `/public/content/data?language=${languageCode}&file=${fileType}.json`;
     console.log('[ContentLoader] Fetching via proxy', { language: languageCode, file: fileType });
     
     const response = await fetch(proxyUrl, {

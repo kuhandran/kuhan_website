@@ -120,17 +120,36 @@ export async function fetchCollectionData<T extends Record<string, unknown> | un
     }
 
     // Fallback to API
-    const url = getCollectionUrl(language, 'data', dataType);
-    console.log(`[API] Fetching collection: ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      cache: 'default',
-    });
+    const baseUrl = getCollectionUrl(language, 'data', dataType);
+    const requestUrls = [baseUrl];
+    if (!baseUrl.toLowerCase().endsWith('.json')) {
+      requestUrls.push(`${baseUrl}.json`);
+    }
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    let response: Response | null = null;
+    let lastError: Error | null = null;
+
+    for (const requestUrl of requestUrls) {
+      try {
+        console.log(`[API] Fetching collection: ${requestUrl}`);
+        response = await fetch(requestUrl, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          cache: 'default',
+        });
+
+        if (response.ok) {
+          break;
+        }
+
+        lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+      } catch (fetchError) {
+        lastError = fetchError as Error;
+      }
+    }
+
+    if (!response || !response.ok) {
+      throw lastError || new Error('Failed to fetch collection data');
     }
 
     const responseData = await response.json();
