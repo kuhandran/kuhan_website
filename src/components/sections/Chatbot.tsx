@@ -11,6 +11,31 @@ import { MessageCircle, Bot, X } from 'lucide-react';
 import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
 import { fetchApiConfig } from '@/lib/config/loaders';
 
+const AUTH_SERVICE_BASE_URL = 'https://auth-services.kuhandranchatbot.info';
+
+type JsonObject = Record<string, any>;
+
+async function readJsonResponse(response: Response) {
+  const data = await response.json().catch(() => ({}));
+  return data && typeof data === 'object' ? data as JsonObject : {};
+}
+
+function unwrapResponsePayload(data: JsonObject) {
+  if (data.data && typeof data.data === 'object') return data.data as JsonObject;
+  if (data.content && typeof data.content === 'object') return data.content as JsonObject;
+  return data;
+}
+
+function isOtpSentResponse(data: JsonObject) {
+  const message = typeof data.message === 'string' ? data.message.toLowerCase() : '';
+  return (
+    data.otp_generated === true ||
+    data.otpGenerated === true ||
+    message.includes('otp sent') ||
+    (typeof data.identifier === 'string' && typeof data.expiresAt === 'string')
+  );
+}
+
 // Safe defaults in case contentLabels is undefined
 const defaultContentLabels = {
   chatbot: {
@@ -346,13 +371,17 @@ export function Chatbot() {
     const identifier = email.trim();
 
     setStatusMsg(null);
+    if (!identifier) {
+      setStatusMsg('Please enter your email.');
+      return;
+    }
     if (!turnstileToken) {
       setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || 'Please complete the captcha.');
       return;
     }
     setLoading(true);
     try {
-      const res = await fetch('https://auth-services.kuhandranchatbot.info/generate-otp', {
+      const res = await fetch(`${AUTH_SERVICE_BASE_URL}/generate-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -363,13 +392,16 @@ export function Chatbot() {
           captchaToken: turnstileToken,
         })
       });
-      const data = await res.json().catch(() => ({}));
-      if (data.otp_generated) {
+      const data = unwrapResponsePayload(await readJsonResponse(res));
+      if (isOtpSentResponse(data)) {
+        if (typeof data.identifier === 'string') {
+          setEmail(data.identifier);
+        }
         setStep('otp');
-        setStatusMsg(contentLabels?.chatbot?.messages?.otpSent || 'OTP sent successfully.');
+        setStatusMsg(data.message || contentLabels?.chatbot?.messages?.otpSent || 'OTP sent successfully.');
       } else {
         setCaptchaToken(null);
-        setStatusMsg(data.detail || data.error || contentLabels?.chatbot?.messages?.otpFailed || 'Failed to send OTP.');
+        setStatusMsg(data.detail || data.error || data.message || contentLabels?.chatbot?.messages?.otpFailed || 'Failed to send OTP.');
       }
     } catch (e) {
       setCaptchaToken(null);
@@ -383,19 +415,24 @@ export function Chatbot() {
     setStatusMsg(null);
     setLoading(true);
     try {
-      const res = await fetch(apiConfig.fullUrls.verifyOtp, {
+      const identifier = email.trim();
+      const res = await fetch(`${AUTH_SERVICE_BASE_URL}/authorise-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp })
+        body: JSON.stringify({ identifier, otp: otp.trim() })
       });
-      const data = await res.json();
-      if ((data.jwt || data.token) && data.session_id) {
-        setJwt(data.jwt || data.token);
-        setSessionId(data.session_id);
+      const data = unwrapResponsePayload(await readJsonResponse(res));
+      const sessionToken = data.sessionToken || data.session_token;
+      const accessToken = data.jwt || data.token || sessionToken;
+      const sessionId = data.session_id || data.sessionId || sessionToken;
+
+      if (res.ok && accessToken && sessionId) {
+        setJwt(accessToken);
+        setSessionId(sessionId);
         setStep('chat');
         setStatusMsg(contentLabels?.chatbot?.messages?.verifySuccess || 'Verified successfully!');
       } else {
-        setStatusMsg(data.detail || 'Invalid OTP. Try again.');
+        setStatusMsg(data.detail || data.error || 'Invalid OTP. Try again.');
       }
     } catch (e) {
       setStatusMsg(contentLabels?.chatbot?.messages?.otpError2 || 'Error verifying OTP. Please try again.');
