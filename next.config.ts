@@ -17,7 +17,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: https:",
   "font-src 'self' https://fonts.gstatic.com data:",
-  "connect-src 'self' https://static.kuhandranchatbot.info https://api.github.com https://challenges.cloudflare.com",
+  "connect-src 'self' https://static.kuhandranchatbot.info https://auth-services.kuhandranchatbot.info https://api.github.com https://challenges.cloudflare.com",
   "frame-src 'self' https://challenges.cloudflare.com",
   "object-src 'none'",
   "base-uri 'self'",
