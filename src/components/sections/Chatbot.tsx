@@ -343,6 +343,7 @@ export function Chatbot() {
   // OTP request handler: requests OTP from backend
   async function handleRequestOtp(tokenOverride?: string | null) {
     const turnstileToken = tokenOverride || captchaToken;
+    const identifier = email.trim();
 
     setStatusMsg(null);
     if (!turnstileToken) {
@@ -355,13 +356,14 @@ export function Chatbot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email,
+          identifier,
+          email: identifier,
           turnstile: turnstileToken,
           turnstileToken,
           captchaToken: turnstileToken,
         })
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (data.otp_generated) {
         setStep('otp');
         setStatusMsg(contentLabels?.chatbot?.messages?.otpSent || 'OTP sent successfully.');
