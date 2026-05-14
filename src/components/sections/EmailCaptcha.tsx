@@ -23,6 +23,9 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
   onRequestOtp
 }) => {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const handleTurnstileToken = (token: string) => {
+    setCaptchaToken(token || null);
+  };
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50">
@@ -42,7 +45,8 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
         {turnstileSiteKey ? (
           <Turnstile
             sitekey={turnstileSiteKey}
-            onVerify={(token) => setCaptchaToken(token)}
+            onVerify={handleTurnstileToken}
+            onSuccess={handleTurnstileToken}
             onExpire={() => setCaptchaToken(null)}
             onError={() => setCaptchaToken(null)}
             onTimeout={() => setCaptchaToken(null)}
@@ -56,6 +60,7 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
         )}
       </div>
       <button
+        type="button"
         onClick={onRequestOtp}
         disabled={!email || !captchaToken || loading}
         className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"

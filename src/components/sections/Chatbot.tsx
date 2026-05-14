@@ -353,13 +353,13 @@ export function Chatbot() {
     }
     setLoading(true);
     try {
-      const res = await fetch(apiConfig.fullUrls.requestOtp, {
+      const res = await fetch('https://auth-services.kuhandranchatbot.info/generate-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           turnstile: captchaToken,
-          turnstileToken: captchaToken,
+          captchaToken: captchaToken,
         })
       });
       const data = await res.json();
