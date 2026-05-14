@@ -62,7 +62,6 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
       <button
         type="button"
         onClick={onRequestOtp}
-        disabled={!email || !captchaToken || loading}
         className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
         {loading ? 'Sending OTP...' : 'Request OTP'}
