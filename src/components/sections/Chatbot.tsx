@@ -341,9 +341,11 @@ export function Chatbot() {
     </>
   );
   // OTP request handler: requests OTP from backend
-  async function handleRequestOtp() {
+  async function handleRequestOtp(tokenOverride?: string | null) {
+    const turnstileToken = tokenOverride || captchaToken;
+
     setStatusMsg(null);
-    if (!captchaToken) {
+    if (!turnstileToken) {
       setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || 'Please complete the captcha.');
       return;
     }
@@ -358,8 +360,9 @@ export function Chatbot() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          turnstile: captchaToken,
-          captchaToken: captchaToken,
+          turnstile: turnstileToken,
+          turnstileToken,
+          captchaToken: turnstileToken,
         })
       });
       const data = await res.json();

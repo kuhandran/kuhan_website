@@ -10,7 +10,7 @@ interface EmailCaptchaProps {
   setCaptchaToken: (token: string | null) => void;
   loading: boolean;
   statusMsg: string | null;
-  onRequestOtp: () => void;
+  onRequestOtp: (captchaToken?: string | null) => void;
 }
 
 const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
@@ -23,8 +23,17 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
   onRequestOtp
 }) => {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(captchaToken);
+
+  const clearTurnstileToken = () => {
+    setTurnstileToken(null);
+    setCaptchaToken(null);
+  };
+
   const handleTurnstileToken = (token: string) => {
-    setCaptchaToken(token || null);
+    const nextToken = token?.trim() || null;
+    setTurnstileToken(nextToken);
+    setCaptchaToken(nextToken);
   };
 
   return (
@@ -35,7 +44,7 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
         value={email}
         onChange={e => {
           setEmail(e.target.value);
-          setCaptchaToken(null);
+          clearTurnstileToken();
         }}
         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3 text-black"
         placeholder="you@email.com"
@@ -47,9 +56,9 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
             sitekey={turnstileSiteKey}
             onVerify={handleTurnstileToken}
             onSuccess={handleTurnstileToken}
-            onExpire={() => setCaptchaToken(null)}
-            onError={() => setCaptchaToken(null)}
-            onTimeout={() => setCaptchaToken(null)}
+            onExpire={clearTurnstileToken}
+            onError={clearTurnstileToken}
+            onTimeout={clearTurnstileToken}
             refreshExpired="auto"
             theme="light"
           />
@@ -61,7 +70,8 @@ const EmailCaptcha: React.FC<EmailCaptchaProps> = ({
       </div>
       <button
         type="button"
-        onClick={onRequestOtp}
+        onClick={() => onRequestOtp(turnstileToken)}
+        disabled={!email || !turnstileToken || loading}
         className="w-full p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
         {loading ? 'Sending OTP...' : 'Request OTP'}
