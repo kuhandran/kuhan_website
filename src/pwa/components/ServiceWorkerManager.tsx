@@ -12,9 +12,29 @@ export function ServiceWorkerManager() {
     if (typeof window === 'undefined') return;
 
     let updateCheckInterval: NodeJS.Timeout | null = null;
+    const isLocalDevelopment =
+      process.env.NODE_ENV === 'development' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+
+    const clearLocalServiceWorkers = async () => {
+      if (!('serviceWorker' in navigator)) return;
+
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+
+      if (registrations.length > 0) {
+        console.log('[SW] Cleared local development service workers');
+      }
+    };
 
     const initializeServiceWorker = async () => {
       try {
+        if (isLocalDevelopment) {
+          await clearLocalServiceWorkers();
+          return;
+        }
+
         // Register service worker
         if ('serviceWorker' in navigator) {
           const registration = await navigator.serviceWorker.register('/sw.js', {

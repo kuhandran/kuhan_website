@@ -303,6 +303,7 @@ export function Chatbot() {
               captchaToken={captchaToken}
               setCaptchaToken={setCaptchaToken}
               loading={loading}
+              statusMsg={statusMsg}
               onRequestOtp={handleRequestOtp}
               key={step}
             />
@@ -346,21 +347,31 @@ export function Chatbot() {
       setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || 'Please complete the captcha.');
       return;
     }
+    if (!apiConfig?.fullUrls?.requestOtp) {
+      setStatusMsg(contentLabels?.chatbot?.messages?.connectionError || 'Sorry, I\'m having trouble connecting.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(apiConfig.fullUrls.requestOtp, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, recaptcha: captchaToken })
+        body: JSON.stringify({
+          email,
+          turnstile: captchaToken,
+          turnstileToken: captchaToken,
+        })
       });
       const data = await res.json();
       if (data.otp_generated) {
         setStep('otp');
         setStatusMsg(contentLabels?.chatbot?.messages?.otpSent || 'OTP sent successfully.');
       } else {
-        setStatusMsg(contentLabels?.chatbot?.messages?.otpFailed || 'Failed to send OTP.');
+        setCaptchaToken(null);
+        setStatusMsg(data.detail || data.error || contentLabels?.chatbot?.messages?.otpFailed || 'Failed to send OTP.');
       }
     } catch (e) {
+      setCaptchaToken(null);
       setStatusMsg(contentLabels?.chatbot?.messages?.otpError || 'Error sending OTP. Please try again.');
     }
     setLoading(false);

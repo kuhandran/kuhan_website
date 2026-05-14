@@ -101,6 +101,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const scriptSrc = [
+    "'self'",
+    "'unsafe-inline'",
+    ...(isDevelopment ? ["'unsafe-eval'"] : []),
+    "https://www.googletagmanager.com",
+    "https://www.google-analytics.com",
+    "https://va.vercel-scripts.com",
+    "https://challenges.cloudflare.com",
+  ].join(" ");
+  const csp = [
+    "default-src 'self'",
+    "manifest-src 'self' https://static.kuhandranchatbot.info",
+    "img-src 'self' data: https:",
+    `script-src ${scriptSrc}`,
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://static.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co https://challenges.cloudflare.com",
+    "frame-src 'self' https://static.kuhandranchatbot.info https://challenges.cloudflare.com",
+  ].join("; ");
+
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <head>
@@ -151,25 +172,7 @@ export default function RootLayout({
         {/* Security and trust meta tags for Zscaler and SEO */}
         <meta
           httpEquiv="Content-Security-Policy"
-          content="
-
-          default-src 'self';
-
-          manifest-src 'self' https://static.kuhandranchatbot.info;
-
-          img-src 'self' data: https:;
-
-          script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://va.vercel-scripts.com;
-
-          style-src 'self' 'unsafe-inline';
-
-          font-src 'self' https://fonts.gstatic.com;
-
-          connect-src 'self' https://static.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://www.google.com https://www.gstatic.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co;
-
-          frame-src 'self' https://www.google.com https://www.gstatic.com https://static.kuhandranchatbot.info;
-
-          "
+          content={csp}
         />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta
