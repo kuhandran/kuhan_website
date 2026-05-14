@@ -349,10 +349,6 @@ export function Chatbot() {
       setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || 'Please complete the captcha.');
       return;
     }
-    if (!apiConfig?.fullUrls?.requestOtp) {
-      setStatusMsg(contentLabels?.chatbot?.messages?.connectionError || 'Sorry, I\'m having trouble connecting.');
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch('https://auth-services.kuhandranchatbot.info/generate-otp', {
