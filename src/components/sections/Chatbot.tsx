@@ -3,67 +3,33 @@
 
 import { useState, useRef, useEffect } from 'react';
 import EmailCaptcha from './EmailCaptcha';
-import OtpEntry from './OtpEntry';
 import ChatProcess from './ChatProcess';
 import type { ChatbotStep } from './ChatbotState';
-import { resetToOtp } from './chatbotHelpers';
 import { MessageCircle, Bot, X } from 'lucide-react';
 import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
-import { fetchApiConfig } from '@/lib/config/loaders';
 
-const AUTH_SERVICE_BASE_URL = 'https://auth-services.kuhandranchatbot.info';
+const CF_CHAT_BASE_URL = 'https://cf-chat-services.skuhandran.workers.dev';
 
-type JsonObject = Record<string, any>;
+const defaultMessage = "Hi! I'm Kuhandran's AI assistant. Ask me anything about his experience, skills, or projects!";
 
-async function readJsonResponse(response: Response) {
-  const data = await response.json().catch(() => ({}));
-  return data && typeof data === 'object' ? data as JsonObject : {};
-}
-
-function unwrapResponsePayload(data: JsonObject) {
-  if (data.data && typeof data.data === 'object') return data.data as JsonObject;
-  if (data.content && typeof data.content === 'object') return data.content as JsonObject;
-  return data;
-}
-
-function isOtpSentResponse(data: JsonObject) {
-  const message = typeof data.message === 'string' ? data.message.toLowerCase() : '';
-  return (
-    data.otp_generated === true ||
-    data.otpGenerated === true ||
-    message.includes('otp sent') ||
-    (typeof data.identifier === 'string' && typeof data.expiresAt === 'string')
-  );
-}
-
-// Safe defaults in case contentLabels is undefined
 const defaultContentLabels = {
   chatbot: {
     title: 'AI Assistant',
     subtitle: 'Ask me anything about Kuhandran',
-    initialMessage: "Hi! I'm Kuhandran's AI assistant.",
+    initialMessage: defaultMessage,
     messages: {
-      sessionExpired: 'Session expired. Please refresh.',
-      sessionExpiredOtp: 'Session expired. Please re-enter OTP.',
+      sessionExpired: 'Session expired. Please log in again.',
+      sessionExpiredOtp: 'Session expired. Please re-enter details.',
       noResponse: 'Sorry, I did not understand the response.',
-      connectionError: 'Sorry, I\'m having trouble connecting.',
+      connectionError: "Sorry, I'm having trouble connecting.",
+      captchaRequired: 'Please complete the captcha.',
     },
-    otp: {
-      label: 'Enter OTP',
-      placeholder: '6-digit OTP',
-      verifyButton: 'Verify OTP',
-      verifying: 'Verifying...',
-      changeEmail: 'Change email'
-    }
   }
 };
 
 export function Chatbot() {
-
-  // Use provided labels or fallback to defaults
   const contentLabels = defaultLabels || defaultContentLabels;
 
-  // Message type for chat messages
   interface Message {
     id: string;
     text: string;
@@ -71,91 +37,49 @@ export function Chatbot() {
     timestamp: Date;
   }
 
-  // State and refs for chatbot session, input, and timers
-  const [apiConfig, setApiConfig] = useState<any>({});
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [inactivitySeconds, setInactivitySeconds] = useState(300);
   const [isTyping, setIsTyping] = useState(false);
-  
-  useEffect(() => {
-    // Fetch API config from CDN
-    fetchApiConfig().then(config => setApiConfig(config));
-  }, []);
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [jwt, setJwt] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [step, setStep] = useState<ChatbotStep>('email');
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
+  // Tokens kept in memory only (not localStorage)
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  // CF chat session ID — passed back to /chat for conversation context
+  const [cfSessionId, setCfSessionId] = useState<string | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  // Timers: use number | null for browser
   const idleTimeoutRef = useRef<number | null>(null);
   const inactivityTimeoutRef = useRef<number | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
 
-  // Countdown effect for inactivity timer (visible timer)
-  // Resets inactivitySeconds if not in chat, or decrements every second
+  // Inactivity countdown (visible timer)
   useEffect(() => {
-    if (step !== 'chat') {
-      setInactivitySeconds(300);
-      return;
-    }
+    if (step !== 'chat') return;
     if (inactivitySeconds <= 0) {
-      resetToOtp(
-        setJwt,
-        setSessionId,
-        setOtp,
-        setStep,
-        setStatusMsg,
-        setInactivitySeconds
-      );
+      resetSession('Session timed out. Please log in again.');
       return;
     }
     const interval = setInterval(() => {
-      setInactivitySeconds((s: number) => s - 1);
+      setInactivitySeconds(s => s - 1);
     }, 1000);
     return () => clearInterval(interval);
   }, [step, inactivitySeconds]);
-  // (State, refs, and interface declarations are only at the top of the file now)
 
-  // On mount, reset all session state to initial values
-  useEffect(() => {
-    setJwt(null);
-    setSessionId(null);
-    setEmail('');
-    setStep('email');
-    setCaptchaToken(null);
-  }, []);
-
-  // Persist jwt/sessionId/email to localStorage when changed
-  useEffect(() => {
-    if (jwt && sessionId && email) {
-      localStorage.setItem('chatbot_jwt', jwt);
-      localStorage.setItem('chatbot_session_id', sessionId);
-      localStorage.setItem('chatbot_email', email);
-    }
-  }, [jwt, sessionId, email]);
-
-  // Idle timeout: reset if no typing or interaction for 5min
+  // Idle timeout: reset after 5 min of no user interaction
   useEffect(() => {
     if (step !== 'chat') return;
     const resetIdle = () => {
       if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
       idleTimeoutRef.current = window.setTimeout(() => {
-        resetToOtp(
-          setJwt,
-          setSessionId,
-          setOtp,
-          setStep,
-          setStatusMsg,
-          setInactivitySeconds
-        );
-      }, 300000); // 5min
+        resetSession('Session expired due to inactivity.');
+      }, 300000);
     };
     const handleUserActivity = () => {
       lastActivityRef.current = Date.now();
@@ -164,109 +88,121 @@ export function Chatbot() {
     document.addEventListener('keydown', handleUserActivity);
     document.addEventListener('mousedown', handleUserActivity);
     const chatWindow = document.querySelector('.fixed.bottom-24.right-6');
-    if (chatWindow) {
-      chatWindow.addEventListener('scroll', handleUserActivity);
-    }
+    if (chatWindow) chatWindow.addEventListener('scroll', handleUserActivity);
     resetIdle();
     return () => {
       document.removeEventListener('keydown', handleUserActivity);
       document.removeEventListener('mousedown', handleUserActivity);
-      if (chatWindow) {
-        chatWindow.removeEventListener('scroll', handleUserActivity);
-      }
+      if (chatWindow) chatWindow.removeEventListener('scroll', handleUserActivity);
       if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
     };
   }, [step]);
 
-  // Inactivity timeout: reset if no chat message sent for 5min
+  // Inactivity timeout: reset if no message sent for 5 min
   useEffect(() => {
     if (step !== 'chat') return;
     if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
     inactivityTimeoutRef.current = window.setTimeout(() => {
-      resetToOtp(
-        setJwt,
-        setSessionId,
-        setOtp,
-        setStep,
-        setStatusMsg,
-        setInactivitySeconds
-      );
-    }, 5 * 60 * 1000); // 5min
+      resetSession('Session expired due to inactivity.');
+    }, 5 * 60 * 1000);
     return () => {
       if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
     };
   }, [messages, step]);
 
+  function resetSession(msg?: string) {
+    setAccessToken(null);
+    setCfSessionId(null);
+    setStep('email');
+    setInactivitySeconds(300);
+    setStatusMsg(msg || null);
+  }
 
-  // Send message handler: sends user message, calls backend, handles bot response and session expiry
+  async function refreshAccessToken(): Promise<string | null> {
+    try {
+      const sessionToken = crypto.randomUUID();
+      const res = await fetch(`${CF_CHAT_BASE_URL}/generate-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: email, sessionToken })
+      });
+      const data = await res.json();
+      if (res.ok && data.accessToken) {
+        setAccessToken(data.accessToken);
+        return data.accessToken;
+      }
+    } catch {}
+    return null;
+  }
+
   const handleSendMessage = async () => {
-    // Reset inactivity timer on send
-    if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
     if (!inputValue.trim()) return;
+    if (inactivityTimeoutRef.current) clearTimeout(inactivityTimeoutRef.current);
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputValue,
       sender: 'user',
       timestamp: new Date()
     };
-    setMessages((prev: Message[]) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
 
-    // Call new /chat API with jwt and sessionId
     let botResponse = '';
     try {
-      if (!jwt || !sessionId) {
-        botResponse = contentLabels?.chatbot?.messages?.sessionExpired || 'Session expired. Please log in again.';
+      if (!accessToken) {
+        botResponse = contentLabels?.chatbot?.messages?.sessionExpired || defaultContentLabels.chatbot.messages.sessionExpired;
       } else {
-        const response = await fetch(apiConfig.fullUrls.chatSend, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwt}`
-          },
-          body: JSON.stringify({ token: sessionId, question: userMessage.text })
-        });
+        const doChat = (token: string) =>
+          fetch(`${CF_CHAT_BASE_URL}/chat`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              message: userMessage.text,
+              ...(cfSessionId ? { sessionId: cfSessionId } : {})
+            })
+          });
+
+        let response = await doChat(accessToken);
+
+        if (response.status === 401) {
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            response = await doChat(newToken);
+          } else {
+            resetSession(contentLabels?.chatbot?.messages?.sessionExpired || defaultContentLabels.chatbot.messages.sessionExpired);
+            setIsTyping(false);
+            return;
+          }
+        }
+
         const data = await response.json();
-        if (data.detail === 'Token expired') {
-          // Clear session and reset to OTP screen
-          const sessionExpiredMsg = contentLabels?.chatbot?.messages?.sessionExpiredOtp || 'Session expired. Please log in again.';
-          resetToOtp(
-            setJwt,
-            setSessionId,
-            setOtp,
-            setStep,
-            setStatusMsg,
-            setInactivitySeconds,
-            sessionExpiredMsg
-          );
-          botResponse = sessionExpiredMsg;
-        } else if (data.answer) {
-          botResponse = data.answer;
+        if (data.response) {
+          botResponse = data.response;
+          if (data.sessionId) setCfSessionId(data.sessionId);
         } else if (data.error) {
           botResponse = data.error;
         } else {
-          botResponse = contentLabels?.chatbot?.messages?.noResponse || 'No response received. Please try again.';
+          botResponse = contentLabels?.chatbot?.messages?.noResponse || defaultContentLabels.chatbot.messages.noResponse;
         }
       }
-    } catch (error) {
-      botResponse = contentLabels?.chatbot?.messages?.connectionError || 'Connection error. Please try again.';
+    } catch {
+      botResponse = contentLabels?.chatbot?.messages?.connectionError || defaultContentLabels.chatbot.messages.connectionError;
     }
+
     setIsTyping(false);
-    // Add bot message
-    const botMessage: Message = {
+    setMessages(prev => [...prev, {
       id: (Date.now() + 1).toString(),
       text: botResponse,
       sender: 'bot',
       timestamp: new Date()
-    };
-    setMessages((prev: Message[]) => [...prev, botMessage]);
-    // Only reset to email or OTP if session expired or inactivity, not after every message
+    }]);
   };
 
-  // Handle Enter key to send message
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -274,7 +210,50 @@ export function Chatbot() {
     }
   };
 
-  // Helper to reset all session, token, email, otp and go to email entry
+  async function handleRequestOtp(tokenOverride?: string | null) {
+    const turnstileToken = tokenOverride || captchaToken;
+    const identifier = email.trim();
+
+    setStatusMsg(null);
+    if (!identifier) {
+      setStatusMsg('Please enter your email.');
+      return;
+    }
+    if (!turnstileToken) {
+      setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || defaultContentLabels.chatbot.messages.captchaRequired);
+      return;
+    }
+    setLoading(true);
+    try {
+      const sessionToken = crypto.randomUUID();
+      const res = await fetch(`${CF_CHAT_BASE_URL}/generate-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, sessionToken })
+      });
+      const data = await res.json();
+      if (res.ok && data.accessToken) {
+        setAccessToken(data.accessToken);
+        setCfSessionId(null);
+        setMessages([{
+          id: '1',
+          text: contentLabels?.chatbot?.initialMessage || defaultMessage,
+          sender: 'bot',
+          timestamp: new Date()
+        }]);
+        setInactivitySeconds(300);
+        setStep('chat');
+        setStatusMsg(null);
+      } else {
+        setCaptchaToken(null);
+        setStatusMsg(data.error || data.message || 'Authentication failed. Please try again.');
+      }
+    } catch {
+      setCaptchaToken(null);
+      setStatusMsg(contentLabels?.chatbot?.messages?.connectionError || defaultContentLabels.chatbot.messages.connectionError);
+    }
+    setLoading(false);
+  }
 
   return (
     <>
@@ -282,8 +261,8 @@ export function Chatbot() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 ${
-          isOpen 
-            ? 'bg-red-500 hover:bg-red-600' 
+          isOpen
+            ? 'bg-red-500 hover:bg-red-600'
             : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
         }`}
         aria-label={contentLabels?.chatbot?.toggleChat || 'Toggle chat'}
@@ -293,7 +272,6 @@ export function Chatbot() {
         ) : (
           <MessageCircle className="w-6 h-6 text-white animate-pulse" />
         )}
-        {/* Notification Badge */}
         {!isOpen && (
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
         )}
@@ -308,8 +286,8 @@ export function Chatbot() {
               <Bot className="w-6 h-6" />
             </div>
             <div className="flex-1">
-            <h3 className="font-bold text-lg">{contentLabels?.chatbot?.header?.title || 'Chat with me'}</h3>
-            <p className="text-xs text-white/80">{contentLabels?.chatbot?.header?.subtitle || 'Ask me anything'}</p>
+              <h3 className="font-bold text-lg">{contentLabels?.chatbot?.header?.title || 'Chat with me'}</h3>
+              <p className="text-xs text-white/80">{contentLabels?.chatbot?.header?.subtitle || 'Ask me anything'}</p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
@@ -320,7 +298,6 @@ export function Chatbot() {
             </button>
           </div>
 
-          {/* Step-based component rendering */}
           {step === 'email' && (
             <EmailCaptcha
               email={email}
@@ -331,16 +308,6 @@ export function Chatbot() {
               statusMsg={statusMsg}
               onRequestOtp={handleRequestOtp}
               key={step}
-            />
-          )}
-          {step === 'otp' && (
-            <OtpEntry
-              otp={otp}
-              setOtp={setOtp}
-              loading={loading}
-              statusMsg={statusMsg}
-              onVerifyOtp={handleVerifyOtp}
-              onChangeEmail={() => setStep('email')}
             />
           )}
           {step === 'chat' && (
@@ -365,78 +332,4 @@ export function Chatbot() {
       )}
     </>
   );
-  // OTP request handler: requests OTP from backend
-  async function handleRequestOtp(tokenOverride?: string | null) {
-    const turnstileToken = tokenOverride || captchaToken;
-    const identifier = email.trim();
-
-    setStatusMsg(null);
-    if (!identifier) {
-      setStatusMsg('Please enter your email.');
-      return;
-    }
-    if (!turnstileToken) {
-      setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || 'Please complete the captcha.');
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch(`${AUTH_SERVICE_BASE_URL}/generate-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          identifier,
-          email: identifier,
-          turnstile: turnstileToken,
-          turnstileToken,
-          captchaToken: turnstileToken,
-        })
-      });
-      const data = unwrapResponsePayload(await readJsonResponse(res));
-      if (isOtpSentResponse(data)) {
-        if (typeof data.identifier === 'string') {
-          setEmail(data.identifier);
-        }
-        setStep('otp');
-        setStatusMsg(data.message || contentLabels?.chatbot?.messages?.otpSent || 'OTP sent successfully.');
-      } else {
-        setCaptchaToken(null);
-        setStatusMsg(data.detail || data.error || data.message || contentLabels?.chatbot?.messages?.otpFailed || 'Failed to send OTP.');
-      }
-    } catch (e) {
-      setCaptchaToken(null);
-      setStatusMsg(contentLabels?.chatbot?.messages?.otpError || 'Error sending OTP. Please try again.');
-    }
-    setLoading(false);
-  }
-
-  // OTP verify handler: verifies OTP and transitions to chat step
-  async function handleVerifyOtp() {
-    setStatusMsg(null);
-    setLoading(true);
-    try {
-      const identifier = email.trim();
-      const res = await fetch(`${AUTH_SERVICE_BASE_URL}/authorise-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, otp: otp.trim() })
-      });
-      const data = unwrapResponsePayload(await readJsonResponse(res));
-      const sessionToken = data.sessionToken || data.session_token;
-      const accessToken = data.jwt || data.token || sessionToken;
-      const sessionId = data.session_id || data.sessionId || sessionToken;
-
-      if (res.ok && accessToken && sessionId) {
-        setJwt(accessToken);
-        setSessionId(sessionId);
-        setStep('chat');
-        setStatusMsg(contentLabels?.chatbot?.messages?.verifySuccess || 'Verified successfully!');
-      } else {
-        setStatusMsg(data.detail || data.error || 'Invalid OTP. Try again.');
-      }
-    } catch (e) {
-      setStatusMsg(contentLabels?.chatbot?.messages?.otpError2 || 'Error verifying OTP. Please try again.');
-    }
-    setLoading(false);
-  }
 }
