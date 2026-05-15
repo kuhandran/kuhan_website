@@ -118,7 +118,7 @@ export default function RootLayout({
     `script-src ${scriptSrc}`,
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self' https://fonts.gstatic.com",
-    "connect-src 'self' https://static.kuhandranchatbot.info https://auth-services.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co https://challenges.cloudflare.com",
+    "connect-src 'self' https://static.kuhandranchatbot.info https://auth-services.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co https://challenges.cloudflare.com https://chat-services.kuhandranchatbot.info",
     "frame-src 'self' https://static.kuhandranchatbot.info https://challenges.cloudflare.com",
   ].join("; ");
 

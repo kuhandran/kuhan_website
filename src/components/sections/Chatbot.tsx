@@ -3,26 +3,28 @@
 
 import { useState, useRef, useEffect } from 'react';
 import EmailCaptcha from './EmailCaptcha';
+import OtpEntry from './OtpEntry';
 import ChatProcess from './ChatProcess';
 import type { ChatbotStep } from './ChatbotState';
 import { MessageCircle, Bot, X } from 'lucide-react';
 import { contentLabels as defaultLabels } from '../../lib/data/contentLabels';
 
-const CF_CHAT_BASE_URL = 'https://cf-chat-services.skuhandran.workers.dev';
+const AUTH_SERVICE_BASE_URL = 'https://auth-services.kuhandranchatbot.info';
+const CHAT_SERVICE_BASE_URL = 'https://chat-services.kuhandranchatbot.info';
 
 const defaultMessage = "Hi! I'm Kuhandran's AI assistant. Ask me anything about his experience, skills, or projects!";
 
 const defaultContentLabels = {
   chatbot: {
-    title: 'AI Assistant',
-    subtitle: 'Ask me anything about Kuhandran',
     initialMessage: defaultMessage,
     messages: {
       sessionExpired: 'Session expired. Please log in again.',
-      sessionExpiredOtp: 'Session expired. Please re-enter details.',
       noResponse: 'Sorry, I did not understand the response.',
       connectionError: "Sorry, I'm having trouble connecting.",
       captchaRequired: 'Please complete the captcha.',
+      otpSent: 'OTP sent! Please check your email.',
+      otpFailed: 'Failed to send OTP. Please try again.',
+      verifySuccess: 'Verified! Starting chat...',
     },
   }
 };
@@ -43,6 +45,7 @@ export function Chatbot() {
   const [inactivitySeconds, setInactivitySeconds] = useState(300);
   const [isTyping, setIsTyping] = useState(false);
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
   const [step, setStep] = useState<ChatbotStep>('email');
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -113,26 +116,103 @@ export function Chatbot() {
   function resetSession(msg?: string) {
     setAccessToken(null);
     setCfSessionId(null);
+    setOtp('');
     setStep('email');
     setInactivitySeconds(300);
     setStatusMsg(msg || null);
   }
 
-  async function refreshAccessToken(): Promise<string | null> {
+  // Step 1: Send OTP
+  async function handleRequestOtp(tokenOverride?: string | null) {
+    const turnstileToken = tokenOverride || captchaToken;
+    const identifier = email.trim();
+
+    setStatusMsg(null);
+    if (!identifier) {
+      setStatusMsg('Please enter your email.');
+      return;
+    }
+    if (!turnstileToken) {
+      setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || defaultContentLabels.chatbot.messages.captchaRequired);
+      return;
+    }
+    setLoading(true);
     try {
-      const sessionToken = crypto.randomUUID();
-      const res = await fetch(`${CF_CHAT_BASE_URL}/generate-token`, {
+      const res = await fetch(`${AUTH_SERVICE_BASE_URL}/generate-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: email, sessionToken })
+        body: JSON.stringify({ identifier, captchaToken: turnstileToken })
       });
       const data = await res.json();
-      if (res.ok && data.accessToken) {
-        setAccessToken(data.accessToken);
-        return data.accessToken;
+      if (res.ok) {
+        setStep('otp');
+        setStatusMsg(data.message || contentLabels?.chatbot?.messages?.otpSent || defaultContentLabels.chatbot.messages.otpSent);
+      } else {
+        setCaptchaToken(null);
+        setStatusMsg(data.error || data.message || contentLabels?.chatbot?.messages?.otpFailed || defaultContentLabels.chatbot.messages.otpFailed);
       }
-    } catch {}
-    return null;
+    } catch {
+      setCaptchaToken(null);
+      setStatusMsg(contentLabels?.chatbot?.messages?.connectionError || defaultContentLabels.chatbot.messages.connectionError);
+    }
+    setLoading(false);
+  }
+
+  // Step 2: Verify OTP → Step 3: Exchange sessionToken for accessToken
+  async function handleVerifyOtp() {
+    setStatusMsg(null);
+    setLoading(true);
+    try {
+      const identifier = email.trim();
+
+      // Verify OTP
+      const otpRes = await fetch(`${AUTH_SERVICE_BASE_URL}/authorise-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, otp: otp.trim() })
+      });
+      const otpData = await otpRes.json();
+
+      if (!otpRes.ok) {
+        setStatusMsg(otpData.error || otpData.message || 'Invalid OTP. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const sessionToken = otpData.sessionToken;
+      if (!sessionToken) {
+        setStatusMsg('Verification failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Exchange sessionToken for accessToken
+      const tokenRes = await fetch(`${CHAT_SERVICE_BASE_URL}/generate-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, sessionToken })
+      });
+      const tokenData = await tokenRes.json();
+
+      if (tokenRes.ok && tokenData.accessToken) {
+        setAccessToken(tokenData.accessToken);
+        setCfSessionId(null);
+        setMessages([{
+          id: '1',
+          text: contentLabels?.chatbot?.initialMessage || defaultMessage,
+          sender: 'bot',
+          timestamp: new Date()
+        }]);
+        setInactivitySeconds(300);
+        setStep('chat');
+        setStatusMsg(null);
+      } else {
+        setStatusMsg(tokenData.error || tokenData.message || 'Authentication failed. Please try again.');
+      }
+    } catch {
+      setStatusMsg(contentLabels?.chatbot?.messages?.connectionError || defaultContentLabels.chatbot.messages.connectionError);
+    }
+    setLoading(false);
   }
 
   const handleSendMessage = async () => {
@@ -155,7 +235,7 @@ export function Chatbot() {
         botResponse = contentLabels?.chatbot?.messages?.sessionExpired || defaultContentLabels.chatbot.messages.sessionExpired;
       } else {
         const doChat = (token: string) =>
-          fetch(`${CF_CHAT_BASE_URL}/chat`, {
+          fetch(`${CHAT_SERVICE_BASE_URL}/chat`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -167,17 +247,13 @@ export function Chatbot() {
             })
           });
 
-        let response = await doChat(accessToken);
+        const response = await doChat(accessToken);
 
+        // On 401, reset to email — no silent refresh possible without OTP flow
         if (response.status === 401) {
-          const newToken = await refreshAccessToken();
-          if (newToken) {
-            response = await doChat(newToken);
-          } else {
-            resetSession(contentLabels?.chatbot?.messages?.sessionExpired || defaultContentLabels.chatbot.messages.sessionExpired);
-            setIsTyping(false);
-            return;
-          }
+          resetSession(contentLabels?.chatbot?.messages?.sessionExpired || defaultContentLabels.chatbot.messages.sessionExpired);
+          setIsTyping(false);
+          return;
         }
 
         const data = await response.json();
@@ -209,51 +285,6 @@ export function Chatbot() {
       handleSendMessage();
     }
   };
-
-  async function handleRequestOtp(tokenOverride?: string | null) {
-    const turnstileToken = tokenOverride || captchaToken;
-    const identifier = email.trim();
-
-    setStatusMsg(null);
-    if (!identifier) {
-      setStatusMsg('Please enter your email.');
-      return;
-    }
-    if (!turnstileToken) {
-      setStatusMsg(contentLabels?.chatbot?.messages?.captchaRequired || defaultContentLabels.chatbot.messages.captchaRequired);
-      return;
-    }
-    setLoading(true);
-    try {
-      const sessionToken = crypto.randomUUID();
-      const res = await fetch(`${CF_CHAT_BASE_URL}/generate-token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, sessionToken })
-      });
-      const data = await res.json();
-      if (res.ok && data.accessToken) {
-        setAccessToken(data.accessToken);
-        setCfSessionId(null);
-        setMessages([{
-          id: '1',
-          text: contentLabels?.chatbot?.initialMessage || defaultMessage,
-          sender: 'bot',
-          timestamp: new Date()
-        }]);
-        setInactivitySeconds(300);
-        setStep('chat');
-        setStatusMsg(null);
-      } else {
-        setCaptchaToken(null);
-        setStatusMsg(data.error || data.message || 'Authentication failed. Please try again.');
-      }
-    } catch {
-      setCaptchaToken(null);
-      setStatusMsg(contentLabels?.chatbot?.messages?.connectionError || defaultContentLabels.chatbot.messages.connectionError);
-    }
-    setLoading(false);
-  }
 
   return (
     <>
@@ -308,6 +339,21 @@ export function Chatbot() {
               statusMsg={statusMsg}
               onRequestOtp={handleRequestOtp}
               key={step}
+            />
+          )}
+          {step === 'otp' && (
+            <OtpEntry
+              otp={otp}
+              setOtp={setOtp}
+              loading={loading}
+              statusMsg={statusMsg}
+              onVerifyOtp={handleVerifyOtp}
+              onChangeEmail={() => {
+                setStep('email');
+                setOtp('');
+                setStatusMsg(null);
+                setCaptchaToken(null);
+              }}
             />
           )}
           {step === 'chat' && (
