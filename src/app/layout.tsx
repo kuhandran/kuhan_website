@@ -127,12 +127,6 @@ export default function RootLayout({
           href="https://api-gateway-715i.onrender.com"
           crossOrigin="anonymous"
         />
-        <link
-          rel="preconnect"
-          href="https://api-gateway-9unh.onrender.com"
-          crossOrigin="anonymous"
-        />
-
         {/* Favicon and Web App Icons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />

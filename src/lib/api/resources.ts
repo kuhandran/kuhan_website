@@ -14,7 +14,7 @@ const TTL = 5 * 60 * 1000;
 // ============================================================================
 
 const STATIC_API_BASE  = process.env.NEXT_PUBLIC_STATIC_API_URL  ?? 'https://static.kuhandranchatbot.info';
-const BACKEND_API_BASE = process.env.NEXT_PUBLIC_BACKEND_API_URL ?? 'https://api-gateway-9unh.onrender.com';
+const BACKEND_API_BASE = process.env.NEXT_PUBLIC_BACKEND_API_URL ?? '';
 const STORAGE_FILES_URL = `${STATIC_API_BASE}/public`;
 
 // ============================================================================
