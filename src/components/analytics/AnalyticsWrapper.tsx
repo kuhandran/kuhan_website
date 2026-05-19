@@ -1,14 +1,6 @@
-import Script from 'next/script';
-
 export default function AnalyticsWrapper() {
-  const token = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
-  if (!token || process.env.NODE_ENV === 'development') return null;
-
-  return (
-    <Script
-      src="https://static.cloudflareinsights.com/beacon.min.js"
-      data-cf-beacon={JSON.stringify({ token })}
-      strategy="afterInteractive"
-    />
-  );
+  // Cloudflare RUM is configured with auto-inject in the Cloudflare zone.
+  // Do not add a manual `beacon.min.js` snippet here — the proxy will
+  // inject the beacon on the server edge when requests pass through Cloudflare.
+  return null;
 }

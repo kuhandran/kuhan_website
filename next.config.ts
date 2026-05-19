@@ -7,7 +7,6 @@ const scriptSrc = [
   "'unsafe-inline'",
   ...(isDevelopment ? ["'unsafe-eval'"] : []),
   "https://challenges.cloudflare.com",
-  "https://static.cloudflareinsights.com",
 ].join(" ");
 
 const contentSecurityPolicy = [
@@ -26,7 +25,6 @@ const contentSecurityPolicy = [
     "https://api-gateway-715i.onrender.com",
     "https://ipapi.co",
     "https://challenges.cloudflare.com",
-    "https://cloudflareinsights.com",
   ].join(" "),
   "frame-src 'self' https://static.kuhandranchatbot.info https://challenges.cloudflare.com",
   "object-src 'none'",

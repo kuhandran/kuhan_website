@@ -116,7 +116,6 @@ export default function RootLayout({
           href="https://auth-services.kuhandranchatbot.info"
           crossOrigin="anonymous"
         />
-        <link rel="dns-prefetch" href="https://static.cloudflareinsights.com" />
         <link
           rel="preconnect"
           href="https://resume-chatbot-services-v2-0.onrender.com"
