@@ -1,0 +1,53 @@
+{
+  "name": "Kuhandran SamudraPandiyan",
+  "short_name": "Kuhandran",
+  "description": "Technical Delivery Manager & Full-Stack Engineer with 8+ years delivering enterprise-grade software in banking and insurance.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "https://www.kuhandranchatbot.info/",
+  "scope": "https://www.kuhandranchatbot.info/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "categories": ["portfolio", "technology", "business"],
+  "icons": [
+    {
+      "src": "https://www.kuhandranchatbot.info/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "https://www.kuhandranchatbot.info/files/apple-touch-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://static.kuhandranchatbot.info/public/image/profile.png",
+      "sizes": "400x400",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://static.kuhandranchatbot.info/public/image/profile.webp",
+      "sizes": "400x400",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Resume",
+      "url": "https://www.kuhandranchatbot.info/?section=about",
+      "description": "Open resume viewer"
+    },
+    {
+      "name": "Contact Me",
+      "url": "https://www.kuhandranchatbot.info/?section=contact",
+      "description": "Send a message"
+    }
+  ],
+  "prefer_related_applications": false
+}

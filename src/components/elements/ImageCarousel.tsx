@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import { memo, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { getImage } from '@/lib/api/apiClient';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -9,33 +10,25 @@ interface ImageCarouselProps {
   title: string;
 }
 
-export function ImageCarousel({ images, title }: ImageCarouselProps) {
+function ImageCarouselInner({ images, title }: ImageCarouselProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const hasMultipleImages = images.length > 1;
 
-  const nextImage = () => {
-    if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }
-  };
+  // Resolve all image URLs once — not on every render
+  const imageUrls = useMemo(() => images.map((img) => getImage(img)), [images]);
 
-  const prevImage = () => {
-    if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-    }
-  };
+  const nextImage = () => setCurrentImageIndex((p) => (p + 1) % images.length);
+  const prevImage = () => setCurrentImageIndex((p) => (p - 1 + images.length) % images.length);
 
   return (
     <div className="flex flex-col items-center justify-center">
-      {/* Main Image */}
       <div className="relative w-full rounded-lg shadow-lg overflow-hidden bg-slate-100">
         <img
-          src={getImage(images[currentImageIndex])}
+          src={imageUrls[currentImageIndex]}
           alt={`${title} - Image ${currentImageIndex + 1}`}
           className="w-full h-auto"
         />
 
-        {/* Navigation Arrows */}
         {hasMultipleImages && (
           <>
             <button
@@ -52,8 +45,6 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
             >
               <ChevronRight size={24} className="text-slate-900" />
             </button>
-
-            {/* Image Counter */}
             <div className="absolute bottom-4 right-4 bg-slate-900/70 text-white px-3 py-1 rounded-full text-sm font-medium">
               {currentImageIndex + 1} / {images.length}
             </div>
@@ -61,10 +52,9 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
         )}
       </div>
 
-      {/* Thumbnails */}
       {hasMultipleImages && (
         <div className="flex gap-3 mt-4 justify-center">
-          {images.map((_, index) => (
+          {imageUrls.map((url, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
@@ -74,11 +64,7 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
                   : 'border-slate-300 hover:border-slate-400'
               }`}
             >
-              <img
-                src={getImage(images[index])}
-                alt={`Thumbnail ${index + 1}`}
-                className="w-full h-full object-cover rounded-sm"
-              />
+              <Image src={url} alt={`Thumbnail ${index + 1}`} width={48} height={48} className="w-full h-full object-cover rounded-sm" />
             </button>
           ))}
         </div>
@@ -86,3 +72,5 @@ export function ImageCarousel({ images, title }: ImageCarouselProps) {
     </div>
   );
 }
+
+export const ImageCarousel = memo(ImageCarouselInner);

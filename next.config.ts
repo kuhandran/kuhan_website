@@ -6,9 +6,8 @@ const scriptSrc = [
   "'self'",
   "'unsafe-inline'",
   ...(isDevelopment ? ["'unsafe-eval'"] : []),
-  "https://cdn.jsdelivr.net",
-  "https://cdn.plot.ly",
   "https://challenges.cloudflare.com",
+  "https://static.cloudflareinsights.com",
 ].join(" ");
 
 const contentSecurityPolicy = [
@@ -17,8 +16,20 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: https:",
   "font-src 'self' https://fonts.gstatic.com data:",
-  "connect-src 'self' https://static.kuhandranchatbot.info https://auth-services.kuhandranchatbot.info https://api.github.com https://challenges.cloudflare.com",
-  "frame-src 'self' https://challenges.cloudflare.com",
+  "manifest-src 'self' https://static.kuhandranchatbot.info",
+  [
+    "connect-src 'self'",
+    "https://static.kuhandranchatbot.info",
+    "https://auth-services.kuhandranchatbot.info",
+    "https://chat-services.kuhandranchatbot.info",
+    "https://resume-chatbot-services-v2-0.onrender.com",
+    "https://api-gateway-715i.onrender.com",
+    "https://api-gateway-9unh.onrender.com",
+    "https://ipapi.co",
+    "https://challenges.cloudflare.com",
+    "https://cloudflareinsights.com",
+  ].join(" "),
+  "frame-src 'self' https://static.kuhandranchatbot.info https://challenges.cloudflare.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -37,9 +48,15 @@ const nextConfig: NextConfig = {
   },
   /* Image optimization settings */
   images: {
-    unoptimized: false, // Enable next/image optimization
-    formats: ['image/webp', 'image/avif'], // Modern image formats
-    minimumCacheTTL: 31536000, // Cache images for 1 year
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 31536000,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'static.kuhandranchatbot.info',
+        pathname: '/public/image/**',
+      },
+    ],
   },
   /* Headers for caching and bfcache optimization */
   headers: async () => {

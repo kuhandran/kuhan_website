@@ -28,8 +28,7 @@ export { ResumePDFViewer } from './elements/ResumePDFViewer';
 // Sections - Full Page Sections
 export { About } from './sections/About';
 export { Achievements } from './sections/Achievements';
-export { Chatbot } from './sections/Chatbot';
-export { default as ChatProcess } from './sections/ChatProcess';
+export { Chatbot } from './chatbot';
 export { Contact } from './sections/Contact';
 export { Education } from './sections/Education';
 export { Experience } from './sections/Experience';
@@ -59,18 +58,12 @@ export {
   CaseStudyDetailSections 
 } from './renderers/case-studies';
 
-// Examples - Demo/Test Components
-export { LogoShowcase } from './examples/LogoShowcase';
-
 // Layout - Layout Components
 export { Navbar } from './layout/Navbar';
 export { Footer } from './layout/Footer';
 
-// Analytics - Analytics & Consent Components
-export { 
-  AnalyticsConsentBanner,
-  AnalyticsWrapper 
-} from './analytics';
+// Analytics
+export { AnalyticsConsentBanner, AnalyticsWrapper } from './analytics';
 
 // Language - Language & Translation Components & Hooks
 export { LanguageSwitcher } from './language';

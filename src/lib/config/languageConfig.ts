@@ -45,8 +45,8 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
   languagesConfigPromise = (async () => {
     try {
       // Fetch directly from static CDN config to avoid API path rewriting issues
-      const configUrl = 'https://static.kuhandranchatbot.info/public/config/languages.json';
-      console.log('Fetching languages config from static CDN...', configUrl);
+      const staticBase = process.env.NEXT_PUBLIC_STATIC_API_URL ?? 'https://static.kuhandranchatbot.info';
+      const configUrl = `${staticBase}/public/config/languages.json`;
 
       const staticResponse = await fetch(configUrl, {
         method: 'GET',
@@ -65,7 +65,6 @@ export async function fetchLanguagesConfig(): Promise<LanguagesConfig | null> {
       const response: { data?: LanguagesConfig } | LanguagesConfig =
         await staticResponse.json();
 
-      console.log('Languages config raw response:', response);
       
       // Extract data from API response wrapper
       const result = response && typeof response === 'object' && 'data' in response 

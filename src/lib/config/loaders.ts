@@ -6,7 +6,7 @@
  * Supports both client and server-side rendering with caching
  */
 
-import { DEFAULT_LANGUAGE, DATA_FILES, getConfigRouteUrl, getCollectionUrl } from './domains';
+import { DEFAULT_LANGUAGE, DATA_FILES, getCollectionUrl, SupportedLanguage } from './domains';
 
 // ============================================================================
 // CACHE MANAGEMENT
@@ -36,7 +36,7 @@ export async function loadUrlConfig(language: string = DEFAULT_LANGUAGE): Promis
 
   urlConfigPromise = (async () => {
     try {
-      const urlConfigUrl = getConfigRouteUrl(language as any, DATA_FILES.urlConfig);
+      const urlConfigUrl = getCollectionUrl(language as SupportedLanguage, 'config', DATA_FILES.urlConfig);
       const response = await fetch(urlConfigUrl);
       if (!response.ok) throw new Error('Failed to load URL config');
       cachedUrlConfig = await response.json();
@@ -197,7 +197,6 @@ export async function fetchPageLayout() {
     try {
       // Fetch from external API
       const url = `${getApiBaseUrl()}${getConfigUrl('pageLayout', DEFAULT_LANGUAGE)}`;
-      console.log('[Loaders] Fetching pageLayout from:', url);
       
       const response = await fetch(url);
       
@@ -236,7 +235,6 @@ export async function fetchPageLayout() {
       }
       
       cachedPageLayout = layoutData;
-      console.log('[Loaders] pageLayout loaded successfully from API with', cachedPageLayout.sections.length, 'sections');
       pageLayoutPromise = null;
       return cachedPageLayout;
     } catch (error) {
@@ -277,7 +275,6 @@ export async function fetchApiConfig() {
       const data = await response.json();
       // Extract 'data' field if present (API response wrapper)
       cachedApiConfig = data.data || data;
-      console.log('[Loaders] apiConfig loaded from API');
       apiConfigPromise = null;
       return cachedApiConfig;
     } catch (error) {
@@ -316,9 +313,9 @@ export function getApiConfigSync() {
  * 
  * Examples:
  * - getDataSourceUrl('contentLabels.json', 'en', 'data')
- *   → https://static-api-opal.vercel.app/collections/en/data/contentLabels.json
+ *   → {STATIC_API_URL}/public/collections/en/data/contentLabels.json
  * - getDataSourceUrl('apiConfig.json', 'ta', 'config')
- *   → https://static-api-opal.vercel.app/collections/ta/config/apiConfig.json
+ *   → {STATIC_API_URL}/public/collections/ta/config/apiConfig.json
  */
 export function getDataSourceUrl(
   filename: string,
@@ -340,9 +337,9 @@ export function getDataSourceUrl(
  * 
  * Examples:
  * - getMultilingualUrl('experience', 'en')
- *   → https://static-api-opal.vercel.app/collections/en/data/experience.json
+ *   → {STATIC_API_URL}/public/collections/en/data/experience.json
  * - getMultilingualUrl('contentLabels', 'ar-AE')
- *   → https://static-api-opal.vercel.app/collections/ar-AE/data/contentLabels.json
+ *   → {STATIC_API_URL}/public/collections/ar-AE/data/contentLabels.json
  */
 export function getMultilingualUrl(
   fileType: string,
@@ -392,5 +389,5 @@ export async function initializeAppConfig(): Promise<void> {
  * @returns Base URL for production API
  */
 export function getApiBaseUrl(): string {
-  return 'https://static.kuhandranchatbot.info';
+  return process.env.NEXT_PUBLIC_STATIC_API_URL ?? 'https://static.kuhandranchatbot.info';
 }

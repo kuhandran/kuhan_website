@@ -41,12 +41,10 @@ export const useContentLabels = () => {
   React.useEffect(() => {
     const loadLabels = async () => {
       try {
-        console.log(`[ContentLabels] Loading content labels for language: ${language}`);
         const data = await fetchContentLabelsAPI(language as SupportedLanguage);
         if (data) {
           cachedLabels = data;
           setContentLabels(data);
-          console.log(`[ContentLabels] Successfully loaded for language: ${language}`);
         } else {
           throw new Error('Failed to fetch content labels');
         }

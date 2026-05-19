@@ -1,271 +1,108 @@
-/**
- * API Data Fetchers
- * Handles fetching: configuration, collection data, and manifest
- * Uses legacy cache for backwards compatibility
- */
-
-import { 
-  getConfigRouteUrl, 
-  getManifestUrl, 
-  getCollectionUrl,
-  SupportedLanguage, 
-  DEFAULT_LANGUAGE 
-} from '@/lib/config/domains';
 import {
-  getFromCache,
-  setInCache,
-} from './cache-legacy';
+  getConfigRouteUrl,
+  getManifestUrl,
+  getCollectionUrl,
+  SupportedLanguage,
+  DEFAULT_LANGUAGE,
+} from '@/lib/config/domains';
+import { cacheManager } from './cache';
 
-// ============================================================================
-// CONFIGURATION ENDPOINTS
-// ============================================================================
+const TTL = 5 * 60 * 1000; // 5 minutes
 
-/**
- * Fetch configuration file (apiConfig, pageLayout, urlConfig)
- * @param configType - Type of config (apiConfig, pageLayout, urlConfig)
- * @param language - Language code (defaults to DEFAULT_LANGUAGE)
- * @returns Configuration object
- */
 export async function fetchConfig<T extends Record<string, unknown> = Record<string, unknown>>(
   configType: 'apiConfig' | 'pageLayout' | 'urlConfig',
   language: SupportedLanguage = DEFAULT_LANGUAGE
 ): Promise<T> {
-  const cacheKey = `config:${language}:${configType}`;
-  
-  // Check cache first
-  const cached = getFromCache<T>(cacheKey);
+  const key = `config:${language}:${configType}`;
+  const cached = cacheManager.get<T>(key);
   if (cached) return cached;
 
   try {
     const url = getConfigRouteUrl(language, configType);
-    console.log(`[API] Fetching config: ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      cache: 'default',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
-    const data = responseData.data || responseData;
-    setInCache(cacheKey, data);
-    return data as T;
-  } catch (error) {
-    console.error(`[API Error] Failed to fetch config (${language}/${configType}):`, error);
+    const res = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'default' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    const data = (raw.data || raw) as T;
+    cacheManager.set(key, data, TTL);
+    return data;
+  } catch (err) {
+    console.error(`[fetchers] config ${language}/${configType}:`, err);
     return {} as unknown as T;
   }
 }
 
-/**
- * Fetch API configuration (contains API endpoints)
- */
-export async function fetchApiConfig(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchConfig('apiConfig', language);
-}
+export const fetchApiConfig = (language: SupportedLanguage = DEFAULT_LANGUAGE) => fetchConfig('apiConfig', language);
+export const fetchPageLayout = (language: SupportedLanguage = DEFAULT_LANGUAGE) => fetchConfig('pageLayout', language);
+export const fetchUrlConfig  = (language: SupportedLanguage = DEFAULT_LANGUAGE) => fetchConfig('urlConfig', language);
 
-/**
- * Fetch page layout configuration
- */
-export async function fetchPageLayout(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchConfig('pageLayout', language);
-}
-
-/**
- * Fetch URL configuration
- */
-export async function fetchUrlConfig(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchConfig('urlConfig', language);
-}
-
-// ============================================================================
-// COLLECTION DATA ENDPOINTS
-// ============================================================================
-
-/**
- * Fetch collection data (projects, experience, skills, etc.)
- * @param dataType - Type of data (projects, experience, skills, education, achievements, caseStudies, contentLabels)
- * @param language - Language code (defaults to DEFAULT_LANGUAGE)
- * @returns Collection data
- */
 export async function fetchCollectionData<T extends Record<string, unknown> | unknown[] = unknown[]>(
   dataType: string,
   language: SupportedLanguage = DEFAULT_LANGUAGE
 ): Promise<T> {
-  const cacheKey = `collection:${language}:${dataType}`;
-  
-  // Check cache first
-  const cached = getFromCache<T>(cacheKey);
+  const key = `collection:${language}:${dataType}`;
+  const cached = cacheManager.get<T>(key);
   if (cached) return cached;
 
   try {
-    // Try local file first (server-side)
+    // Server-side: try local public/collections file first
     if (typeof window === 'undefined') {
       try {
-        const fs = await import('fs/promises');
+        const fs   = await import('fs/promises');
         const path = await import('path');
-        const filePath = path.join(process.cwd(), 'public', 'collections', language, 'data', `${dataType}.json`);
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const data = JSON.parse(fileContent) as T;
-        setInCache(cacheKey, data);
-        console.log(`[API] Loaded ${dataType} from local file for ${language}`);
+        const file = path.join(process.cwd(), 'public', 'collections', language, 'data', `${dataType}.json`);
+        const data = JSON.parse(await fs.readFile(file, 'utf-8')) as T;
+        cacheManager.set(key, data, TTL);
         return data;
-      } catch (fileError) {
-        console.warn(`[API] Local file not found for ${language}/${dataType}, trying API`);
-      }
+      } catch { /* fall through to API */ }
     }
 
-    // Fallback to API
     const baseUrl = getCollectionUrl(language, 'data', dataType);
-    const requestUrls = [baseUrl];
-    if (!baseUrl.toLowerCase().endsWith('.json')) {
-      requestUrls.push(`${baseUrl}.json`);
-    }
+    const urls = baseUrl.endsWith('.json') ? [baseUrl] : [baseUrl, `${baseUrl}.json`];
 
-    let response: Response | null = null;
-    let lastError: Error | null = null;
-
-    for (const requestUrl of requestUrls) {
+    let res: Response | null = null;
+    for (const url of urls) {
       try {
-        console.log(`[API] Fetching collection: ${requestUrl}`);
-        response = await fetch(requestUrl, {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' },
-          cache: 'default',
-        });
-
-        if (response.ok) {
-          break;
-        }
-
-        lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
-      } catch (fetchError) {
-        lastError = fetchError as Error;
-      }
+        res = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'default' });
+        if (res.ok) break;
+      } catch { continue; }
     }
+    if (!res?.ok) throw new Error('Failed to fetch collection');
 
-    if (!response || !response.ok) {
-      throw lastError || new Error('Failed to fetch collection data');
-    }
+    let data = await res.json();
+    // Unwrap common API envelope shapes
+    data = data.data ?? data.content ?? data;
+    if (data && typeof data === 'object' && !Array.isArray(data) && 'data' in data) data = data.data;
 
-    const responseData = await response.json();
-    // Extract data from various response formats:
-    // - { status, data: { data: {...} } } (API wrapper with nested data)
-    // - { content: {...} } (pageLayout wrapper)
-    // - { data: {...} } (standard wrapper)
-    // - {...} (direct data)
-    let data = responseData.data || responseData.content || responseData;
-    
-    // Handle nested data structure from API (data.data)
-    if (data && typeof data === 'object' && 'data' in data && !Array.isArray(data.data)) {
-      data = data.data;
-    }
-    
-    // If data is still wrapped in metadata object but has a 'data' or 'content' property, unwrap again
-    if (data && typeof data === 'object' && !Array.isArray(data)) {
-      if ('data' in data && !('items' in data && typeof data.data === 'object')) {
-        data = data.data;
-      } else if ('content' in data && !('items' in data && typeof data.content === 'object')) {
-        data = data.content;
-      }
-    }
-    
-    setInCache(cacheKey, data);
+    cacheManager.set(key, data as T, TTL);
     return data as T;
-  } catch (error) {
-    console.error(`[API Error] Failed to fetch collection (${language}/${dataType}):`, error);
-    // Return empty array for data collections that expect array responses
+  } catch (err) {
+    console.error(`[fetchers] collection ${language}/${dataType}:`, err);
     return [] as unknown as T;
   }
 }
 
-/**
- * Fetch projects data
- */
-export async function fetchProjects(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchCollectionData('projects', language);
-}
+export const fetchProjects       = (l?: SupportedLanguage) => fetchCollectionData('projects', l);
+export const fetchExperience     = (l?: SupportedLanguage) => fetchCollectionData('experience', l);
+export const fetchSkills         = (l?: SupportedLanguage) => fetchCollectionData('skills', l);
+export const fetchEducation      = (l?: SupportedLanguage) => fetchCollectionData('education', l);
+export const fetchAchievements   = (l?: SupportedLanguage) => fetchCollectionData('achievements', l);
+export const fetchCaseStudies    = (l?: SupportedLanguage) => fetchCollectionData('caseStudies', l);
+export const fetchContentLabels  = (l?: SupportedLanguage) => fetchCollectionData('contentLabels', l);
 
-/**
- * Fetch experience data
- */
-export async function fetchExperience(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchCollectionData('experience', language);
-}
-
-/**
- * Fetch skills data
- */
-export async function fetchSkills(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchCollectionData('skills', language);
-}
-
-/**
- * Fetch education data
- */
-export async function fetchEducation(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchCollectionData('education', language);
-}
-
-/**
- * Fetch achievements data
- */
-export async function fetchAchievements(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchCollectionData('achievements', language);
-}
-
-/**
- * Fetch case studies data
- */
-export async function fetchCaseStudies(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchCollectionData('caseStudies', language);
-}
-
-/**
- * Fetch content labels (UI text)
- */
-export async function fetchContentLabels(language: SupportedLanguage = DEFAULT_LANGUAGE) {
-  return fetchCollectionData('contentLabels', language);
-}
-
-// ============================================================================
-// MANIFEST ENDPOINT
-// ============================================================================
-
-/**
- * Fetch PWA manifest
- */
 export async function fetchManifest(language: SupportedLanguage = DEFAULT_LANGUAGE): Promise<Record<string, unknown> | null> {
-  const cacheKey = `manifest:${language}`;
-  
-  const cached = getFromCache<Record<string, unknown>>(cacheKey);
-  if (cached) return cached as Record<string, unknown>;
+  const key = `manifest:${language}`;
+  const cached = cacheManager.get<Record<string, unknown>>(key);
+  if (cached) return cached;
 
   try {
-    const url = getManifestUrl(language);
-    console.log(`[API] Fetching manifest: ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      cache: 'default',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const responseData = await response.json() as Record<string, unknown>;
-    // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
-    const data = (responseData.data as Record<string, unknown>) || responseData;
-    setInCache(cacheKey, data);
+    const res = await fetch(getManifestUrl(language), { headers: { Accept: 'application/json' }, cache: 'default' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json() as Record<string, unknown>;
+    const data = (raw.data as Record<string, unknown>) || raw;
+    cacheManager.set(key, data, TTL);
     return data;
-  } catch (error) {
-    console.error(`[API Error] Failed to fetch manifest (${language}):`, error);
+  } catch (err) {
+    console.error(`[fetchers] manifest ${language}:`, err);
     return null;
   }
 }

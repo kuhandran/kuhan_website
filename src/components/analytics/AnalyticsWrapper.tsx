@@ -1,36 +1,14 @@
-'use client';
+import Script from 'next/script';
 
-import { useEffect } from 'react';
-
-/**
- * Analytics Wrapper Component
- * Initializes and manages analytics tracking
- * - Checks consent before tracking
- * - Handles tracking initialization
- * - Manages analytics state
- */
 export default function AnalyticsWrapper() {
-  useEffect(() => {
-    // Get analytics consent from cookie
-    const getAnalyticsConsent = () => {
-      const consentCookie = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('analytics-consent='));
+  const token = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
+  if (!token || process.env.NODE_ENV === 'development') return null;
 
-      if (!consentCookie) return null;
-      return consentCookie.split('=')[1] === 'true';
-    };
-
-    const consent = getAnalyticsConsent();
-
-    // Only initialize analytics if user has consented
-    if (consent) {
-      // Analytics initialization code here
-      console.log('[Analytics] Tracking enabled');
-    } else if (consent === false) {
-      console.log('[Analytics] Tracking disabled by user');
-    }
-  }, []);
-
-  return null; // This component doesn't render anything
+  return (
+    <Script
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={JSON.stringify({ token })}
+      strategy="afterInteractive"
+    />
+  );
 }

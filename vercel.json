@@ -1,9 +1,0 @@
-{
-  "buildCommand": "next build",
-  "rewrites": [
-    {
-      "source": "/data/:path*",
-      "destination": "/public/:path*"
-    }
-  ]
-}

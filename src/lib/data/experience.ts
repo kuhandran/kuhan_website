@@ -23,7 +23,6 @@ export const useExperience = () => {
     const loadExperience = async () => {
       setLoading(true);
       try {
-        console.log(`[Experience] Loading experience for language: ${language}`);
         const data = await fetchExperienceAPI(language as SupportedLanguage);
         const experienceItems = Array.isArray(data) ? (data as TimelineItemProps[]) : EMPTY_EXPERIENCE;
         setExperience(experienceItems);

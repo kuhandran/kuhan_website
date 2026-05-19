@@ -5,14 +5,16 @@
  */
 
 import { getCdnImageUrl, SupportedLanguage, DEFAULT_LANGUAGE } from '@/lib/config/domains';
-import { getFromCache, setInCache } from './cache-legacy';
+import { cacheManager } from './cache';
+
+const TTL = 5 * 60 * 1000;
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const STATIC_API_BASE = 'https://static.kuhandranchatbot.info';
-const BACKEND_API_BASE = 'https://api-gateway-9unh.onrender.com';
+const STATIC_API_BASE  = process.env.NEXT_PUBLIC_STATIC_API_URL  ?? 'https://static.kuhandranchatbot.info';
+const BACKEND_API_BASE = process.env.NEXT_PUBLIC_BACKEND_API_URL ?? 'https://api-gateway-9unh.onrender.com';
 const STORAGE_FILES_URL = `${STATIC_API_BASE}/public`;
 
 // ============================================================================
@@ -74,9 +76,7 @@ export function getImage(path: string): string {
     }
   }
 
-  const imageUrl = `${STATIC_API_BASE}/public/image/${finalPath}`;
-  console.log(`[API] Image URL: ${imageUrl}`);
-  return imageUrl;
+  return `${STATIC_API_BASE}/public/image/${finalPath}`;
 }
 
 /**
@@ -86,14 +86,8 @@ export async function preloadImages(imagePaths: string[]): Promise<void> {
   const promises = imagePaths.map(path => {
     return new Promise<void>((resolve) => {
       const img = new Image();
-      img.onload = () => {
-        console.log('[Image] Preloaded:', path);
-        resolve();
-      };
-      img.onerror = () => {
-        console.warn('[Image] Failed to preload:', path);
-        resolve();
-      };
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
       img.src = getImageUrl(path);
     });
   });
@@ -111,10 +105,7 @@ export async function preloadImages(imagePaths: string[]): Promise<void> {
  * @returns Full resume URL
  */
 export function getResume(path: string): string {
-  const cleanPath = extractPath(path);
-  const resumeUrl = `${STATIC_API_BASE}/public/resume/${cleanPath}`;
-  console.log(`[API] Resume URL: ${resumeUrl}`);
-  return resumeUrl;
+  return `${STATIC_API_BASE}/public/resume/${extractPath(path)}`;
 }
 
 // ============================================================================
@@ -127,10 +118,7 @@ export function getResume(path: string): string {
  * @returns Full config URL
  */
 export function getConfig(path: string): string {
-  const cleanPath = extractPath(path);
-  const configUrl = `${STATIC_API_BASE}/public/config/${cleanPath}.json`;
-  console.log(`[API] Config URL: ${configUrl}`);
-  return configUrl;
+  return `${STATIC_API_BASE}/public/config/${extractPath(path)}.json`;
 }
 
 // ============================================================================
@@ -146,12 +134,11 @@ export async function getStorageFile<T = unknown>(fileName: string): Promise<T |
   const cacheKey = `storage:${fileName}`;
   
   // Check cache first
-  const cached = getFromCache<T>(cacheKey);
+  const cached = cacheManager.get<T>(cacheKey);
   if (cached) return cached;
 
   try {
     const url = `${STORAGE_FILES_URL}/${fileName}`;
-    console.log(`[API] Fetching storage file: ${url}`);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -167,7 +154,7 @@ export async function getStorageFile<T = unknown>(fileName: string): Promise<T |
     const responseData = await response.json();
     // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
     const data = responseData.data || responseData;
-    setInCache(cacheKey, data);
+    cacheManager.set(cacheKey, data);
     return data as T;
   } catch (error) {
     console.error(`[API Error] Failed to fetch storage file ${fileName}:`, { error });
@@ -211,15 +198,12 @@ export async function getCollection<T = unknown>(
   const cleanUrl = extractPath(url);
   const cacheKey = `collection:${language}:${type}:${cleanUrl}`;
   
-  console.log(`[API] getCollection called - Language: ${language}, Type: ${type}, URL: ${cleanUrl}`);
-  
   // Check cache first
-  const cached = getFromCache<T>(cacheKey);
+  const cached = cacheManager.get<T>(cacheKey);
   if (cached) return cached;
 
   try {
     const fullUrl = `${STATIC_API_BASE}/public/collections/${language}/${type}/${cleanUrl}.json`;
-    console.log(`[API] Fetching collection: ${fullUrl}`);
     
     const response = await fetch(fullUrl, {
       method: 'GET',
@@ -235,7 +219,7 @@ export async function getCollection<T = unknown>(
     const responseData = await response.json();
     // Extract 'data' field if present (API response wrapper from static.kuhandranchatbot.info)
     const data = responseData.data || responseData;
-    setInCache(cacheKey, data);
+    cacheManager.set(cacheKey, data);
     return data as T;
   } catch (error) {
     console.error(`[API Error] Failed to fetch collection from ${url}:`, { error });
@@ -261,7 +245,6 @@ export async function getInfoFromAPI<T = unknown>(
   data?: Record<string, unknown>,
   useStatic: boolean = false
 ): Promise<T | null> {
-  console.log(`[API] getInfoFromAPI called - Type: ${type}, Path: ${path}, Use Static: ${useStatic}`);
   const cleanPath = extractPath(path);
   const baseUrl = useStatic ? STATIC_API_BASE : BACKEND_API_BASE;
   const fullUrl = `${baseUrl}/${cleanPath}.json`;
@@ -270,13 +253,11 @@ export async function getInfoFromAPI<T = unknown>(
   
   // Check cache for GET requests only
   if (type === 'GET') {
-    const cached = getFromCache<T>(cacheKey);
+    const cached = cacheManager.get<T>(cacheKey);
     if (cached) return cached;
   }
 
   try {
-    console.log(`[API] ${type} request to: ${fullUrl}`);
-    
     const requestOptions: RequestInit = {
       method: type,
       headers: {
@@ -301,7 +282,7 @@ export async function getInfoFromAPI<T = unknown>(
     
     // Cache GET requests only
     if (type === 'GET') {
-      setInCache(cacheKey, responseData);
+      cacheManager.set(cacheKey, responseData);
     }
 
     return responseData as T;

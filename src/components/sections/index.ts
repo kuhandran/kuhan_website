@@ -1,8 +1,6 @@
 // All section components
 export { About } from './About';
 export { Achievements } from './Achievements';
-export { Chatbot } from './Chatbot';
-export { default as ChatProcess } from './ChatProcess';
 export { Contact } from './Contact';
 export { Education } from './Education';
 export { Experience } from './Experience';

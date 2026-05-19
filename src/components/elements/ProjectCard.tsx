@@ -1,4 +1,5 @@
 
+import { memo } from 'react';
 import Link from 'next/link';
 import { Badge } from './Badge';
 import { getImage } from '@/lib/api/apiClient';
@@ -17,7 +18,7 @@ interface ProjectCardProps {
   caseStudySlug?: string;
 }
 
-export const ProjectCard = ({ 
+const ProjectCardInner = ({
   title, 
   description,
   image, 
@@ -136,3 +137,5 @@ export const ProjectCard = ({
     </div>
   );
 };
+
+export const ProjectCard = memo(ProjectCardInner);

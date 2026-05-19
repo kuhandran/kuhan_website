@@ -10,26 +10,13 @@
 
 /** Production API - Main data source for all multilingual content */
 export const DOMAINS = {
-  // Production API
-  PRODUCTION_API: 'https://static.kuhandranchatbot.info',
+  PRODUCTION_API: process.env.NEXT_PUBLIC_STATIC_API_URL ?? 'https://static.kuhandranchatbot.info',
+  CDN:            process.env.NEXT_PUBLIC_STATIC_API_URL ?? 'https://static.kuhandranchatbot.info',
+  IP_API:         process.env.NEXT_PUBLIC_IP_API_URL     ?? 'https://ipapi.co',
 
-  // CDN - Static content and images
-  CDN: 'https://static.kuhandranchatbot.info',
-
-  // Third-party services
-  IP_API: 'https://ipapi.co',
-
-  // Local development & production host (dynamic)
   getAppUrl: (): string => {
-    if (typeof window !== 'undefined') {
-      // Client-side: use current location
-      return window.location.origin;
-    }
-    // Server-side: use environment variable or default
-    // if (process.env.VERCEL_URL) {
-    //   return `https://${process.env.VERCEL_URL}`;
-    // }
-    return 'https://static.kuhandranchatbot.info';
+    if (typeof window !== 'undefined') return window.location.origin;
+    return process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
   },
 } as const;
 
@@ -46,13 +33,11 @@ export const API_ENDPOINTS = {
 
   // Internal API routes
   contentProxy: (type: string) => `/api/content/${type}`,
-  analyticsVisitor: () => '/public/analytics/visitor',
-
   // Language-specific config routes
   configRoute: (language: string, configType: string) =>
     `${DOMAINS.PRODUCTION_API}/public/config/${language}/${configType}`,
   manifestRoute: (language: string = DEFAULT_LANGUAGE) =>
-    `${DOMAINS.PRODUCTION_API}/public/manifest/${language}`,
+    `${DOMAINS.PRODUCTION_API}/public/manifest/${language}.json`,
   // CDN paths
   cdnData: (file: string) =>
     `${DOMAINS.CDN}/public/collections/en/data/${file}.json`,
@@ -231,7 +216,7 @@ export function getContentProxyUrl(
 /**
  * Get full app URL (works on both server and client)
  * @example getAppUrl()
- *          → 'http://localhost:3000' (dev) or 'https://example.vercel.app' (prod)
+ *          → 'http://localhost:3000' (dev) or NEXT_PUBLIC_SITE_URL (prod)
  */
 export function getAppUrl(): string {
   return DOMAINS.getAppUrl();

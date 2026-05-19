@@ -45,7 +45,7 @@ const LazyAbout = lazy(() => import('@/components/sections/About').then(m => ({ 
 
 // Below-the-fold sections: deferred until viewport intersection
 const LazyContact = lazy(() => import('@/components/sections/Contact').then(m => ({ default: m.Contact })));
-const LazyChatbot = lazy(() => import('@/components/sections/Chatbot').then(m => ({ default: m.Chatbot })));
+const LazyChatbot = lazy(() => import('@/components/chatbot/Chatbot').then(m => ({ default: m.Chatbot })));
 const LazySkills = lazy(() => import('@/components/sections/Skills').then(m => ({ default: m.Skills })));
 const LazyProjects = lazy(() => import('@/components/sections/Projects').then(m => ({ default: m.Projects })));
 const LazyExperience = lazy(() => import('@/components/sections/Experience').then(m => ({ default: m.Experience })));

@@ -1,7 +1,4 @@
-// ============================================
-// FILE: src/components/ui/TimelineItem.tsx
-// ============================================
-
+import { memo } from 'react';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { getImage } from '@/lib/api/apiClient';
@@ -18,7 +15,7 @@ interface TimelineItemProps {
   logo?: string;
 }
 
-export const TimelineItem = ({ 
+const TimelineItemInner = ({ 
   title, 
   company, 
   duration, 
@@ -103,3 +100,5 @@ export const TimelineItem = ({
     </div>
   );
 };
+
+export const TimelineItem = memo(TimelineItemInner);

@@ -6,17 +6,17 @@ import { ServiceWorkerManager } from "@/pwa";
 import "@/styles/critical.css";
 import "@/styles/globals.css";
 
-// Lazy load Analytics - deferred until after initial render
+// Lazy load Cloudflare Web Analytics beacon — deferred until after initial render
 const AnalyticsWrapper = dynamic(
   () => import("../components/analytics/AnalyticsWrapper"),
   { loading: () => null },
 );
 
-// Lazy load Analytics Consent Banner
+// Lazy load consent banner — shown only when no prior choice is stored
 const AnalyticsConsentBanner = dynamic(
   () =>
-    import("../components/analytics/AnalyticsConsentBanner").then((mod) => ({
-      default: mod.AnalyticsConsentBanner,
+    import("../components/analytics/AnalyticsConsentBanner").then((m) => ({
+      default: m.AnalyticsConsentBanner,
     })),
   { loading: () => null },
 );
@@ -101,27 +101,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const isDevelopment = process.env.NODE_ENV === "development";
-  const scriptSrc = [
-    "'self'",
-    "'unsafe-inline'",
-    ...(isDevelopment ? ["'unsafe-eval'"] : []),
-    "https://www.googletagmanager.com",
-    "https://www.google-analytics.com",
-    "https://va.vercel-scripts.com",
-    "https://challenges.cloudflare.com",
-  ].join(" ");
-  const csp = [
-    "default-src 'self'",
-    "manifest-src 'self' https://static.kuhandranchatbot.info",
-    "img-src 'self' data: https:",
-    `script-src ${scriptSrc}`,
-    "style-src 'self' 'unsafe-inline'",
-    "font-src 'self' https://fonts.gstatic.com",
-    "connect-src 'self' https://static.kuhandranchatbot.info https://auth-services.kuhandranchatbot.info https://resume-chatbot-services-v2-0.onrender.com https://api-gateway-715i.onrender.com https://api-gateway-9unh.onrender.com https://ipapi.co https://challenges.cloudflare.com https://chat-services.kuhandranchatbot.info",
-    "frame-src 'self' https://static.kuhandranchatbot.info https://challenges.cloudflare.com",
-  ].join("; ");
-
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <head>
@@ -137,7 +116,7 @@ export default function RootLayout({
           href="https://auth-services.kuhandranchatbot.info"
           crossOrigin="anonymous"
         />
-        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="dns-prefetch" href="https://static.cloudflareinsights.com" />
         <link
           rel="preconnect"
           href="https://resume-chatbot-services-v2-0.onrender.com"
@@ -174,11 +153,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Kuhandran" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
 
-        {/* Security and trust meta tags for Zscaler and SEO */}
-        <meta
-          httpEquiv="Content-Security-Policy"
-          content={csp}
-        />
+        {/* Security meta tags */}
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta
           name="robots"

@@ -30,7 +30,6 @@ export const useEducation = () => {
     const loadEducation = async () => {
       setLoading(true);
       try {
-        console.log(`[Education] Loading education for language: ${language}`);
         const data = await fetchEducationAPI(language as SupportedLanguage);
         const educationItems = Array.isArray(data) ? (data as EducationItem[]) : EMPTY_EDUCATION;
         setEducation(educationItems);

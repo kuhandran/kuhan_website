@@ -26,7 +26,6 @@ export const useProjects = () => {
     const loadProjects = async () => {
       setLoading(true);
       try {
-        console.log(`[Projects] Loading projects for language: ${language}`);
         const data = await fetchProjectsAPI(language as SupportedLanguage);
         const projectItems = Array.isArray(data) ? (data as ProjectCardProps[]) : EMPTY_PROJECTS;
         setProjects(projectItems);

@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
         name: 'Portfolio Contact Form',
         address: process.env.EMAIL_USER as string,
       },
-      to: 'skuhandran@yahoo.com',
+      to: process.env.CONTACT_EMAIL ?? (process.env.EMAIL_USER as string),
       subject: `🎯 New Portfolio Contact: ${subject}`,
       html: getAdminNotificationEmail(emailData),
       attachments,

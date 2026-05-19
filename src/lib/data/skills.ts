@@ -22,12 +22,20 @@ interface SkillCategory {
 
 type SkillsData = Record<string, SkillCategory>;
 
-const EMPTY_SKILLS: SkillsData = {
-  frontend: { name: '', icon: '', skills: [] },
-  backend: { name: '', icon: '', skills: [] },
-  data: { name: '', icon: '', skills: [] },
-  cloud: { name: '', icon: '', skills: [] }
-};
+// Validates that fetched data matches the expected categorized structure.
+// Guards against flat-array shapes (e.g. { skills: [...] }) from stale placeholders.
+function isValidSkillsData(data: unknown): data is SkillsData {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+  const entries = Object.entries(data as Record<string, unknown>);
+  if (entries.length === 0) return false;
+  return entries.every(([, category]) => {
+    if (!category || typeof category !== 'object' || Array.isArray(category)) return false;
+    const { skills } = category as Record<string, unknown>;
+    return Array.isArray(skills) && skills.every(
+      (s: unknown) => s && typeof s === 'object' && typeof (s as Record<string, unknown>).level === 'number'
+    );
+  });
+}
 
 const DEFAULT_SKILLS: SkillsData = {
   frontend: {
@@ -88,10 +96,10 @@ export const useSkills = () => {
     const loadSkills = async () => {
       setLoading(true);
       try {
-        console.log(`[Skills] Loading skills for language: ${language}`);
         const data = await fetchSkillsAPI(language as SupportedLanguage);
-        setSkills((data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) ? data : DEFAULT_SKILLS);
-        skillsData = (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) ? data : DEFAULT_SKILLS;
+        const valid = isValidSkillsData(data) ? data : DEFAULT_SKILLS;
+        setSkills(valid);
+        skillsData = valid;
         setError(null);
       } catch (err) {
         console.error(`[Skills] Failed to load skills for language ${language}:`, err);
