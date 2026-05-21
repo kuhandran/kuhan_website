@@ -21,6 +21,7 @@ const contentSecurityPolicy = [
     "https://static.kuhandranchatbot.info",
     "https://auth-services.kuhandranchatbot.info",
     "https://chat-services.kuhandranchatbot.info",
+    "https://contact-ai-services.kuhandranchatbot.info",
     "https://resume-chatbot-services-v2-0.onrender.com",
     "https://api-gateway-715i.onrender.com",
     "https://ipapi.co",

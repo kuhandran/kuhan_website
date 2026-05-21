@@ -3,14 +3,17 @@
 // ============================================
 
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Button } from '../elements/Button';
 import { Card } from '../elements/Card';
 import { Mail, Phone, MapPin, Linkedin, Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { useContentLabels } from '../../lib/data/contentLabels';
-import { fetchApiConfig } from '@/lib/config/loaders';
 import { getErrorMessageSync } from '@/lib/config/loaders';
+
+const CONTACT_API_URL =
+  process.env.NEXT_PUBLIC_CONTACT_API_URL ||
+  'https://contact-ai-services.kuhandranchatbot.info/contact';
 
 interface FormData {
   name: string;
@@ -21,18 +24,12 @@ interface FormData {
 
 export const Contact = () => {
   const { contentLabels } = useContentLabels();
-  const [apiConfig, setApiConfig] = useState<any>({});
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     subject: '',
     message: ''
   });
-  
-  useEffect(() => {
-    // Fetch API config from CDN
-    fetchApiConfig().then(config => setApiConfig(config));
-  }, []);
   
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,8 +98,7 @@ export const Contact = () => {
         formDataToSend.append('file', attachedFile);
       }
       
-      // Send to API Gateway backend
-      const response = await fetch(apiConfig.fullUrls.contact, {
+      const response = await fetch(CONTACT_API_URL, {
         method: 'POST',
         body: formDataToSend,
       });
