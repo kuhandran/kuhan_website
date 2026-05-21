@@ -13,10 +13,17 @@ interface ChatStepProps {
   inputRef: React.RefObject<HTMLInputElement>;
   messagesEndRef: React.RefObject<HTMLDivElement>;
   onSend: () => void;
-  onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   quickActions: string[];
   onQuickAction: (action: string) => void;
+  miniAvatar?: React.ReactNode;
 }
+
+const BotFallback = () => (
+  <div className="w-8 h-8 bg-linear-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shrink-0">
+    <Bot className="w-5 h-5 text-white" />
+  </div>
+);
 
 const ChatStep: React.FC<ChatStepProps> = ({
   messages,
@@ -27,9 +34,10 @@ const ChatStep: React.FC<ChatStepProps> = ({
   inputRef,
   messagesEndRef,
   onSend,
-  onKeyPress,
+  onKeyDown,
   quickActions,
   onQuickAction,
+  miniAvatar,
 }) => {
   const labels = defaultLabels?.chatbot;
   const mins = Math.floor(inactivitySeconds / 60);
@@ -41,8 +49,8 @@ const ChatStep: React.FC<ChatStepProps> = ({
         {messages.map(msg => (
           <div key={msg.id} className={`flex gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.sender === 'bot' && (
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <Bot className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 shrink-0">
+                {miniAvatar ?? <BotFallback />}
               </div>
             )}
             <div className={`max-w-[75%] p-3 rounded-2xl ${
@@ -70,8 +78,8 @@ const ChatStep: React.FC<ChatStepProps> = ({
         ))}
         {isTyping && (
           <div className="flex gap-2 justify-start">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <Bot className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 shrink-0">
+              {miniAvatar ?? <BotFallback />}
             </div>
             <div className="bg-white p-3 rounded-2xl rounded-bl-none shadow-sm">
               <div className="flex gap-1">
@@ -95,7 +103,7 @@ const ChatStep: React.FC<ChatStepProps> = ({
             type="text"
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
-            onKeyPress={onKeyPress}
+            onKeyDown={onKeyDown}
             placeholder={labels?.placeholder || 'Type your message...'}
             className="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
             disabled={isTyping}
