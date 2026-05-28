@@ -62,7 +62,8 @@ export function useSpeech(): SpeechControls {
   const voiceRef     = useRef<SpeechSynthesisVoice | null>(null);
   const isSupported  = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
-  // Load voices — browsers fire onvoiceschanged when the list is ready
+  // Load voices — browsers fire onvoiceschanged when the list is ready.
+  // Mobile browsers often need a user interaction before voices are available.
   useEffect(() => {
     if (!isSupported) return;
 
@@ -71,12 +72,24 @@ export function useSpeech(): SpeechControls {
       if (voices.length) voiceRef.current = pickBestVoice(voices);
     };
 
+    const warmUp = () => {
+      load();
+      if (window.speechSynthesis.getVoices().length) {
+        document.removeEventListener('click', warmUp);
+        document.removeEventListener('touchstart', warmUp);
+      }
+    };
+
     load(); // may already be available (Safari)
     window.speechSynthesis.onvoiceschanged = load;
+    document.addEventListener('click', warmUp, { once: true, passive: true });
+    document.addEventListener('touchstart', warmUp, { once: true, passive: true });
 
     return () => {
       window.speechSynthesis.onvoiceschanged = null;
       window.speechSynthesis.cancel();
+      document.removeEventListener('click', warmUp);
+      document.removeEventListener('touchstart', warmUp);
     };
   }, [isSupported]);
 
