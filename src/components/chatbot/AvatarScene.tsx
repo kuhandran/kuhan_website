@@ -56,7 +56,11 @@ class ModernClock {
   }
 }
 
-(THREE as Record<string, unknown>).Clock = ModernClock;
+Object.defineProperty(THREE, "Clock", {
+  value: ModernClock,
+  writable: true,
+  configurable: true,
+});
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Error boundary — falls back to photo avatar if GLB missing / fails ───────
