@@ -7,6 +7,7 @@ const scriptSrc = [
   "'unsafe-inline'",
   ...(isDevelopment ? ["'unsafe-eval'"] : []),
   "https://challenges.cloudflare.com",
+  "https://static.cloudflareinsights.com",
 ].join(" ");
 
 const contentSecurityPolicy = [

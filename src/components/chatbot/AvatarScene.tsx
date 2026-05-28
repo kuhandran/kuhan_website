@@ -8,60 +8,17 @@ import * as THREE from "three";
 import { AvatarWidget } from "./AvatarWidget";
 import type { AvatarEmotion } from "./types";
 
-// ─── THREE.Clock → ModernClock shim ──────────────────────────────────────────
-// THREE.Clock was deprecated in three >= r178. @react-three/fiber creates one
-// internally via `new THREE.Clock()`. We replace THREE.Clock with a drop-in
-// class that replicates the exact same API using performance.now() directly,
-// so no deprecation warning is ever triggered.
-class ModernClock {
-  autoStart: boolean;
-  running = false;
-  startTime = 0;
-  oldTime = 0;
-  elapsedTime = 0;
-
-  constructor(autoStart = true) {
-    this.autoStart = autoStart;
-  }
-
-  start() {
-    this.startTime = performance.now() / 1000;
-    this.oldTime = this.startTime;
-    this.elapsedTime = 0;
-    this.running = true;
-  }
-
-  stop() {
-    this.getElapsedTime();
-    this.running = false;
-    this.autoStart = false;
-  }
-
-  getElapsedTime() {
-    this.getDelta();
-    return this.elapsedTime;
-  }
-
-  getDelta() {
-    if (this.autoStart && !this.running) {
-      this.start();
-      return 0;
-    }
-    if (!this.running) return 0;
-    const now = performance.now() / 1000;
-    const diff = now - this.oldTime;
-    this.oldTime = now;
-    this.elapsedTime += diff;
-    return diff;
-  }
+// three.js exports are sealed ES module properties — they cannot be patched at
+// runtime. The THREE.Clock deprecation comes from @react-three/fiber internals
+// and will be fixed in a future r3f release. Filter only this one message so it
+// doesn't appear in the console while everything continues to work correctly.
+if (typeof window !== "undefined") {
+  const _warn = console.warn.bind(console);
+  console.warn = (...args: unknown[]) => {
+    if (typeof args[0] === "string" && args[0].includes("THREE.Clock")) return;
+    _warn(...args);
+  };
 }
-
-Object.defineProperty(THREE, "Clock", {
-  value: ModernClock,
-  writable: true,
-  configurable: true,
-});
-// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Error boundary — falls back to photo avatar if GLB missing / fails ───────
 
