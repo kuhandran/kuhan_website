@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { X, Volume2, VolumeX } from 'lucide-react';
+import { X, Volume2, VolumeX, MessageCircle, Sparkles } from 'lucide-react';
 import { contentLabels as defaultLabels } from '@/lib/data/contentLabels';
 import { sendOtp, verifyOtp } from '@/services/auth.service';
 import { generateToken, sendMessage } from '@/services/chat.service';
@@ -44,11 +44,9 @@ export function Chatbot() {
   const [isMuted, setIsMuted]   = useState(true);
   const { speak, cancel, isSpeaking } = useSpeech();
 
-  // true = 3D avatar trigger  |  false = photo circle trigger
-  const [avatar3D, setAvatar3D] = useState(false); // start false (SSR safe), flip after mount
+  const [avatar3D, setAvatar3D] = useState(false);
   useEffect(() => { setAvatar3D(true); }, []);
 
-  // Hint bubble
   const [showHint, setShowHint] = useState(false);
   useEffect(() => {
     const show = setTimeout(() => setShowHint(true), 1400);
@@ -93,6 +91,16 @@ export function Chatbot() {
     inactivityTimerRef.current = window.setTimeout(() => resetSession('Session expired due to inactivity.'), 300_000);
     return () => { if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current); };
   }, [messages, step]);
+
+  // ── Lock body scroll when open on mobile ─────────────────────────
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   // ── Avatar emotion effects ────────────────────────────────────────
   useEffect(() => {
@@ -190,7 +198,6 @@ export function Chatbot() {
   };
 
   const miniAvatar = <AvatarWidget emotion={emotion} size="mini" />;
-
   const toggleOpen = () => { setIsOpen(o => !o); setShowHint(false); };
 
   // ════════════════════════════════════════════════════════════════════
@@ -198,7 +205,7 @@ export function Chatbot() {
   // ════════════════════════════════════════════════════════════════════
   return (
     <>
-      {/* ── "Click to chat" hint ─────────────────────────────────── */}
+      {/* ── Hint bubble ──────────────────────────────────────────── */}
       {showHint && !isOpen && (
         <div className="fixed bottom-48 right-24 z-50 bg-white rounded-2xl px-4 py-2.5 shadow-xl text-sm font-medium text-gray-700 whitespace-nowrap pointer-events-none animate-scale-in">
           👋 Hi! Click me to chat
@@ -206,114 +213,151 @@ export function Chatbot() {
         </div>
       )}
 
-      {/* ── Avatar trigger (3D or photo circle) ─────────────────── */}
-      <div className="fixed bottom-0 right-4 z-50 select-none flex flex-col items-center">
-        {/* Sound toggle — always visible on the avatar */}
-        <button
-          onClick={e => { e.stopPropagation(); setIsMuted(m => !m); }}
-          className={`mb-1 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium shadow-md transition-all ${
-            isMuted
-              ? 'bg-white/90 text-gray-500 border border-gray-200'
-              : 'bg-blue-500 text-white'
-          }`}
-          aria-label={isMuted ? 'Enable voice' : 'Mute voice'}
-        >
-          {isMuted ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
-          <span>{isMuted ? 'Voice off' : 'Voice on'}</span>
-        </button>
+      {/* ── Floating trigger ─────────────────────────────────────── */}
+      {!isOpen && (
+        <div className="fixed bottom-0 right-4 z-50 select-none flex flex-col items-center">
+          <button
+            onClick={e => { e.stopPropagation(); setIsMuted(m => !m); }}
+            className={`mb-1 flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium shadow-md transition-all ${
+              isMuted ? 'bg-white/90 text-gray-500 border border-gray-200' : 'bg-indigo-500 text-white'
+            }`}
+            aria-label={isMuted ? 'Enable voice' : 'Mute voice'}
+          >
+            {isMuted ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+            <span>{isMuted ? 'Voice off' : 'Voice on'}</span>
+          </button>
 
-        {/* Trigger: 3D avatar OR photo circle */}
-        <div className="relative cursor-pointer" onClick={toggleOpen}>
-          {/* Notification dot */}
-          {!isOpen && (
+          <div className="relative cursor-pointer" onClick={toggleOpen}>
             <span className="absolute top-3 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping z-10 pointer-events-none" />
-          )}
-
-          {avatar3D ? (
-            /* ── PATHWAY A: 3D avatar ── */
-            <AvatarScene
-              compact
-              emotion={emotion}
-              isSpeaking={isSpeaking}
-              onError={() => setAvatar3D(false)}
-            />
-          ) : (
-            /* ── PATHWAY B: Photo circle ── */
-            <div className={`w-20 h-20 rounded-full overflow-hidden border-4 shadow-2xl transition-all duration-300 mb-2 ${
-              isSpeaking ? 'border-blue-400 scale-105' : 'border-white/80'
-            }`}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={PROFILE_URL} alt="Kuhandran" className="w-full h-full object-cover" draggable={false} />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── Modern speech bubble chat panel ─────────────────────── */}
-      {isOpen && (
-        <div className="fixed bottom-40 right-24 z-50 w-80 max-w-[calc(100vw-7rem)] bg-white rounded-2xl shadow-2xl flex flex-col animate-scale-in overflow-hidden">
-
-          {/* Header */}
-          <div className="bg-linear-to-br from-blue-600 via-blue-500 to-purple-600 px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="relative shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={PROFILE_URL} alt="Kuhandran" className="w-9 h-9 rounded-full object-cover border-2 border-white/50" draggable={false} />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-white leading-tight">{labels?.header?.title || "Kuhandran's Assistant"}</p>
-                  <p className="text-[10px] text-white/70 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />
-                    Online · AI powered
-                  </p>
-                </div>
+            {avatar3D ? (
+              <AvatarScene compact emotion={emotion} isSpeaking={isSpeaking} onError={() => setAvatar3D(false)} />
+            ) : (
+              <div className={`w-20 h-20 rounded-full overflow-hidden border-4 shadow-2xl transition-all duration-300 mb-2 ${isSpeaking ? 'border-indigo-400 scale-105' : 'border-white/80'}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={PROFILE_URL} alt="Kuhandran" className="w-full h-full object-cover" draggable={false} />
               </div>
-              <div className="flex items-center gap-0.5">
-                <button
-                  onClick={e => { e.stopPropagation(); setIsMuted(m => !m); }}
-                  className="p-1.5 hover:bg-white/20 rounded-lg transition-colors text-white"
-                  aria-label={isMuted ? 'Unmute voice' : 'Mute voice'}
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
-                <button
-                  onClick={e => { e.stopPropagation(); setIsOpen(false); }}
-                  className="p-1.5 hover:bg-white/20 rounded-lg transition-colors text-white"
-                  aria-label="Close"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            )}
           </div>
-
-          {/* Chat steps */}
-          {step === 'email' && (
-            <EmailStep email={email} setEmail={setEmail} captchaToken={captchaToken}
-              setCaptchaToken={setCaptchaToken} loading={loading} statusMsg={statusMsg}
-              onSubmit={handleEmailSubmit} key="email" />
-          )}
-          {step === 'otp' && (
-            <OtpStep otp={otp} setOtp={setOtp} loading={loading} statusMsg={statusMsg}
-              onVerify={handleOtpVerify}
-              onChangeEmail={() => { setStep('email'); setOtp(''); setStatusMsg(null); setCaptchaToken(null); }} />
-          )}
-          {step === 'chat' && (
-            <ChatStep messages={messages} inactivitySeconds={inactivitySeconds} isTyping={isTyping}
-              inputValue={inputValue} setInputValue={setInputValue}
-              inputRef={inputRef as React.RefObject<HTMLInputElement>}
-              messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
-              onSend={handleSendMessage} onKeyDown={handleKeyDown}
-              quickActions={labels?.quickActions || []}
-              onQuickAction={action => { setInputValue(action); setTimeout(handleSendMessage, 100); }}
-              miniAvatar={miniAvatar} />
-          )}
-
-          {/* Speech bubble tail */}
-          <div className="absolute -bottom-3 right-6 w-5 h-5 bg-white rotate-45 shadow-[2px_2px_4px_rgba(0,0,0,0.08)]" />
         </div>
+      )}
+
+      {/* ── Chat panel — full screen mobile / large card desktop ─── */}
+      {isOpen && (
+        <>
+          {/* Backdrop (desktop: dim behind card) */}
+          <div
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm sm:bg-black/20"
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Panel */}
+          <div className="
+            fixed z-50 flex flex-col bg-white overflow-hidden
+            inset-0
+            sm:inset-auto sm:bottom-6 sm:right-6
+            sm:w-110 sm:h-170 sm:max-h-[calc(100dvh-3rem)]
+            sm:rounded-3xl sm:shadow-2xl
+            animate-scale-in
+          ">
+            {/* ── Header ─────────────────────────────────────────── */}
+            <div
+              className="shrink-0 px-5 py-4 sm:rounded-t-3xl"
+              style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 40%, #24243e 100%)' }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={PROFILE_URL} alt="Kuhandran"
+                      className="w-11 h-11 rounded-2xl object-cover ring-2 ring-white/20 shadow-lg"
+                      draggable={false}
+                    />
+                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-[#302b63] shadow" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-bold text-base text-white leading-tight tracking-tight">
+                        {labels?.header?.title || "Kuhandran's Assistant"}
+                      </p>
+                      <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                    </div>
+                    <p className="text-[11px] text-purple-200 flex items-center gap-1.5 mt-0.5">
+                      <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full inline-block animate-pulse" />
+                      Online · AI powered
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={e => { e.stopPropagation(); setIsMuted(m => !m); }}
+                    className="p-2.5 hover:bg-white/10 rounded-xl transition-colors text-white/70 hover:text-white"
+                    aria-label={isMuted ? 'Unmute voice' : 'Mute voice'}
+                  >
+                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  </button>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-2.5 hover:bg-white/10 rounded-xl transition-colors text-white/70 hover:text-white"
+                    aria-label="Close chat"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Step content ───────────────────────────────────── */}
+            <div className="flex-1 min-h-0 flex flex-col">
+              {step === 'email' && (
+                <EmailStep
+                  email={email} setEmail={setEmail}
+                  captchaToken={captchaToken} setCaptchaToken={setCaptchaToken}
+                  loading={loading} statusMsg={statusMsg}
+                  onSubmit={handleEmailSubmit} key="email"
+                />
+              )}
+              {step === 'otp' && (
+                <OtpStep
+                  otp={otp} setOtp={setOtp}
+                  loading={loading} statusMsg={statusMsg}
+                  onVerify={handleOtpVerify}
+                  onChangeEmail={() => { setStep('email'); setOtp(''); setStatusMsg(null); setCaptchaToken(null); }}
+                />
+              )}
+              {step === 'chat' && (
+                <ChatStep
+                  messages={messages} inactivitySeconds={inactivitySeconds}
+                  isTyping={isTyping} inputValue={inputValue}
+                  setInputValue={setInputValue}
+                  inputRef={inputRef as React.RefObject<HTMLInputElement>}
+                  messagesEndRef={messagesEndRef as React.RefObject<HTMLDivElement>}
+                  onSend={handleSendMessage} onKeyDown={handleKeyDown}
+                  quickActions={labels?.quickActions || []}
+                  onQuickAction={action => { setInputValue(action); setTimeout(handleSendMessage, 100); }}
+                  miniAvatar={miniAvatar}
+                />
+              )}
+            </div>
+
+            {/* ── Mobile bottom safe area ─────────────────────────── */}
+            <div className="shrink-0 h-safe-bottom sm:hidden" />
+          </div>
+        </>
+      )}
+
+      {/* ── Mobile open-chat FAB (shown when closed, bottom-right) ─ */}
+      {!isOpen && (
+        <button
+          onClick={toggleOpen}
+          className="fixed bottom-6 right-6 z-40 sm:hidden flex items-center gap-2 px-5 py-3.5 rounded-2xl text-white font-semibold text-sm shadow-2xl"
+          style={{ background: 'linear-gradient(135deg, #302b63, #24243e)' }}
+          aria-label="Open chat"
+        >
+          <MessageCircle className="w-5 h-5" />
+          Chat with AI
+        </button>
       )}
     </>
   );

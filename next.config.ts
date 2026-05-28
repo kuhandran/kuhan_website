@@ -95,15 +95,6 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
         source: '/public/image/(.*)',
         headers: [
           {
@@ -118,33 +109,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/(.*).css',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'text/css',
-          },
-        ],
-      },
-      {
-        source: '/(.*).js',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/javascript',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/chunks/(.*).js',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/javascript',
           },
         ],
       },
