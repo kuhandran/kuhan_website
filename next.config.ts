@@ -5,6 +5,9 @@ const isDevelopment = process.env.NODE_ENV === "development";
 const scriptSrc = [
   "'self'",
   "'unsafe-inline'",
+  // 'wasm-unsafe-eval' allows WebAssembly compilation (three.js/r3f shaders)
+  // without opening up general eval(). Needed in both dev and prod.
+  "'wasm-unsafe-eval'",
   ...(isDevelopment ? ["'unsafe-eval'"] : []),
   "https://challenges.cloudflare.com",
   "https://static.cloudflareinsights.com",
@@ -28,6 +31,8 @@ const contentSecurityPolicy = [
     "https://api-gateway-715i.onrender.com",
     "https://ipapi.co",
     "https://challenges.cloudflare.com",
+    "https://static.cloudflareinsights.com",
+    "https://cloudflareinsights.com",
   ].join(" "),
   "frame-src 'self' https://static.kuhandranchatbot.info https://challenges.cloudflare.com",
   "object-src 'none'",
