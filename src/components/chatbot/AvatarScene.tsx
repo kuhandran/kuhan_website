@@ -9,13 +9,13 @@ import { AvatarWidget } from "./AvatarWidget";
 import type { AvatarEmotion } from "./types";
 
 // three.js exports are sealed ES module properties — they cannot be patched at
-// runtime. The THREE.Clock deprecation comes from @react-three/fiber internals
+// runtime. The THREE.Timer deprecation comes from @react-three/fiber internals
 // and will be fixed in a future r3f release. Filter only this one message so it
 // doesn't appear in the console while everything continues to work correctly.
 if (typeof window !== "undefined") {
   const _warn = console.warn.bind(console);
   console.warn = (...args: unknown[]) => {
-    if (typeof args[0] === "string" && args[0].includes("THREE.Clock")) return;
+    if (typeof args[0] === "string" && args[0].includes("THREE.Timer")) return;
     _warn(...args);
   };
 }

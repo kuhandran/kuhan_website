@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Download, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from './Button';
+import { trackResumeDownload } from '@/lib/analytics/ga4';
 
 interface ResumePDFViewerProps {
   isOpen: boolean;
@@ -79,8 +80,9 @@ export const ResumePDFViewer = ({
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
 
-      // Track AFTER successful download
+      // Track AFTER successful download — both existing + GA4
       await trackDownload(language);
+      trackResumeDownload(undefined, language);
     } catch (error) {
       console.error('Download error:', error);
       alert("Failed to download resume. Please try again.");
@@ -97,7 +99,7 @@ export const ResumePDFViewer = ({
 
       <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-white">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-purple-50 shrink-0">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-200 bg-linear-to-r from-blue-50 to-purple-50 shrink-0">
           <div className="flex-1">
             <h2 className="text-xl md:text-2xl font-bold text-slate-900">Resume</h2>
             <p className="text-xs md:text-sm text-slate-500 mt-1">

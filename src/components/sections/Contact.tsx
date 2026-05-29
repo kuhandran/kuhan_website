@@ -7,9 +7,29 @@ import { useState } from 'react';
 import { SectionHeader } from '../elements/SectionHeader';
 import { Button } from '../elements/Button';
 import { Card } from '../elements/Card';
-import { Mail, Phone, MapPin, Linkedin, Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Link2, Upload, X, FileText, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { useContentLabels } from '../../lib/data/contentLabels';
 import { getErrorMessageSync } from '@/lib/config/loaders';
+import { trackContactSubmit } from '@/lib/analytics/ga4';
+import { useGeolocation } from '@/lib/hooks/useGeolocation';
+import { useSectionDwell } from '@/lib/hooks/useSectionDwell';
+
+// Purely client-side timezone diff — no API call needed
+function getTimezoneLabel(): string | null {
+  try {
+    const MY_OFFSET  = 8; // UTC+8 KL
+    const localOffset = -new Date().getTimezoneOffset() / 60;
+    const diff = MY_OFFSET - localOffset;
+    if (diff === 0) return 'Same timezone as you (UTC+8) ✓';
+    const abs  = Math.abs(diff);
+    const h    = Math.floor(abs);
+    const m    = Math.round((abs - h) * 60);
+    const str  = [h ? `${h}h` : '', m ? `${m}m` : ''].filter(Boolean).join(' ');
+    return diff > 0 ? `${str} ahead of you` : `${str} behind you`;
+  } catch {
+    return null;
+  }
+}
 
 const CONTACT_API_URL =
   process.env.NEXT_PUBLIC_CONTACT_API_URL ||
@@ -24,6 +44,13 @@ interface FormData {
 
 export const Contact = () => {
   const { contentLabels } = useContentLabels();
+  // Lazy initialiser: runs only on client, returns null during SSR
+  const [tzLabel] = useState<string | null>(() =>
+    typeof window === 'undefined' ? null : getTimezoneLabel()
+  );
+  const { geo } = useGeolocation();
+  useSectionDwell('contact', geo?.country);
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -111,11 +138,12 @@ export const Contact = () => {
       
       setIsSubmitting(false);
       setSubmitStatus('success');
-      
+      trackContactSubmit(geo?.country);
+
       // Reset form
       setFormData({ name: '', email: '', subject: '', message: '' });
       setAttachedFile(null);
-      
+
       setTimeout(() => setSubmitStatus('idle'), 5000);
       
     } catch (error) {
@@ -140,7 +168,7 @@ export const Contact = () => {
   };
   
   return (
-    <section id="contact" className="py-20 bg-gradient-to-b from-blue-50 to-indigo-50">
+    <section id="contact" className="py-20 bg-linear-to-b from-blue-50 to-indigo-50">
       <div className="container mx-auto px-4">
         <SectionHeader
           subtitle={contentLabels?.contact?.subtitle || ''}
@@ -154,7 +182,7 @@ export const Contact = () => {
             <Card className="p-8 md:p-10 bg-white border-2 border-slate-100">
               <div className="mb-8">
                 <h3 className="text-3xl font-bold text-slate-900 mb-2">{contentLabels?.contact?.form?.heading || 'Send Me a Message'}</h3>
-                <p className="text-slate-600">Fill out the form below and I'll get back to you within 24 hours.</p>
+                <p className="text-slate-600">Fill out the form below and I&apos;ll get back to you within 24 hours.</p>
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -288,7 +316,7 @@ export const Contact = () => {
                 {/* Success Message */}
                 {submitStatus === 'success' && (
                   <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-emerald-900 font-semibold">{contentLabels?.contact?.form?.messages?.successTitle || 'Success!'}</p>
                       <p className="text-emerald-700 text-sm mt-1">
@@ -301,7 +329,7 @@ export const Contact = () => {
                 {/* Error Message */}
                 {submitStatus === 'error' && (
                   <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-red-900 font-semibold">{contentLabels?.contact?.form?.messages?.errorTitle || 'Error'}</p>
                       <p className="text-red-700 text-sm mt-1">
@@ -317,7 +345,7 @@ export const Contact = () => {
           {/* Contact Information - 1 column */}
           <div className="space-y-6">
             {/* Contact Info Card */}
-            <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+            <Card className="p-8 bg-linear-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
               <h3 className="text-2xl font-bold text-slate-900 mb-2">{contentLabels?.contact?.contactInfo?.heading || 'Contact Information'}</h3>
               <p className="text-slate-600 text-sm mb-6">
                 {contentLabels?.contact?.contactInfo?.description || ''}
@@ -329,7 +357,7 @@ export const Contact = () => {
                   href={`mailto:${contentLabels?.contact?.contactInfo?.email?.value || 'skuhandran@yahoo.com'}`}
                   className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                     <Mail size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
@@ -343,7 +371,7 @@ export const Contact = () => {
                   href={`tel:${(contentLabels?.contact?.contactInfo?.phone?.value || '').replace(/\s+/g, '')}`}
                   className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                     <Phone size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
@@ -352,14 +380,20 @@ export const Contact = () => {
                   </div>
                 </a>
                 
-                {/* Location */}
+                {/* Location + timezone */}
                 <div className="flex items-start gap-4 p-4 bg-white rounded-xl">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shrink-0">
                     <MapPin size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.location?.label || 'Location'}</div>
                     <div className="text-sm font-semibold text-slate-900">{contentLabels?.contact?.contactInfo?.location?.value || 'Kuala Lumpur, Malaysia'}</div>
+                    {tzLabel && (
+                      <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[11px] font-medium">
+                        <Clock size={10} />
+                        {tzLabel}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -370,8 +404,8 @@ export const Contact = () => {
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-all group"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                    <Linkedin size={20} className="text-white" />
+                  <div className="w-12 h-12 bg-linear-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                    <Link2 size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{contentLabels?.contact?.contactInfo?.linkedin?.label || 'LinkedIn'}</div>
@@ -382,14 +416,27 @@ export const Contact = () => {
             </Card>
             
             {/* Availability Badge */}
-            <Card className="p-6 bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200">
+            <Card className="p-6 bg-linear-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200">
               <div className="flex items-start gap-3">
-                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse mt-1 flex-shrink-0"></div>
+                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse mt-1 shrink-0"></div>
                 <div>
-                  <span className="font-bold text-slate-900 block text-lg">{contentLabels?.contact?.availability?.title || 'Available for Work'}</span>
+                  <span className="font-bold text-slate-900 block text-lg">
+                    {contentLabels?.contact?.availability?.title || 'Available for Work'}
+                  </span>
                   <p className="text-slate-700 text-sm mt-2">
                     {contentLabels?.contact?.availability?.description || 'Open to new opportunities'}
                   </p>
+                  {/* Global openness — always visible regardless of visitor location */}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {['Malaysia', 'Singapore', 'UK', 'Australia', 'Gulf', 'Europe', 'Remote'].map(loc => (
+                      <span
+                        key={loc}
+                        className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700"
+                      >
+                        {loc}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </Card>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { LanguageProvider } from "@/lib/hooks/useLanguageHook";
+import { ReadingProgress } from "@/components/elements/ReadingProgress";
+import { GA4Provider } from "@/components/analytics/GA4Provider";
 import { getManifestUrl, DEFAULT_LANGUAGE } from "@/lib/config/domains";
 import { ServiceWorkerManager } from "@/pwa";
 import "@/styles/critical.css";
@@ -166,7 +168,21 @@ export default function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
         <link rel="canonical" href="https://www.kuhandranchatbot.info" />
 
-        {/* JSON-LD Schema for better search results */}
+        {/* hreflang — language + country signals for Google multi-region indexing */}
+        {[
+          { lang: "en-MY", href: "https://www.kuhandranchatbot.info/en" },
+          { lang: "en-SG", href: "https://www.kuhandranchatbot.info/en" },
+          { lang: "en-GB", href: "https://www.kuhandranchatbot.info/en" },
+          { lang: "en-AU", href: "https://www.kuhandranchatbot.info/en" },
+          { lang: "en-AE", href: "https://www.kuhandranchatbot.info/en" },
+          { lang: "en-US", href: "https://www.kuhandranchatbot.info/en" },
+          { lang: "en-CA", href: "https://www.kuhandranchatbot.info/en" },
+          { lang: "x-default", href: "https://www.kuhandranchatbot.info" },
+        ].map(({ lang, href }) => (
+          <link key={lang} rel="alternate" hrefLang={lang} href={href} />
+        ))}
+
+        {/* JSON-LD Schema — enhanced with availableIn for international SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -175,66 +191,73 @@ export default function RootLayout({
               "@type": "Person",
               name: "Kuhandran SamudraPandiyan",
               url: "https://www.kuhandranchatbot.info",
-              image: "/image/profile.png",
+              image: "https://www.kuhandranchatbot.info/image/profile.png",
               jobTitle: "Technical Delivery Manager",
-              worksFor: [
-                {
-                  "@type": "Organization",
-                  name: "FWD Insurance",
-                  url: "https://www.fwd.com",
-                  alternateName: [
-                    "FWD Malaysia",
-                    "FWD Technology and Innovation Malaysia Sdn. Bhd",
-                  ],
-                },
-                {
-                  "@type": "Organization",
-                  name: "Maybank",
-                  url: "https://www.maybank.com",
-                  alternateName: ["Maybank Tech", "Maybank Shared Services"],
-                },
+              description:
+                "Technical Delivery Manager and Full-Stack Engineer with 8+ years in enterprise applications, React Native, and banking/insurance solutions. Open to opportunities in Malaysia, Singapore, UK, Australia, Gulf, Europe, and remote roles globally.",
+              nationality: { "@type": "Country", name: "Sri Lanka" },
+              worksFor: {
+                "@type": "Organization",
+                name: "FWD Insurance",
+                url: "https://www.fwd.com",
+                alternateName: ["FWD Malaysia", "FWD Technology and Innovation Malaysia Sdn. Bhd"],
+              },
+              availableIn: [
+                { "@type": "Country", name: "Malaysia" },
+                { "@type": "Country", name: "Singapore" },
+                { "@type": "Country", name: "United Kingdom" },
+                { "@type": "Country", name: "Australia" },
+                { "@type": "Country", name: "United Arab Emirates" },
+                { "@type": "Country", name: "Germany" },
+                { "@type": "Country", name: "Canada" },
+                { "@type": "Country", name: "United States" },
               ],
-              sameAs: [
-                "https://www.linkedin.com/in/kuhandran-samudrapandiyan/",
-                "https://instagram.com/kuhan_samudra",
-              ],
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Kuala Lumpur",
-                addressRegion: "Malaysia",
-                addressCountry: "MY",
+              hasOccupation: {
+                "@type": "Occupation",
+                name: "Technical Delivery Manager",
+                occupationLocation: [
+                  { "@type": "Country", name: "Malaysia" },
+                  { "@type": "Country", name: "Singapore" },
+                  { "@type": "Country", name: "United Kingdom" },
+                ],
+                skills: "React Native, React.js, Spring Boot, Power BI, TypeScript, Agile, Project Management",
               },
               alumniOf: [
                 {
-                  "@type": "Organization",
-                  name: "INTI International University",
-                  url: "https://www.newinti.edu.my",
-                  alternateName: ["INTI Alumni", "INTI International"],
+                  "@type": "CollegeOrUniversity",
+                  name: "Cardiff Metropolitan University",
+                  url: "https://www.cardiffmet.ac.uk",
+                  alternateName: ["Cardiff Met", "UWIC"],
                 },
                 {
-                  "@type": "Organization",
+                  "@type": "CollegeOrUniversity",
                   name: "University of Wollongong Malaysia",
                   url: "https://www.uow.edu.au",
                   alternateName: ["UOW Malaysia", "UOW Australia"],
                 },
+                {
+                  "@type": "CollegeOrUniversity",
+                  name: "INTI International University",
+                  url: "https://www.newinti.edu.my",
+                },
               ],
-              description:
-                "Technical Delivery Manager and Full-Stack Engineer with 8+ years of experience in enterprise applications, React Native development, and banking/insurance solutions. Experienced with Maybank, FWD Insurance Malaysia, and other leading technology companies.",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Kuala Lumpur",
+                addressRegion: "Wilayah Persekutuan",
+                addressCountry: "MY",
+              },
+              sameAs: [
+                "https://www.linkedin.com/in/kuhandran-samudrapandiyan/",
+                "https://github.com/kuhandran",
+                "https://instagram.com/kuhan_samudra",
+              ],
               knowsAbout: [
-                "React Native",
-                "React.js",
-                "Power BI",
-                "Data Visualization",
-                "Full-Stack Development",
-                "Microservices",
-                "Enterprise Applications",
-                "Banking Solutions",
-                "Project Management",
-                "Agile Methodologies",
-                "Cross-functional Teams",
-                "RESTful APIs",
-                "Spring Boot",
-                "TypeScript",
+                "React Native", "React.js", "TypeScript", "Spring Boot",
+                "Power BI", "Data Visualization", "Full-Stack Development",
+                "Microservices", "Enterprise Applications", "Banking Technology",
+                "Insurance Technology", "Project Management", "Agile Methodologies",
+                "Cross-functional Teams", "RESTful APIs", "AWS",
               ],
             }),
           }}
@@ -245,6 +268,8 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <GA4Provider />
+        <ReadingProgress />
         <LanguageProvider>{children}</LanguageProvider>
         <ServiceWorkerManager />
         <AnalyticsWrapper />

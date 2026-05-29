@@ -4,7 +4,7 @@
  */
 
 // Cache version - increment when updating caching strategy
-const CACHE_VERSION = 'v1.0.2';
+const CACHE_VERSION = 'v1.0.4';
 const CACHE_NAMES = {
   STATIC: `${CACHE_VERSION}-static`,
   API: `${CACHE_VERSION}-api`,
@@ -274,8 +274,10 @@ function isApiRequest(url) {
 
 /**
  * Check if request is for static asset
+ * Excludes /_next/ chunks — Next.js manages cache-busting for those via content-hash filenames
  */
 function isStaticAsset(url) {
+  if (url.pathname.startsWith('/_next/')) return false;
   return /\.(css|js|woff|woff2|ttf|eot)$/i.test(url.pathname);
 }
 

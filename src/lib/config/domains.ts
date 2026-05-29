@@ -9,6 +9,8 @@
 // ============================================================================
 
 /** Production API - Main data source for all multilingual content */
+export const GITHUB_USERNAME = process.env.NEXT_PUBLIC_GITHUB_USERNAME ?? 'kuhandran';
+
 export const DOMAINS = {
   PRODUCTION_API: process.env.NEXT_PUBLIC_STATIC_API_URL ?? 'https://static.kuhandranchatbot.info',
   CDN:            process.env.NEXT_PUBLIC_STATIC_API_URL ?? 'https://static.kuhandranchatbot.info',

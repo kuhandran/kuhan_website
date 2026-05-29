@@ -44,6 +44,18 @@
   }
 }
 
+/* Hero click ripple */
+@keyframes hero-ripple {
+  0%   { width: 0; height: 0; opacity: 0.7; }
+  100% { width: 500px; height: 500px; opacity: 0; }
+}
+
+.hero-ripple {
+  transform: translate(-50%, -50%);
+  animation: hero-ripple 1.3s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+  pointer-events: none;
+}
+
 /* Animation utilities */
 .animate-fade-in {
   animation: fadeIn 1s ease-in;

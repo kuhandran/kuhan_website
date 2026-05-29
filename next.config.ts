@@ -11,6 +11,7 @@ const scriptSrc = [
   ...(isDevelopment ? ["'unsafe-eval'"] : []),
   "https://challenges.cloudflare.com",
   "https://static.cloudflareinsights.com",
+  "https://www.googletagmanager.com",
 ].join(" ");
 
 const contentSecurityPolicy = [
@@ -23,6 +24,11 @@ const contentSecurityPolicy = [
   "manifest-src 'self' https://static.kuhandranchatbot.info",
   [
     "connect-src 'self' blob:",
+    "https://api.github.com",
+    "https://www.google-analytics.com",
+    "https://analytics.google.com",
+    "https://stats.g.doubleclick.net",
+    "https://www.googletagmanager.com",
     "https://static.kuhandranchatbot.info",
     "https://auth-services.kuhandranchatbot.info",
     "https://chat-services.kuhandranchatbot.info",
