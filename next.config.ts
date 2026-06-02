@@ -25,6 +25,8 @@ const contentSecurityPolicy = [
   [
     "connect-src 'self' blob:",
     "https://api.github.com",
+    "https://api.anthropic.com",
+    "https://gateway.ai.cloudflare.com",
     "https://www.google-analytics.com",
     "https://analytics.google.com",
     "https://stats.g.doubleclick.net",

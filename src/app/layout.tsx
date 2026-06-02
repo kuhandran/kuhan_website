@@ -3,6 +3,9 @@ import dynamic from "next/dynamic";
 import { LanguageProvider } from "@/lib/hooks/useLanguageHook";
 import { ReadingProgress } from "@/components/elements/ReadingProgress";
 import { GA4Provider } from "@/components/analytics/GA4Provider";
+import { VisitorTracker } from "@/components/analytics/VisitorTracker";
+import { JDMatchProvider } from "@/lib/context/JDMatchContext";
+import { JDMatcherWidget } from "@/components/sections/JDMatcherWidget";
 import { getManifestUrl, DEFAULT_LANGUAGE } from "@/lib/config/domains";
 import { ServiceWorkerManager } from "@/pwa";
 import "@/styles/critical.css";
@@ -269,8 +272,12 @@ export default function RootLayout({
       </head>
       <body>
         <GA4Provider />
+        <VisitorTracker />
         <ReadingProgress />
-        <LanguageProvider>{children}</LanguageProvider>
+        <JDMatchProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+          <JDMatcherWidget />
+        </JDMatchProvider>
         <ServiceWorkerManager />
         <AnalyticsWrapper />
         <AnalyticsConsentBanner />

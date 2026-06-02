@@ -9,6 +9,7 @@ import { useSkills } from '../../lib/data/skills';
 import { useContentLabels } from '../../lib/data/contentLabels';
 import { useSectionDwell } from '@/lib/hooks/useSectionDwell';
 import { trackSkillView } from '@/lib/analytics/ga4';
+import { useJDMatch } from '@/lib/context/JDMatchContext';
 
 type SkillEntry = { name: string; level: number; color: string };
 type SkillsData = Record<string, { name: string; icon: string; skills: SkillEntry[] }>;
@@ -18,6 +19,7 @@ export const Skills = () => {
   const { contentLabels } = useContentLabels();
   const [activeTab, setActiveTab] = useState('frontend');
   const [view, setView] = useState<'list' | '3d'>('list');
+  const { result: jdMatch } = useJDMatch();
   useSectionDwell('skills');
 
   const typedSkillsData = skillsData as SkillsData;
@@ -135,15 +137,27 @@ export const Skills = () => {
                   </div>
 
                   <StaggerContainer className="grid md:grid-cols-2 gap-x-8 gap-y-1 mt-8">
-                    {activeSkills.map((skill, index) => (
-                      <StaggerItem key={index}>
-                        <SkillBar
-                          skillName={skill.name}
-                          level={skill.level}
-                          color={skill.color}
-                        />
-                      </StaggerItem>
-                    ))}
+                    {activeSkills.map((skill, index) => {
+                      const isRequired = jdMatch?.matchedSkills.some(
+                        m => m.toLowerCase() === skill.name.toLowerCase()
+                      );
+                      return (
+                        <StaggerItem key={index}>
+                          <div className="relative">
+                            {isRequired && (
+                              <span className="absolute -top-1 right-0 text-[9px] font-bold uppercase tracking-wider text-violet-600 bg-violet-50 border border-violet-200 px-1.5 py-0.5 rounded-full z-10">
+                                Required
+                              </span>
+                            )}
+                            <SkillBar
+                              skillName={skill.name}
+                              level={skill.level}
+                              color={skill.color}
+                            />
+                          </div>
+                        </StaggerItem>
+                      );
+                    })}
                   </StaggerContainer>
                 </Card>
               </ScrollReveal>

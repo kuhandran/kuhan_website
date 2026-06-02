@@ -7,10 +7,12 @@ import { useExperience } from '../../lib/data/experience';
 import { getStaticContentLabels } from '../../lib/data/contentLabels';
 import { useGeolocation } from '@/lib/hooks/useGeolocation';
 import { useSectionDwell } from '@/lib/hooks/useSectionDwell';
+import { useJDMatch } from '@/lib/context/JDMatchContext';
 
 export const Experience = () => {
   const { experience: experienceData, loading } = useExperience();
   const { geo } = useGeolocation();
+  const { result: jdMatch } = useJDMatch();
   useSectionDwell('experience', geo?.country);
   const [contentLabels, setContentLabels] = useState(getStaticContentLabels());
 
@@ -48,7 +50,13 @@ export const Experience = () => {
         <StaggerContainer className="max-w-3xl mx-auto mt-12 flex flex-col gap-6">
           {experienceData.map((exp, index) => (
             <StaggerItem key={index}>
-              <TimelineItem {...exp} isLeft={index % 2 === 0} visitorCountry={geo?.country} />
+              <TimelineItem
+                {...exp}
+                isLeft={index % 2 === 0}
+                visitorCountry={geo?.country}
+                jdMatchedSkills={jdMatch?.matchedSkills}
+                jdRelevantRoles={jdMatch?.relevantRoles}
+              />
             </StaggerItem>
           ))}
         </StaggerContainer>
