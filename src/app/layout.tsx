@@ -263,10 +263,6 @@ export default function RootLayout({
             }),
           }}
         />
-        <link
-          rel="sitemap"
-          href="https://www.kuhandranchatbot.info/sitemap.xml"
-        />
       </head>
       <body>
         <GA4Provider />
