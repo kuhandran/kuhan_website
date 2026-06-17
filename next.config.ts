@@ -55,7 +55,6 @@ const nextConfig: NextConfig = {
   /* Optimize for modern browsers - no legacy polyfills needed */
   experimental: {
     optimizePackageImports: ["lucide-react"],
-    optimizeCss: true, // Enable CSS optimization
   },
   /* Image optimization settings */
   images: {
