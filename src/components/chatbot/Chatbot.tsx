@@ -24,7 +24,6 @@ const DEFAULT_GREETING = "Hi! I'm Kuhandran's AI assistant. Ask me anything abou
 
 export function Chatbot() {
   const labels = defaultLabels?.chatbot;
-
   const [isOpen, setIsOpen]       = useState(false);
   const [step, setStep]           = useState<ChatbotStep>('email');
   const [email, setEmail]         = useState('');

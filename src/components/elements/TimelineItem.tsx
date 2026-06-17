@@ -16,8 +16,6 @@ interface TimelineItemProps {
   isLeft?: boolean;
   logo?: string;
   visitorCountry?: string;
-  jdMatchedSkills?: string[];
-  jdRelevantRoles?: string[];
 }
 
 const PREVIEW_COUNT = 2;
@@ -47,21 +45,10 @@ const TimelineItemInner = ({
   techStack,
   logo,
   visitorCountry,
-  jdMatchedSkills,
-  jdRelevantRoles,
 }: TimelineItemProps) => {
   const isCurrent      = duration.toLowerCase().includes('present');
   const relevanceBadge = getRelevanceBadge(visitorCountry ?? '');
-
-  // JD match — does this card's tech stack or company overlap with Claude's result?
-  const matchedTech = jdMatchedSkills
-    ? techStack.filter(t => jdMatchedSkills.some(s => s.toLowerCase() === t.toLowerCase()))
-    : [];
-  const isJDRelevant = jdRelevantRoles
-    ? jdRelevantRoles.some(r => company.toLowerCase().includes(r.toLowerCase()))
-    : false;
-  const hasJDMatch = matchedTech.length > 0 || isJDRelevant;
-  const items      = Array.isArray(description) ? description : [];
+  const items          = Array.isArray(description) ? description : [];
   const hasMore    = items.length > PREVIEW_COUNT;
   const [expanded, setExpanded] = useState(false);
 
@@ -118,12 +105,7 @@ const TimelineItemInner = ({
                   {relevanceBadge.text}
                 </span>
               )}
-              {hasJDMatch && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-                  JD Match
-                </span>
-              )}
+
               <span className="inline-flex items-center gap-1 text-xs text-slate-500">
                 <Calendar size={11} className="text-slate-400" />{duration}
               </span>
@@ -200,16 +182,9 @@ const TimelineItemInner = ({
             ${isCurrent ? 'border-blue-100 bg-blue-50/50' : 'border-slate-100 bg-slate-50/70'}`}
         >
           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 self-center mr-1">Stack</span>
-          {techStack.map((tech, i) => {
-            const isMatched = matchedTech.some(m => m.toLowerCase() === tech.toLowerCase());
-            return isMatched ? (
-              <span key={i} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-700 border border-violet-300 ring-1 ring-violet-200">
-                ✓ {tech}
-              </span>
-            ) : (
-              <Badge key={i} variant={isCurrent ? 'blue' : 'gray'} size="sm">{tech}</Badge>
-            );
-          })}
+          {techStack.map((tech, i) => (
+            <Badge key={i} variant={isCurrent ? 'blue' : 'gray'} size="sm">{tech}</Badge>
+          ))}
         </div>
       )}
     </div>

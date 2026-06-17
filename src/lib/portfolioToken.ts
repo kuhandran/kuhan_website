@@ -5,6 +5,8 @@
  */
 
 const AUTH_SERVICE = 'https://auth-services.kuhandranchatbot.info';
+// In production NEXT_PUBLIC_SITE_URL must be set to the live domain so the auth
+// service's origin allowlist accepts the request.
 const ORIGIN       = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.kuhandranchatbot.info';
 
 interface TokenResponse {

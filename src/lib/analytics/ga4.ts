@@ -63,16 +63,3 @@ export function trackProjectClick(title: string, action: 'case_study' | 'live' |
     action_type: action,
   });
 }
-
-// ── AI feature events (Phase 3) ───────────────────────────────────────────────
-
-/** Job description matcher result */
-export function trackJDMatch(matched: number, total: number, country = 'unknown') {
-  fire('jd_match', {
-    event_category: 'ai_feature',
-    matched_skills: matched,
-    total_skills: total,
-    match_rate: total > 0 ? Math.round((matched / total) * 100) : 0,
-    country,
-  });
-}
