@@ -1,5 +1,3 @@
-const BASE = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL ?? 'https://auth-services.kuhandranchatbot.info';
-
 export interface OtpResult {
   ok: boolean;
   message?: string;
@@ -15,7 +13,7 @@ export interface VerifyOtpResult {
 
 export async function sendOtp(identifier: string, captchaToken: string): Promise<OtpResult> {
   try {
-    const res = await fetch(`${BASE}/generate-otp`, {
+    const res = await fetch('/api/auth/generate-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier, captchaToken }),
@@ -29,7 +27,7 @@ export async function sendOtp(identifier: string, captchaToken: string): Promise
 
 export async function verifyOtp(identifier: string, otp: string): Promise<VerifyOtpResult> {
   try {
-    const res = await fetch(`${BASE}/authorise-otp`, {
+    const res = await fetch('/api/auth/authorise-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier, otp }),

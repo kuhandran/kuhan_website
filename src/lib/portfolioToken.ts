@@ -28,7 +28,11 @@ export async function getPortfolioToken(): Promise<string> {
   }
 
   const res = await fetch(`${AUTH_SERVICE}/portfolio/token`, {
-    headers: { Origin: ORIGIN },
+    headers: {
+      'Origin': ORIGIN,
+      'User-Agent': 'Mozilla/5.0 (compatible; NextJS/SSR)',
+      'Accept': 'application/json',
+    },
     // No caching — we manage expiry ourselves
     cache: 'no-store',
   });

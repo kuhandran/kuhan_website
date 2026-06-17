@@ -1,5 +1,3 @@
-const BASE = process.env.NEXT_PUBLIC_CHAT_SERVICE_URL ?? 'https://chat-services.kuhandranchatbot.info';
-
 export interface TokenResult {
   ok: boolean;
   accessToken?: string;
@@ -16,7 +14,7 @@ export interface ChatResult {
 
 export async function generateToken(identifier: string, sessionToken: string): Promise<TokenResult> {
   try {
-    const res = await fetch(`${BASE}/generate-token`, {
+    const res = await fetch('/api/chat/generate-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier, sessionToken }),
@@ -34,7 +32,7 @@ export async function sendMessage(
   sessionId?: string
 ): Promise<ChatResult> {
   try {
-    const res = await fetch(`${BASE}/chat`, {
+    const res = await fetch('/api/chat/send', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
