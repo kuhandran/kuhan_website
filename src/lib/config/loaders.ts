@@ -37,7 +37,10 @@ export async function loadUrlConfig(language: string = DEFAULT_LANGUAGE): Promis
   urlConfigPromise = (async () => {
     try {
       const urlConfigUrl = getCollectionUrl(language as SupportedLanguage, 'config', DATA_FILES.urlConfig);
-      const response = await fetch(urlConfigUrl);
+      const response = await fetch(urlConfigUrl, {
+        headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0 (compatible; NextJS/SSR)' },
+        next: { revalidate: 3600 },
+      });
       if (!response.ok) throw new Error('Failed to load URL config');
       cachedUrlConfig = await response.json();
       return cachedUrlConfig;
@@ -198,8 +201,14 @@ export async function fetchPageLayout() {
       // Fetch from external API
       const url = `${getApiBaseUrl()}${getConfigUrl('pageLayout', DEFAULT_LANGUAGE)}`;
       
-      const response = await fetch(url);
-      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (compatible; NextJS/SSR)',
+        },
+        next: { revalidate: 3600 },
+      });
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('[Loaders] pageLayout HTTP error:', response.status, response.statusText, errorText);
@@ -269,7 +278,10 @@ export async function fetchApiConfig() {
     try {
       // Fetch from external API
       const url = `${getApiBaseUrl()}${getConfigUrl('apiConfig', DEFAULT_LANGUAGE)}`;
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0 (compatible; NextJS/SSR)' },
+        next: { revalidate: 3600 },
+      });
       if (!response.ok) throw new Error(getErrorMessageSync('data.httpError', `HTTP error! status: ${response.status}`));
       
       const data = await response.json();
