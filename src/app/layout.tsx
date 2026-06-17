@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Viewport } from "next";
 import dynamic from "next/dynamic";
 import { LanguageProvider } from "@/lib/hooks/useLanguageHook";
 import { ReadingProgress } from "@/components/elements/ReadingProgress";
@@ -97,6 +98,13 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Kuhandran SamudraPandiyan",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#3b82f6",
 };
 
 export default function RootLayout({
