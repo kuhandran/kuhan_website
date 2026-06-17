@@ -4,6 +4,8 @@ import { PageRenderer } from '../components/renderers/PageRenderer';
 import { getPageLayoutConfig } from '@/lib/config/pageLayout';
 import { initializeContentLabels } from '@/lib/data/contentLabels';
 
+export const revalidate = 3600; // Re-fetch CDN config at most once per hour
+
 /**
  * Home Page - Server-Side Rendered
  * Fetches all data on server from static API
