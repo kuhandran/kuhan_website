@@ -39,7 +39,7 @@ export const API_ENDPOINTS = {
   configRoute: (language: string, configType: string) =>
     `${DOMAINS.PRODUCTION_API}/public/config/${language}/${configType}`,
   manifestRoute: (language: string = DEFAULT_LANGUAGE) =>
-    `${DOMAINS.PRODUCTION_API}/public/manifest/${language}.json`,
+    `/api/manifest/${language}`,
   // CDN paths
   cdnData: (file: string) =>
     `${DOMAINS.CDN}/public/collections/en/data/${file}.json`,

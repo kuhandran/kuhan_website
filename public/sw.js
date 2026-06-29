@@ -4,7 +4,7 @@
  */
 
 // Cache version - increment when updating caching strategy
-const CACHE_VERSION = 'v1.0.5';
+const CACHE_VERSION = 'v1.0.6';
 const CACHE_NAMES = {
   STATIC: `${CACHE_VERSION}-static`,
   API: `${CACHE_VERSION}-api`,

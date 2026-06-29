@@ -31,82 +31,88 @@ interface NodeDef {
 }
 
 const NODES: NodeDef[] = [
+  // ── LEFT: entry path ──────────────────────────────────────────
   {
     id: 'user',
-    cx: 60, cy: 300,
+    cx: 55, cy: 290,
     label: 'User Browser', sub: 'Client',
     color: '#94a3b8', border: '#475569', glow: '#47556940', bg: '#0f172a',
     Icon: Monitor,
   },
   {
     id: 'dns',
-    cx: 240, cy: 300,
+    cx: 225, cy: 290,
     label: 'Cloudflare DNS', sub: 'DNS · CDN',
     color: '#fb923c', border: '#f97316', glow: '#f9731640', bg: '#1c0900',
     Icon: Globe,
   },
+  // ── CENTRE: Amplify is the hub ────────────────────────────────
+  // GA4 sits directly above Amplify to show it monitors the UI layer
+  {
+    id: 'ga4',
+    cx: 430, cy: 52,
+    label: 'Google Analytics', sub: 'Traffic Monitor',
+    color: '#facc15', border: '#eab308', glow: '#eab30840', bg: '#181000',
+    Icon: BarChart3,
+  },
   {
     id: 'amplify',
-    cx: 450, cy: 150,
+    cx: 430, cy: 290,
     label: 'AWS Amplify', sub: 'UI Hosting',
     color: '#fbbf24', border: '#f59e0b', glow: '#f59e0b40', bg: '#181000',
     Icon: Layers,
   },
+  // ── RIGHT column (top → middle → bottom) ─────────────────────
   {
     id: 'r2',
-    cx: 720, cy: 75,
+    cx: 660, cy: 120,
     label: 'Cloudflare R2', sub: 'Static Assets',
     color: '#fb923c', border: '#f97316', glow: '#f9731640', bg: '#1c0900',
     Icon: HardDrive,
   },
   {
     id: 'workers',
-    cx: 720, cy: 390,
+    cx: 660, cy: 290,
     label: 'CF Workers API', sub: 'API · JWT Auth',
     color: '#fb923c', border: '#f97316', glow: '#f9731640', bg: '#1c0900',
     Icon: Cpu,
   },
   {
     id: 'chatbot',
-    cx: 450, cy: 460,
+    cx: 660, cy: 455,
     label: 'Chatbot Worker', sub: 'AI Endpoint',
     color: '#a78bfa', border: '#8b5cf6', glow: '#8b5cf640', bg: '#0e0520',
     Icon: MessageSquare,
   },
+  // ── BOTTOM row: shared services (JWT used by BOTH Workers & Chatbot) ──
   {
     id: 'jwt',
-    cx: 590, cy: 540,
+    cx: 530, cy: 545,
     label: 'JWT · Session', sub: 'Auth Layer',
     color: '#34d399', border: '#10b981', glow: '#10b98140', bg: '#001510',
     Icon: Shield,
   },
   {
     id: 'r1db',
-    cx: 760, cy: 540,
+    cx: 720, cy: 545,
     label: 'R1 Database', sub: 'Data Storage',
     color: '#38bdf8', border: '#0ea5e9', glow: '#0ea5e940', bg: '#001220',
     Icon: Database,
   },
   {
     id: 'kv',
-    cx: 930, cy: 540,
+    cx: 870, cy: 545,   // pulled left vs 920 so card doesn't clip
     label: 'Cloudflare KV', sub: 'Token Cache',
     color: '#fb923c', border: '#f97316', glow: '#f9731640', bg: '#1c0900',
     Icon: Archive,
   },
+  // ── FAR RIGHT: Claude — reachable only after Chatbot JWT auth ─
   {
     id: 'claude',
-    cx: 930, cy: 280,
+    cx: 870, cy: 370,   // pulled left vs 920 so card doesn't clip
     label: 'Claude LLM', sub: 'Anthropic AI',
     color: '#c084fc', border: '#a855f7', glow: '#a855f740', bg: '#0e0520',
     Icon: Brain,
-  },
-  {
-    id: 'ga4',
-    cx: 890, cy: 48,
-    label: 'Google Analytics', sub: 'Traffic Monitor',
-    color: '#facc15', border: '#eab308', glow: '#eab30840', bg: '#181000',
-    Icon: BarChart3,
   },
 ];
 
@@ -123,16 +129,24 @@ interface EdgeDef {
 }
 
 const EDGES: EdgeDef[] = [
-  { id: 'e1',  from: 'user',    to: 'dns',     label: 'HTTPS Request',  color: '#94a3b8', delay: 0.1 },
-  { id: 'e2',  from: 'dns',     to: 'amplify', label: 'Route → UI',     color: '#fbbf24', delay: 0.4 },
-  { id: 'e3',  from: 'dns',     to: 'workers', label: 'Route → API',    color: '#fb923c', delay: 0.4 },
-  { id: 'e4',  from: 'dns',     to: 'chatbot', label: 'Route → AI',     color: '#a78bfa', delay: 0.4 },
-  { id: 'e5',  from: 'amplify', to: 'r2',      label: 'Fetch Assets',   color: '#fb923c', delay: 0.8 },
-  { id: 'e6',  from: 'workers', to: 'jwt',     label: 'Issue JWT',      color: '#34d399', delay: 1.1 },
-  { id: 'e7',  from: 'workers', to: 'r1db',    label: 'Query DB',       color: '#38bdf8', delay: 1.1 },
-  { id: 'e8',  from: 'workers', to: 'kv',      label: 'Cache Token',    color: '#fb923c', delay: 1.1 },
-  { id: 'e9',  from: 'chatbot', to: 'claude',  label: 'LLM Request',    color: '#c084fc', delay: 1.4 },
-  { id: 'e10', from: 'ga4',     to: 'amplify', label: 'Monitor Traffic',color: '#facc15', dashed: true, delay: 1.7 },
+  // ── 1. Entry chain ──────────────────────────────────────────
+  { id: 'e1',  from: 'user',    to: 'dns',     label: 'HTTPS Request',   color: '#94a3b8', delay: 0.1 },
+  { id: 'e2',  from: 'dns',     to: 'amplify', label: 'Load UI',         color: '#fbbf24', delay: 0.4 },
+  // ── 2. Amplify fans out to all three right-column services ──
+  { id: 'e3',  from: 'amplify', to: 'r2',      label: 'Fetch Assets',    color: '#fb923c', delay: 0.8 },
+  { id: 'e4',  from: 'amplify', to: 'workers', label: 'API Calls',       color: '#fb923c', delay: 0.8 },
+  { id: 'e5',  from: 'amplify', to: 'chatbot', label: 'Open Chatbot',    color: '#a78bfa', delay: 0.8 },
+  // ── 3. CF Workers → storage / auth ──────────────────────────
+  { id: 'e6',  from: 'workers', to: 'jwt',     label: 'Issue JWT',       color: '#34d399', delay: 1.2 },
+  { id: 'e7',  from: 'workers', to: 'r1db',    label: 'Query DB',        color: '#38bdf8', delay: 1.2 },
+  { id: 'e8',  from: 'workers', to: 'kv',      label: 'Cache Token',     color: '#fb923c', delay: 1.2 },
+  // ── 4. Chatbot: authenticate first, THEN call Claude ────────
+  // Step 1 — Chatbot validates JWT via the shared CF Workers auth layer
+  { id: 'e9',  from: 'chatbot', to: 'jwt',     label: 'JWT Auth ①',     color: '#34d399', delay: 1.5 },
+  // Step 2 — Only after JWT passes, Chatbot calls Claude LLM
+  { id: 'e10', from: 'chatbot', to: 'claude',  label: 'LLM Call ②',     color: '#c084fc', delay: 1.9 },
+  // ── 5. GA4 monitors Amplify (dashed overlay) ────────────────
+  { id: 'e11', from: 'ga4',     to: 'amplify', label: 'Monitor Traffic', color: '#facc15', dashed: true, delay: 2.2 },
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -174,7 +188,6 @@ const nodeVar: Variants = {
 export function SiteTechStack() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
-
   return (
     <section
       id="site-tech-stack"
@@ -299,13 +312,14 @@ export function SiteTechStack() {
                   );
                 })}
 
-                {/* ── Animated data packets ── */}
-                {inView && EDGES.map((e, i) => (
+                {/* ── Animated data packets (always rendered; visibility via opacity) ── */}
+                {EDGES.map((e, i) => (
                   <circle
                     key={`pkt-${e.id}`}
                     r={5}
                     fill={e.color}
                     filter="url(#glow)"
+                    opacity={inView ? 1 : 0}
                   >
                     <animateMotion
                       dur={`${PKT_DUR[i % PKT_DUR.length]}s`}
@@ -317,8 +331,8 @@ export function SiteTechStack() {
                   </circle>
                 ))}
 
-                {/* ── Node pulse rings ── */}
-                {inView && NODES.map(node => (
+                {/* ── Node pulse rings (always rendered; visibility via opacity) ── */}
+                {NODES.map((node, ni) => (
                   <circle
                     key={`pulse-${node.id}`}
                     cx={node.cx}
@@ -333,15 +347,15 @@ export function SiteTechStack() {
                       attributeName="r"
                       from="18" to="36"
                       dur="2.4s"
-                      repeatCount="indefinite"
-                      begin={`${NODES.indexOf(node) * 0.22}s`}
+                      repeatCount={inView ? 'indefinite' : '0'}
+                      begin={`${ni * 0.22}s`}
                     />
                     <animate
                       attributeName="opacity"
                       from="0.4" to="0"
                       dur="2.4s"
-                      repeatCount="indefinite"
-                      begin={`${NODES.indexOf(node) * 0.22}s`}
+                      repeatCount={inView ? 'indefinite' : '0'}
+                      begin={`${ni * 0.22}s`}
                     />
                   </circle>
                 ))}

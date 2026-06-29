@@ -1,12 +1,17 @@
 'use client';
 
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
+import dynamic from 'next/dynamic';
 import { PageLayoutConfig, SectionConfig } from '@/lib/config/types';
 import { SectionRenderer } from './SectionRenderer';
 import { CustomSectionRenderer } from './CustomSectionRenderer';
 
-const LazySiteTechStack = lazy(() =>
-  import('@/components/sections/SiteTechStack').then(m => ({ default: m.SiteTechStack }))
+const LazySiteTechStack = dynamic(
+  () => import('@/components/sections/SiteTechStack').then(m => ({ default: m.SiteTechStack })),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-64 bg-slate-950 animate-pulse" />,
+  }
 );
 
 interface PageRendererProps {
@@ -23,11 +28,7 @@ export const PageRenderer: React.FC<PageRendererProps> = ({ config }) => {
     // Inject SiteTechStack once, immediately before the Contact section
     if (isContact && !techStackInserted) {
       techStackInserted = true;
-      nodes.push(
-        <Suspense key="site-tech-stack" fallback={<div className="w-full h-64 bg-slate-950 animate-pulse" />}>
-          <LazySiteTechStack />
-        </Suspense>
-      );
+      nodes.push(<LazySiteTechStack key="site-tech-stack" />);
     }
 
     if (section.custom?.renderAsCustom) {

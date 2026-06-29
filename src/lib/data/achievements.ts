@@ -28,7 +28,7 @@ export interface AchievementsData {
   certifications: Certification[];
 }
 
-const FALLBACK: AchievementsData = {
+export const FALLBACK_ACHIEVEMENTS: AchievementsData = {
   awards: [
     {
       name: 'ACS Skills Assessment',
@@ -134,10 +134,10 @@ export async function fetchAchievementsData(
     const certifications = Array.isArray(data.certifications) ? data.certifications : [];
 
     return {
-      awards:         awards.length         > 0 ? awards         : FALLBACK.awards,
-      certifications: certifications.length  > 0 ? certifications : FALLBACK.certifications,
+      awards:         awards.length         > 0 ? awards         : FALLBACK_ACHIEVEMENTS.awards,
+      certifications: certifications.length  > 0 ? certifications : FALLBACK_ACHIEVEMENTS.certifications,
     };
   } catch {
-    return FALLBACK;
+    return FALLBACK_ACHIEVEMENTS;
   }
 }
