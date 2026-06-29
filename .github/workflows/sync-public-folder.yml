@@ -16,14 +16,14 @@ jobs:
     
     steps:
       - name: Checkout kuhan_website
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: kuhandran/kuhan_website
           token: ${{ secrets.GITHUB_TOKEN }}
           path: kuhan_website
 
       - name: Checkout portfolio-data-api
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: kuhandran/portfolio-data-api
           token: ${{ secrets.PAT_TOKEN }}  # Use PAT for private repo access

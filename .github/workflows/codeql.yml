@@ -17,7 +17,7 @@ on:
 
 env:
   # Set node version (Next.js 16 requires Node.js >=20.9.0)
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 permissions:
   # Required for all workflows
