@@ -1,0 +1,7 @@
+Contact: mailto:kuhandransamdurapandiyan@gmail.com
+Contact: https://www.kuhandranchatbot.info/#contact
+Expires: 2027-06-29T00:00:00.000Z
+Canonical: https://www.kuhandranchatbot.info/.well-known/security.txt
+Hiring: https://www.kuhandranchatbot.info/#contact
+Policy: https://www.kuhandranchatbot.info/#contact
+Preferred-Languages: en
