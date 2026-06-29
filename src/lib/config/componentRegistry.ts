@@ -51,11 +51,14 @@ const LazyProjects = lazy(() => import('@/components/sections/Projects').then(m 
 const LazyExperience = lazy(() => import('@/components/sections/Experience').then(m => ({ default: m.Experience })));
 
 // Heavy components: only loaded when needed
-const LazyEducation = lazy(() => 
+const LazyEducation = lazy(() =>
   import('@/components/sections/Education').then(m => ({ default: m.Education }))
 );
-const LazyAchievements = lazy(() => 
+const LazyAchievements = lazy(() =>
   import('@/components/sections/Achievements').then(m => ({ default: m.Achievements }))
+);
+const LazySiteTechStack = lazy(() =>
+  import('@/components/sections/SiteTechStack').then(m => ({ default: m.SiteTechStack }))
 );
 
 // ============================================
@@ -148,6 +151,7 @@ export const sectionRegistry: Record<string, React.LazyExoticComponent<ReactComp
   Experience: LazyExperience,
   Education: LazyEducation,
   Achievements: LazyAchievements,
+  SiteTechStack: LazySiteTechStack,
 };
 
 /**

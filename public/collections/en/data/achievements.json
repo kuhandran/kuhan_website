@@ -1,0 +1,90 @@
+{
+  "awards": [
+    {
+      "name": "ACS Skills Assessment",
+      "organization": "Australian Computer Society (ACS)",
+      "year": "2024",
+      "icon": "🇦🇺",
+      "description": "Positively assessed by the Australian Computer Society — the authoritative body for ICT professionals in Australia. Qualifies for skilled migration visa subclasses 189, 190, and 491, enabling direct employment at Australian banks and technology firms."
+    },
+    {
+      "name": "Technical Delivery Excellence",
+      "organization": "FWD Technology and Innovation Malaysia Sdn. Bhd",
+      "year": "2023",
+      "icon": "🏆",
+      "description": "Recognised for outstanding technical leadership and delivery of enterprise-grade insurance platform features serving millions of FWD customers across Malaysia."
+    },
+    {
+      "name": "Digital Transformation Champion",
+      "organization": "Maybank Shared Services",
+      "year": "2021",
+      "icon": "🎯",
+      "description": "Awarded for leading the successful modernisation of critical banking workflows and delivering high-impact data visualisation dashboards with Power BI for Maybank Malaysia."
+    },
+    {
+      "name": "Best Innovation Project",
+      "organization": "INTI International University",
+      "year": "2016",
+      "icon": "⭐",
+      "description": "Received best project recognition during undergraduate studies for building an automated academic scheduling system, demonstrating early passion for enterprise software solutions."
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Master of Business Administration (MBA)",
+      "provider": "Cardiff Metropolitan University, Wales, UK",
+      "year": "2022",
+      "icon": "🎓",
+      "credentialUrl": "https://www.cardiffmet.ac.uk"
+    },
+    {
+      "name": "Bachelor of Computer Science",
+      "provider": "University of Wollongong (UOW) — Australian University",
+      "year": "2017",
+      "icon": "🎓",
+      "credentialUrl": "https://www.uow.edu.au"
+    },
+    {
+      "name": "IELTS — International English Language Testing System",
+      "provider": "British Council / IDP — Band 6.0 and above",
+      "year": "2024",
+      "icon": "🌐",
+      "credentialUrl": "https://www.ielts.org"
+    },
+    {
+      "name": "React & React Native Developer",
+      "provider": "Meta / Coursera",
+      "year": "2023",
+      "icon": "⚛️",
+      "credentialUrl": "https://www.coursera.org"
+    },
+    {
+      "name": "Microsoft Power BI Data Analyst",
+      "provider": "Microsoft",
+      "year": "2022",
+      "icon": "📊",
+      "credentialUrl": "https://learn.microsoft.com/en-us/certifications/power-bi-data-analyst-associate/"
+    },
+    {
+      "name": "AWS Cloud Practitioner",
+      "provider": "Amazon Web Services",
+      "year": "2023",
+      "icon": "☁️",
+      "credentialUrl": "https://aws.amazon.com/certification/certified-cloud-practitioner/"
+    },
+    {
+      "name": "Agile Project Management (PMI-ACP)",
+      "provider": "Project Management Institute",
+      "year": "2021",
+      "icon": "🏃",
+      "credentialUrl": "https://www.pmi.org/certifications/agile-acp"
+    },
+    {
+      "name": "Oracle Certified Associate — Java SE 8",
+      "provider": "Oracle University",
+      "year": "2019",
+      "icon": "☕",
+      "credentialUrl": "https://www.oracle.com/certification/"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 // All section components
+export { SiteTechStack } from './SiteTechStack';
 export { About } from './About';
 export { Achievements } from './Achievements';
 export { Contact } from './Contact';

@@ -1,12 +1,13 @@
 /**
  * Achievements Data
- * Loaded from: /data/achievements.json (dev) or https://static.kuhandranchatbot.info/public/collections/{language}/data/achievements (prod)
+ * Uses fetchCollectionData — reads from local public/collections/en/data/achievements.json
+ * on the server side, and falls back to CDN on the client.
  */
 
-import { getDataSourceUrl } from '@/lib/config/loaders';
-import { DEFAULT_LANGUAGE } from '@/lib/config/domains';
+import { fetchCollectionData } from '@/lib/api/fetchers';
+import { DEFAULT_LANGUAGE, SupportedLanguage } from '@/lib/config/domains';
 
-interface Award {
+export interface Award {
   name: string;
   organization: string;
   year: string;
@@ -14,7 +15,7 @@ interface Award {
   description: string;
 }
 
-interface Certification {
+export interface Certification {
   name: string;
   provider: string;
   year: string;
@@ -22,118 +23,121 @@ interface Certification {
   credentialUrl: string;
 }
 
-interface AchievementsData {
+export interface AchievementsData {
   awards: Award[];
   certifications: Certification[];
 }
 
-const EMPTY_ACHIEVEMENTS: AchievementsData = {
-  awards: [],
-  certifications: []
-};
-
-// Default/fallback achievements data
-const DEFAULT_ACHIEVEMENTS: AchievementsData = {
+const FALLBACK: AchievementsData = {
   awards: [
     {
-      name: 'Developer of the Year',
-      organization: 'Tech Innovation Awards 2023',
+      name: 'ACS Skills Assessment',
+      organization: 'Australian Computer Society (ACS)',
+      year: '2024',
+      icon: '🇦🇺',
+      description:
+        'Positively assessed by the ACS — qualifies for Australian skilled migration visa subclasses 189, 190 and 491.',
+    },
+    {
+      name: 'Technical Delivery Excellence',
+      organization: 'FWD Technology and Innovation Malaysia Sdn. Bhd',
       year: '2023',
       icon: '🏆',
-      description: 'Recognized for outstanding contributions to full-stack development and innovative solutions'
+      description:
+        'Recognised for outstanding technical leadership delivering enterprise insurance platform features for millions of FWD customers.',
     },
     {
-      name: 'Best Technical Implementation',
-      organization: 'Architecture Excellence Program',
-      year: '2024',
+      name: 'Digital Transformation Champion',
+      organization: 'Maybank Shared Services',
+      year: '2021',
       icon: '🎯',
-      description: 'Award for best system design and technical implementation in enterprise solutions'
+      description:
+        'Awarded for leading banking workflow modernisation and high-impact Power BI dashboards for Maybank Malaysia.',
     },
     {
-      name: 'Community Leadership Award',
-      organization: 'Open Source Community',
-      year: '2024',
+      name: 'Best Innovation Project',
+      organization: 'INTI International University',
+      year: '2016',
       icon: '⭐',
-      description: 'Recognition for leading and mentoring developers in the open source community'
-    }
+      description:
+        'Best project recognition for an automated academic scheduling system during undergraduate studies.',
+    },
   ],
   certifications: [
     {
-      name: 'AWS Certified Solutions Architect',
-      provider: 'Amazon Web Services',
+      name: 'Master of Business Administration (MBA)',
+      provider: 'Cardiff Metropolitan University, Wales, UK',
+      year: '2022',
+      icon: '🎓',
+      credentialUrl: 'https://www.cardiffmet.ac.uk',
+    },
+    {
+      name: 'Bachelor of Computer Science',
+      provider: 'University of Wollongong (UOW) — Australian University',
+      year: '2017',
+      icon: '🎓',
+      credentialUrl: 'https://www.uow.edu.au',
+    },
+    {
+      name: 'IELTS — English Proficiency (Band 6.0+)',
+      provider: 'British Council / IDP',
       year: '2024',
-      icon: '☁️',
-      credentialUrl: 'https://aws.amazon.com/certification/'
+      icon: '🌐',
+      credentialUrl: 'https://www.ielts.org',
     },
     {
-      name: 'Google Cloud Professional Data Engineer',
-      provider: 'Google Cloud',
+      name: 'React & React Native Developer',
+      provider: 'Meta / Coursera',
       year: '2023',
+      icon: '⚛️',
+      credentialUrl: 'https://www.coursera.org',
+    },
+    {
+      name: 'Microsoft Power BI Data Analyst',
+      provider: 'Microsoft',
+      year: '2022',
       icon: '📊',
-      credentialUrl: 'https://cloud.google.com/certification'
+      credentialUrl: 'https://learn.microsoft.com/en-us/certifications/power-bi-data-analyst-associate/',
     },
     {
-      name: 'Oracle Certified Associate Java Programmer',
-      provider: 'Oracle University',
+      name: 'AWS Cloud Practitioner',
+      provider: 'Amazon Web Services',
       year: '2023',
+      icon: '☁️',
+      credentialUrl: 'https://aws.amazon.com/certification/certified-cloud-practitioner/',
+    },
+    {
+      name: 'Agile Project Management (PMI-ACP)',
+      provider: 'Project Management Institute',
+      year: '2021',
+      icon: '🏃',
+      credentialUrl: 'https://www.pmi.org/certifications/agile-acp',
+    },
+    {
+      name: 'Oracle Certified Associate — Java SE 8',
+      provider: 'Oracle University',
+      year: '2019',
       icon: '☕',
-      credentialUrl: 'https://www.oracle.com/certification/'
-    }
-  ]
+      credentialUrl: 'https://www.oracle.com/certification/',
+    },
+  ],
 };
 
-const cachedData: Map<string, AchievementsData> = new Map();
-
-export async function fetchAchievementsData(language: string = DEFAULT_LANGUAGE): Promise<AchievementsData> {
-  // Check cache for this language
-  if (cachedData.has(language)) {
-    return cachedData.get(language)!;
-  }
-  
+export async function fetchAchievementsData(
+  language: SupportedLanguage = DEFAULT_LANGUAGE
+): Promise<AchievementsData> {
   try {
-    const DATA_URL = getDataSourceUrl('achievements', language);
-    const response = await fetch(DATA_URL);
-    if (!response.ok) return DEFAULT_ACHIEVEMENTS;
-    const responseData = await response.json();
-    
-    // Extract data from various response formats:
-    // - { content: { awards: [], certifications: [] } } (API wrapper)
-    // - { data: { awards: [], certifications: [] } } (alternative wrapper)
-    // - { awards: [], certifications: [] } (direct data)
-    let result = responseData.content || responseData.data || responseData;
-    
-    // Ensure we have the right structure
-    if (result && typeof result === 'object' && !Array.isArray(result)) {
-      // If result is wrapped with metadata, try to extract the actual data
-      if ('awards' in result || 'certifications' in result) {
-        // Already has the right structure
-      } else if ('data' in result) {
-        result = result.data;
-      } else if ('content' in result) {
-        result = result.content;
-      }
-    }
-    
-    // Validate structure
-    if (!result || typeof result !== 'object' || Array.isArray(result)) {
-      console.warn('[Achievements] Invalid response structure:', result);
-      return DEFAULT_ACHIEVEMENTS;
-    }
-    
-    const resultObj = result as Record<string, unknown>;
-    const awards = Array.isArray(resultObj.awards) ? (resultObj.awards as Award[]) : [];
-    const certifications = Array.isArray(resultObj.certifications) ? (resultObj.certifications as Certification[]) : [];
-    
-    // Use default data if API returns empty
-    const validatedResult: AchievementsData = {
-      awards: awards.length > 0 ? awards : DEFAULT_ACHIEVEMENTS.awards,
-      certifications: certifications.length > 0 ? certifications : DEFAULT_ACHIEVEMENTS.certifications
+    const raw = await fetchCollectionData<Record<string, unknown>>('achievements', language);
+    const data = raw as unknown as AchievementsData;
+
+    const awards = Array.isArray(data.awards) ? data.awards : [];
+    const certifications = Array.isArray(data.certifications) ? data.certifications : [];
+
+    return {
+      awards:         awards.length         > 0 ? awards         : FALLBACK.awards,
+      certifications: certifications.length  > 0 ? certifications : FALLBACK.certifications,
     };
-    
-    cachedData.set(language, validatedResult);
-    return validatedResult;
-  } catch (error) {
-    console.error('[Achievements] Failed to fetch:', error);
-    return DEFAULT_ACHIEVEMENTS;
+  } catch {
+    return FALLBACK;
   }
 }
