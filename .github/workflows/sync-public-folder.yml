@@ -8,41 +8,37 @@ on:
     paths:
       - 'public/**'
       - '.github/workflows/sync-public-folder.yml'
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout kuhan_website
         uses: actions/checkout@v4
         with:
-          repository: kuhandran/kuhan_website
-          token: ${{ secrets.GITHUB_TOKEN }}
           path: kuhan_website
 
       - name: Checkout portfolio-data-api
         uses: actions/checkout@v4
         with:
           repository: kuhandran/portfolio-data-api
-          token: ${{ secrets.PAT_TOKEN }}  # Use PAT for private repo access
+          token: ${{ secrets.PAT_TOKEN }}
           path: portfolio-data-api
 
       - name: Sync public folder
         run: |
           echo "Syncing public folder from kuhan_website to portfolio-data-api..."
-          
-          # Create public folder in api repo if it doesn't exist
           mkdir -p portfolio-data-api/public
-          
-          # Copy public folder contents
           rsync -av --delete \
             --exclude '.gitkeep' \
             --exclude 'node_modules' \
             --exclude '.next' \
             kuhan_website/public/ portfolio-data-api/public/
-          
           echo "✓ Sync completed successfully"
 
       - name: Commit and push changes
@@ -50,15 +46,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Check if there are changes
           if git diff --quiet && git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-          
           git add public/
-          git commit -m "Sync public folder from kuhan_website [automated]" || true
-          git push origin main || git push origin master || echo "Failed to push, checking branch..."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git commit -m "Sync public folder from kuhan_website [automated]"
+          git push origin HEAD
